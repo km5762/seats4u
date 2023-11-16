@@ -1,38 +1,75 @@
-.App {
-  text-align: center;
+/* Login Page Role Selection */
+.circle {
+  width: 10px;
+  height: 10px;
+  border: 1px solid #000;
+  border-radius: 50%;
+  margin: 2px;
+  display: inline-block;
+  cursor: pointer;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.filled {
+  background-color: #000;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* App Logo */
+.center-container {
+  text-align: center; /* Center the content horizontally */
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.left-container {
+  text-align: left; /* Center the content horizontally */
+  margin-left: 200px;
 }
 
-.App-link {
-  color: #61dafb;
+.lSection {
+  position: absolute;
+  top: 300px;
+  right: 600px;
+  margin: 20px; /* Optional: Add margin for spacing */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.cSection {
+  position: absolute;
+  top: 300px;
+  right: 400px;
+  margin: 20px; /* Optional: Add margin for spacing */
 }
+
+.rSection {
+  position: absolute;
+  top: 300px;
+  right: 200px;
+  margin: 20px; /* Optional: Add margin for spacing */
+}
+
+.right-container {
+  position: absolute;
+  top: 200px;
+  right: 350px;
+  margin: 20px; /* Optional: Add margin for spacing */
+}
+
+
+.center-image {
+  margin: auto; /* Center the image horizontally */
+  display: block; /* Ensure the image is treated as a block element */
+}
+
+/* Log in link*/
+.upper-right-text {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 20px; /* Optional: Add margin for spacing */
+}
+
+/* switch view */
+.lower-right-text {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin: 20px; /* Optional: Add margin for spacing */
+}
+
