@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { createVenueC, deleteVenueC } from '../controller/Controller';
+import { createVenueC, deleteVenueC, createShowC } from '../controller/Controller';
 import BlockCanvas from '../boundary/Boundary';
 
 const ManagerHome = ({ loggedInUser, onLogout }) => {
@@ -28,7 +28,14 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
    const deleteVenue = () => {
         deleteVenueC();
         setVenueCreating(false);
-        setVenueCreated(true);
+        setVenueCreated(false);
+        setVenueName('');
+        setLeftRow('');
+        setLeftCol('');
+        setRightRow('');
+        setRightCol('');
+        setCenterRow('');
+        setCenterCol('');
     };
 
   return (
