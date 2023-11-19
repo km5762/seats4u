@@ -9,3 +9,7 @@ export function createVenueC(name, leftR, leftC, rightR, rightC, centerR, center
     console.log(centerR);
     console.log(centerC);
 }
+
+export function deleteVenueC(){
+    console.log("Deleted venue");
+}
