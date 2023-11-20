@@ -2,8 +2,13 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createVenueC, deleteVenueC, createShowC } from '../controller/Controller';
 import BlockCanvas from '../boundary/Boundary';
+import { VenueManager } from '../model/Model';
 
 const ManagerHome = ({ loggedInUser, onLogout }) => {
+
+    // let manager = new VenueManager();
+
+    const [manager, setManager] = React.useState(new VenueManager());
 
     const [venueCreating, setVenueCreating] = useState(false);
     const [venueCreated, setVenueCreated] = useState(false);
@@ -29,12 +34,14 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     };
 
     const createVenue = () => {
-        createVenueC(venueName, leftRow, leftCol, rightRow, rightCol, centerRow, centerCol);
+        createVenueC(manager, venueName, leftRow, leftCol, rightRow, rightCol, centerRow, centerCol);
         setVenueCreated(true);
+        console.log(manager)
+        console.log(manager.venue);
     };
 
     const deleteVenue = () => {
-        deleteVenueC();
+        deleteVenueC(manager);
         setVenueCreating(false);
         setVenueCreated(false);
         setVenueName('');
@@ -46,6 +53,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
         setCenterCol('');
         setShowCreated(false);
         setShowNum(0);
+        console.log(manager.venue);
     };
 
     const creatingShow = () => {
@@ -53,7 +61,9 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     }
 
     const createShow = () => {
-        createShowC(showName, showDate, showTime);
+        console.log(manager.venue)
+        createShowC(manager,showName, showDate, showTime);
+        console.log(manager.venue);
         setShowName('');
         setShowDate('');
         setShowTime('');
@@ -158,7 +168,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
         ) : (
             <div>
             {showCreated ? (
-                <div class='middle-container'>
+                <div className='middle-container'>
                     <p>You have {showNum} shows.</p>
                     {/* <BlockCanvas col={showNum} row={1} width={60} height={150} text={showName} style={{ marginRight: '20px' }}/> */}
                 </div>
