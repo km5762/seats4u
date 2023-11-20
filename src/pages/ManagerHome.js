@@ -70,6 +70,21 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
         setShowCreated(true);
     }
 
+    const displayDate = (date) => {
+        const month = parseInt(date / 10000, 10);
+        const day = parseInt((date - month * 10000) / 100, 10);
+        const year = date - month * 10000 - day * 100 + 2000;
+
+        return <p>Date: {month} / {day} / {year}</p>
+    }
+
+    const displayTime = (time) => {
+        const hour = parseInt(time / 100, 10);
+        const minute = time - hour * 100
+
+        return <p>Time: {hour} : {minute}</p>
+    }
+
   return (
     <div>
 
@@ -171,8 +186,8 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                     {manager.venue.shows.map((show, index) => (
                     <div key={index}>
                         <p>Show Name: {show.name}</p>
-                        <p>Date: {show.date}</p>
-                        <p>Time: {show.time}</p>
+                        {displayDate(show.date)}
+                        {displayTime(show.time)}
                     </div>
                     ))}
                 </div>
