@@ -6,8 +6,6 @@ import { VenueManager } from '../model/Model';
 
 const ManagerHome = ({ loggedInUser, onLogout }) => {
 
-    // let manager = new VenueManager();
-
     const [manager, setManager] = React.useState(new VenueManager());
 
     const [venueCreating, setVenueCreating] = useState(false);
@@ -170,7 +168,13 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
             {showCreated ? (
                 <div className='middle-container'>
                     <p>You have {showNum} shows.</p>
-                    {/* <BlockCanvas col={showNum} row={1} width={60} height={150} text={showName} style={{ marginRight: '20px' }}/> */}
+                    {manager.venue.shows.map((show, index) => (
+                    <div key={index}>
+                        <p>Show Name: {show.name}</p>
+                        <p>Date: {show.date}</p>
+                        <p>Time: {show.time}</p>
+                    </div>
+                    ))}
                 </div>
             ) :(
                 <div></div>
