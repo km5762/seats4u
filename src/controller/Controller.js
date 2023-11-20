@@ -14,6 +14,8 @@ export function deleteVenueC(){
     console.log("Deleted venue");
 }
 
-export function createShowC(){
-    console.log("Create show");
+export function createShowC(name, date, time){
+    console.log(name);
+    console.log(date);
+    console.log(time);
 }

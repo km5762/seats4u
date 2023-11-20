@@ -35,7 +35,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
         </div>
 
         <div className="center-container">
-          <SearchBar onSearch={handleSearch} /> {/* Use the SearchBar component */}
+          <SearchBar onSearch={handleSearch} /> 
         </div>
 
     </div>

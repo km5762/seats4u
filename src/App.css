@@ -18,6 +18,11 @@
   text-align: center; /* Center the content horizontally */
 }
 
+.middle-container {
+  text-align: center;
+  margin-top: 50px;
+}
+
 .left-container {
   text-align: left; /* Center the content horizontally */
   margin-left: 200px;

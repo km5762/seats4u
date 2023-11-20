@@ -5,27 +5,35 @@ import BlockCanvas from '../boundary/Boundary';
 
 const ManagerHome = ({ loggedInUser, onLogout }) => {
 
-  const [venueCreating, setVenueCreating] = useState(false);
-  const [venueCreated, setVenueCreated] = useState(false);
+    const [venueCreating, setVenueCreating] = useState(false);
+    const [venueCreated, setVenueCreated] = useState(false);
 
-  const [venueName, setVenueName] = useState('');
-  const [leftRow, setLeftRow] = useState('');
-  const [leftCol, setLeftCol] = useState('');
-  const [rightRow, setRightRow] = useState('');
-  const [rightCol, setRightCol] = useState('');
-  const [centerRow, setCenterRow] = useState('');
-  const [centerCol, setCenterCol] = useState('');
+    const [showCreating, setShowCreating] = useState(false);
+    const [showCreated, setShowCreated] = useState(false);
 
-  const creatingVenue = () => {
+    const [venueName, setVenueName] = useState('');
+    const [leftRow, setLeftRow] = useState('');
+    const [leftCol, setLeftCol] = useState('');
+    const [rightRow, setRightRow] = useState('');
+    const [rightCol, setRightCol] = useState('');
+    const [centerRow, setCenterRow] = useState('');
+    const [centerCol, setCenterCol] = useState('');
+
+    const [showName, setShowName] = useState('');
+    const [showDate, setShowDate] = useState('');
+    const [showTime, setShowTime] = useState('');
+    const [showNum, setShowNum] = useState(0);
+
+    const creatingVenue = () => {
         setVenueCreating(true);
     };
 
-  const createVenue = () => {
+    const createVenue = () => {
         createVenueC(venueName, leftRow, leftCol, rightRow, rightCol, centerRow, centerCol);
         setVenueCreated(true);
     };
 
-   const deleteVenue = () => {
+    const deleteVenue = () => {
         deleteVenueC();
         setVenueCreating(false);
         setVenueCreated(false);
@@ -36,7 +44,23 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
         setRightCol('');
         setCenterRow('');
         setCenterCol('');
+        setShowCreated(false);
+        setShowNum(0);
     };
+
+    const creatingShow = () => {
+        setShowCreating(true);
+    }
+
+    const createShow = () => {
+        createShowC(showName, showDate, showTime);
+        setShowName('');
+        setShowDate('');
+        setShowTime('');
+        setShowNum(prevNum => prevNum + 1);
+        setShowCreating(false);
+        setShowCreated(true);
+    }
 
   return (
     <div>
@@ -87,22 +111,19 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                     <button onClick={createVenue}>Submit</button>
                                 </div>
                                 <div className="lSection">
-                                    <p>Left</p>
-                                    <BlockCanvas col={leftCol} row={leftRow} style={{ marginRight: '20px' }}/>
+                                    <BlockCanvas col={leftCol} row={leftRow} width={20} height={20} text={"left"} style={{ marginRight: '20px' }}/>
                                 </div>
                                 <div className="cSection">
-                                    <p>Center</p>
-                                    <BlockCanvas col={centerCol} row={centerRow} style={{ marginRight: '20px' }}/>
+                                    <BlockCanvas col={centerCol} row={centerRow} width={20} height={20} text={"right"} style={{ marginRight: '20px' }}/>
                                 </div>
                                 <div className="rSection">
-                                    <p>Right</p>
-                                    <BlockCanvas col={rightCol} row={rightRow} style={{ marginRight: '20px' }}/>
+                                    <BlockCanvas col={rightCol} row={rightRow} width={20} height={20} text={"center"} style={{ marginRight: '20px' }}/>
                                 </div>
                             </div>
                         ) : (
                             <div className="center-container">
                                 <p>Your Venue: {venueName}</p>
-                                <button>Create Show</button>
+                                <button onClick={creatingShow}>Create Show</button>
                                 <button onClick={deleteVenue}>Delete Venue</button>
                             </div>
                         )}
@@ -111,6 +132,40 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
             </div>
         ) : (
             <p></p>
+        )}
+
+        {loggedInUser && showCreating ? (
+            <div className="left-container">
+                <input type="text" value={showName} onChange={(e) => setShowName(e.target.value)} placeholder="Show Name"/> <p></p>
+                <input type="number" value={showDate} onChange={(e) => setShowDate(parseInt(e.target.value, 10))} placeholder="Show Date in MMDDYY Format"/><p></p>
+                <input type="number" value={showTime} onChange={(e) => setShowTime(parseInt(e.target.value, 10))} placeholder="Show Time in HHMM Format"/><p></p>
+                <p>Confirm the information: </p>
+                <p>Show Name: {showName}</p> <p>Show Date: {showDate}</p> <p>Show Time: {showTime}</p> 
+                <button onClick={createShow}>Submit</button>
+                <button>Add block</button>
+                <button>Delete block</button>
+
+                <div className="lSection">
+                    <BlockCanvas col={leftCol} row={leftRow} width={20} height={20} text={"left"} style={{ marginRight: '20px' }}/>
+                </div>
+                <div className="cSection">
+                    <BlockCanvas col={centerCol} row={centerRow} width={20} height={20} text={"center"} style={{ marginRight: '20px' }}/>
+                </div>
+                <div className="rSection">
+                    <BlockCanvas col={rightCol} row={rightRow} width={20} height={20} text={"right"} style={{ marginRight: '20px' }}/>
+                </div>
+            </div>
+        ) : (
+            <div>
+            {showCreated ? (
+                <div class='middle-container'>
+                    <p>You have {showNum} shows.</p>
+                    {/* <BlockCanvas col={showNum} row={1} width={60} height={150} text={showName} style={{ marginRight: '20px' }}/> */}
+                </div>
+            ) :(
+                <div></div>
+            )}
+            </div>
         )}
 
         <div className="lower-right-text">

@@ -9,13 +9,10 @@ const App = () => {
   const [loggedInUser, setLoggedInUser] = useState(null);
 
   const handleLogin = (username, role) => {
-    // Simulate login logic (you would typically perform an API call here)
-    // For simplicity, just set the logged-in user to the entered username
     setLoggedInUser({ username, role });
   };
 
   const handleLogout = () => {
-    // Reset the loggedInUser state to null upon logout
     setLoggedInUser(null);
   };
 
