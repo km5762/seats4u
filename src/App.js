@@ -1,3 +1,4 @@
+import fs from "";
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
@@ -19,7 +20,8 @@ const App = () => {
       }
     );
 
-    const token = res.text();
+    const jwt = await res.text();
+    document.cookie = `jwt=${jwt}; Secure`;
 
     // For simplicity, just set the logged-in user to the entered username
     // setLoggedInUser({ username, role });
