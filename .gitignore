@@ -24,3 +24,9 @@ yarn-error.log*
 
 # env variables
 **/.env*
+
+# .key files
+**/*.key
+
+# zipped lambdas
+**/*.zip
