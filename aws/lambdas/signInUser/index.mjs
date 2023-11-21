@@ -21,7 +21,7 @@ try {
 }
 
 export const handler = async (event) => {
-  const { username, password } = event;
+  const { username, password } = JSON.parse(event.body);
 
   if (!username || !password) {
     return {
@@ -69,7 +69,10 @@ export const handler = async (event) => {
           jwtSecret,
           { algorithm: "RS256" }
         );
-        return { statusCode: 200, body: token };
+        return {
+          statusCode: 200,
+          body: token,
+        };
       } else {
         return {
           statusCode: 401,
