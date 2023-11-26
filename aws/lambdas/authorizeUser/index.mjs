@@ -14,13 +14,13 @@ const Role = Object.freeze({ ADMIN: 1, VENUE_MANAGER: 2 });
 // Note that token values are case-sensitive.
 
 export const handler = function (event, context, callback) {
-  const authorizationHeader = event.headers.authorization;
+  const cookie = event.headers.cookie;
 
-  if (!authorizationHeader) {
-    callback("Error: Authorization header missing");
+  if (!cookie) {
+    callback("Error: Cookie missing");
   }
 
-  const token = authorizationHeader.split(" ")[1];
+  const token = cookie.split("=")[1];
 
   let roleId;
   try {
