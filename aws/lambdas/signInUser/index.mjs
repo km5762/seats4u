@@ -69,7 +69,7 @@ export const handler = async (event) => {
               roleId: user["role_id"],
             },
             jwtSecret,
-            { algorithm: "RS256" }
+            { algorithm: "HS256" }
           );
         } catch (error) {
           console.error("JWT error: ", error);

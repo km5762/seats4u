@@ -20,9 +20,10 @@ const App = () => {
       }
     );
 
-    const jwt = await res.text();
-    document.cookie = `jwt=${jwt}; Secure`;
-
+    const res2 = await fetch(
+      "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/createvenue",
+      { credentials: "include", method: "POST" }
+    );
     // For simplicity, just set the logged-in user to the entered username
     // setLoggedInUser({ username, role });
   };
