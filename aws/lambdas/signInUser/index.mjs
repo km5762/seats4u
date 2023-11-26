@@ -17,7 +17,7 @@ try {
     database: process.env.DB_NAME,
   });
 } catch (error) {
-  console.error("Database error: " + error);
+  console.error("Database error: ", error);
 }
 
 export const handler = async (event) => {
@@ -37,7 +37,7 @@ export const handler = async (event) => {
       [username]
     );
   } catch (error) {
-    console.error("Database error:", error);
+    console.error("Database error: ", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Internal server error" }),
@@ -59,19 +59,26 @@ export const handler = async (event) => {
       const match = bcrypt.compareSync(password, hash);
 
       if (match === true) {
-        const token = jwt.sign(
-          {
-            sub: user["id"],
-            exp: Math.floor(Date.now() / 1000) + 60 * 60,
-            username: user["username"],
-            roleId: user["role_id"],
-          },
-          jwtSecret,
-          { algorithm: "RS256" }
-        );
+        let token;
+        try {
+          token = jwt.sign(
+            {
+              sub: user["id"],
+              exp: Math.floor(Date.now() / 1000) + 60 * 60,
+              username: user["username"],
+              roleId: user["role_id"],
+            },
+            jwtSecret,
+            { algorithm: "RS256" }
+          );
+        } catch (error) {
+          console.error("JWT error: ", error);
+        }
         return {
           statusCode: 200,
-          body: token,
+          headers: {
+            "Set-Cookie": `token=${token}; HttpOnly; SameSite=None; Secure`,
+          },
         };
       } else {
         return {

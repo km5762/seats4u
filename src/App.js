@@ -1,4 +1,3 @@
-import fs from "";
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
@@ -14,6 +13,7 @@ const App = () => {
     const res = await fetch(
       "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/signin",
       {
+        credentials: "include",
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: username, password: password }),
