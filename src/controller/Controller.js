@@ -12,3 +12,7 @@ export function createShowC(manager, name, date, time){
     manager.venue.addShow(name, date, time);
     console.log(manager);
 }
+
+export function addVenueC(administrator, name){
+    administrator.addVenue(name);
+}
