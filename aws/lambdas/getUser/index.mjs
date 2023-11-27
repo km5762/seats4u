@@ -16,6 +16,6 @@ export const handler = async (event) => {
   const token = cookie.split("=")[1];
 
   try {
-    jwt.verify(token, jwtSecret)
+    user = jwt.verify(token, jwtSecret)
   }
 };
