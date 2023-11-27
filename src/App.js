@@ -29,7 +29,6 @@ const App = () => {
   };
 
   const handleLogout = () => {
-    // Reset the loggedInUser state to null upon logout
     setLoggedInUser(null);
   };
 

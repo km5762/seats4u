@@ -16,7 +16,7 @@ const Login = ({ onLogin }) => {
   };
 
   const handleLogin = () => {
-    // Basic validation, you can add more complex validation logic here
+
     if (username && password && role !== null) {
       onLogin(username, password);
 

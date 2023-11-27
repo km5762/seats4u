@@ -2,31 +2,44 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createVenueC, deleteVenueC, createShowC } from '../controller/Controller';
 import BlockCanvas from '../boundary/Boundary';
+import { VenueManager } from '../model/Model';
 
 const ManagerHome = ({ loggedInUser, onLogout }) => {
 
-  const [venueCreating, setVenueCreating] = useState(false);
-  const [venueCreated, setVenueCreated] = useState(false);
+    const [manager, setManager] = React.useState(new VenueManager());
 
-  const [venueName, setVenueName] = useState('');
-  const [leftRow, setLeftRow] = useState('');
-  const [leftCol, setLeftCol] = useState('');
-  const [rightRow, setRightRow] = useState('');
-  const [rightCol, setRightCol] = useState('');
-  const [centerRow, setCenterRow] = useState('');
-  const [centerCol, setCenterCol] = useState('');
+    const [venueCreating, setVenueCreating] = useState(false);
+    const [venueCreated, setVenueCreated] = useState(false);
 
-  const creatingVenue = () => {
+    const [showCreating, setShowCreating] = useState(false);
+    const [showCreated, setShowCreated] = useState(false);
+
+    const [venueName, setVenueName] = useState('');
+    const [leftRow, setLeftRow] = useState('');
+    const [leftCol, setLeftCol] = useState('');
+    const [rightRow, setRightRow] = useState('');
+    const [rightCol, setRightCol] = useState('');
+    const [centerRow, setCenterRow] = useState('');
+    const [centerCol, setCenterCol] = useState('');
+
+    const [showName, setShowName] = useState('');
+    const [showDate, setShowDate] = useState('');
+    const [showTime, setShowTime] = useState('');
+    const [showNum, setShowNum] = useState(0);
+
+    const creatingVenue = () => {
         setVenueCreating(true);
     };
 
-  const createVenue = () => {
-        createVenueC(venueName, leftRow, leftCol, rightRow, rightCol, centerRow, centerCol);
+    const createVenue = () => {
+        createVenueC(manager, venueName, leftRow, leftCol, rightRow, rightCol, centerRow, centerCol);
         setVenueCreated(true);
+        console.log(manager)
+        console.log(manager.venue);
     };
 
-   const deleteVenue = () => {
-        deleteVenueC();
+    const deleteVenue = () => {
+        deleteVenueC(manager);
         setVenueCreating(false);
         setVenueCreated(false);
         setVenueName('');
@@ -36,7 +49,41 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
         setRightCol('');
         setCenterRow('');
         setCenterCol('');
+        setShowCreated(false);
+        setShowNum(0);
+        console.log(manager.venue);
     };
+
+    const creatingShow = () => {
+        setShowCreating(true);
+    }
+
+    const createShow = () => {
+        console.log(manager.venue)
+        createShowC(manager,showName, showDate, showTime);
+        console.log(manager.venue);
+        setShowName('');
+        setShowDate('');
+        setShowTime('');
+        setShowNum(prevNum => prevNum + 1);
+        setShowCreating(false);
+        setShowCreated(true);
+    }
+
+    const displayDate = (date) => {
+        const month = parseInt(date / 10000, 10);
+        const day = parseInt((date - month * 10000) / 100, 10);
+        const year = date - month * 10000 - day * 100 + 2000;
+
+        return <p>Date: {month} / {day} / {year}</p>
+    }
+
+    const displayTime = (time) => {
+        const hour = parseInt(time / 100, 10);
+        const minute = time - hour * 100
+
+        return <p>Time: {hour} : {minute}</p>
+    }
 
   return (
     <div>
@@ -87,22 +134,19 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                     <button onClick={createVenue}>Submit</button>
                                 </div>
                                 <div className="lSection">
-                                    <p>Left</p>
-                                    <BlockCanvas col={leftCol} row={leftRow} style={{ marginRight: '20px' }}/>
+                                    <BlockCanvas col={leftCol} row={leftRow} width={20} height={20} text={"left"} style={{ marginRight: '20px' }}/>
                                 </div>
                                 <div className="cSection">
-                                    <p>Center</p>
-                                    <BlockCanvas col={centerCol} row={centerRow} style={{ marginRight: '20px' }}/>
+                                    <BlockCanvas col={centerCol} row={centerRow} width={20} height={20} text={"right"} style={{ marginRight: '20px' }}/>
                                 </div>
                                 <div className="rSection">
-                                    <p>Right</p>
-                                    <BlockCanvas col={rightCol} row={rightRow} style={{ marginRight: '20px' }}/>
+                                    <BlockCanvas col={rightCol} row={rightRow} width={20} height={20} text={"center"} style={{ marginRight: '20px' }}/>
                                 </div>
                             </div>
                         ) : (
                             <div className="center-container">
                                 <p>Your Venue: {venueName}</p>
-                                <button>Create Show</button>
+                                <button onClick={creatingShow}>Create Show</button>
                                 <button onClick={deleteVenue}>Delete Venue</button>
                             </div>
                         )}
@@ -111,6 +155,46 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
             </div>
         ) : (
             <p></p>
+        )}
+
+        {loggedInUser && showCreating ? (
+            <div className="left-container">
+                <input type="text" value={showName} onChange={(e) => setShowName(e.target.value)} placeholder="Show Name"/> <p></p>
+                <input type="number" value={showDate} onChange={(e) => setShowDate(parseInt(e.target.value, 10))} placeholder="Show Date in MMDDYY Format"/><p></p>
+                <input type="number" value={showTime} onChange={(e) => setShowTime(parseInt(e.target.value, 10))} placeholder="Show Time in HHMM Format"/><p></p>
+                <p>Confirm the information: </p>
+                <p>Show Name: {showName}</p> <p>Show Date: {showDate}</p> <p>Show Time: {showTime}</p> 
+                <button onClick={createShow}>Submit</button>
+                <button>Add block</button>
+                <button>Delete block</button>
+
+                <div className="lSection">
+                    <BlockCanvas col={leftCol} row={leftRow} width={20} height={20} text={"left"} style={{ marginRight: '20px' }}/>
+                </div>
+                <div className="cSection">
+                    <BlockCanvas col={centerCol} row={centerRow} width={20} height={20} text={"center"} style={{ marginRight: '20px' }}/>
+                </div>
+                <div className="rSection">
+                    <BlockCanvas col={rightCol} row={rightRow} width={20} height={20} text={"right"} style={{ marginRight: '20px' }}/>
+                </div>
+            </div>
+        ) : (
+            <div>
+            {showCreated ? (
+                <div className='middle-container'>
+                    <p>You have {showNum} shows.</p>
+                    {manager.venue.shows.map((show, index) => (
+                    <div key={index}>
+                        <p>Show Name: {show.name}</p>
+                        {displayDate(show.date)}
+                        {displayTime(show.time)}
+                    </div>
+                    ))}
+                </div>
+            ) :(
+                <div></div>
+            )}
+            </div>
         )}
 
         <div className="lower-right-text">

@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 
-const BlockCanvas = ({ col, row }) => {
+const BlockCanvas = ({ col, row, width, height, text}) => {
   const canvasRef = useRef(null);
   const ctxRef = useRef(null);
-  const blockWidth = 20;
-  const blockHeight = 20;
+  const blockWidth = width;
+  const blockHeight = height;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -42,6 +42,7 @@ const BlockCanvas = ({ col, row }) => {
 
   return (
     <div>
+        <p>{text}</p>
         <canvas ref={canvasRef} width={blockWidth * col} height={blockHeight * row} style={{ border: '1px solid black' }} />
     </div>
   );
