@@ -89,17 +89,17 @@ export const handler = async (event) => {
               body: JSON.stringify({ error: "Internal server error" }),
             };
           }
-        } else if (user["role_id" === Role.VENUE_MANAGER]) {
+        } else if (user["role_id"] === Role.VENUE_MANAGER) {
           try {
-            const [shows] = await connection.execute(
-              "SELECT * FROM show WHERE venue_id = ?",
+            const [events] = await connection.execute(
+              "SELECT * FROM event WHERE venue_id = ?",
               [user["venue_id"]]
             );
             const [venue] = await connection.execute(
               "SELECT * FROM venue WHERE id = ?",
               [user["venue_id"]]
             );
-            responseBody = { venue: venue, shows: shows };
+            responseBody = { venue: venue, events: events };
           } catch (error) {
             console.error("Database error: ", error);
             return {
