@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import SearchBar from '../component/SearchBar';
 import { Administrator } from '../model/Model';
-import { addVenueC } from '../controller/Controller';
 
 const AdminHome = ({ loggedInUser, onLogout }) => {
 
@@ -13,12 +12,6 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
   const handleSearch = () => {
     console.log(`Search query: ${searchQuery}`);
   };
-
-  const addVenue = () => {
-    let name = "random";
-    addVenueC(administrator, name);
-  };
-
 
   return (
     <div>

@@ -75,17 +75,17 @@ export class Administrator{
 
     constructor(){
 
-        //this.venues = [];
-        this.v1 = new Venue("v1");
-        this.v2 = new Venue("v2");
-        this.v3 = new Venue("v3");
+        this.venues = [];
+        // this.v1 = new Venue("v1");
+        // this.v2 = new Venue("v2");
+        // this.v3 = new Venue("v3");
 
-        this.v1.addShow("random", "122523", "1800");
-        this.v1.addShow("random2", "122523", "1800");
-        this.v1.addShow("random3", "122523", "1800");
-        this.v2.addShow("random4", "122523", "1800");
+        // this.v1.addShow("random", "122523", "1800");
+        // this.v1.addShow("random2", "122523", "1800");
+        // this.v1.addShow("random3", "122523", "1800");
+        // this.v2.addShow("random4", "122523", "1800");
 
-        this.venues = [this.v1, this.v2, this.v3];
+        // this.venues = [this.v1, this.v2, this.v3];
     }
 
     addVenue(name){
