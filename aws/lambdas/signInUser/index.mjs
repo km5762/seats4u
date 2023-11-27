@@ -32,10 +32,9 @@ export const handler = async (event) => {
 
   let rows;
   try {
-    [rows] = await connection.execute(
-      "SELECT * FROM account WHERE username = ?",
-      [username]
-    );
+    [rows] = await connection.execute("SELECT * FROM user WHERE username = ?", [
+      username,
+    ]);
   } catch (error) {
     console.error("Database error: ", error);
     return {
