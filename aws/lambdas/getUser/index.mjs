@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
-import fs from 'fs';
+import fs from "fs";
 
-const jwtSecret = fs.readFileSync('private.key')
+const jwtSecret = fs.readFileSync("private.key");
 
 export const handler = async (event) => {
   const cookie = event.headers.cookie;
@@ -15,7 +15,8 @@ export const handler = async (event) => {
 
   const token = cookie.split("=")[1];
 
+  let user;
   try {
-    user = jwt.verify(token, jwtSecret)
-  }
+    user = jwt.verify(token, jwtSecret);
+  } catch (error) {}
 };
