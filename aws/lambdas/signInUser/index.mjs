@@ -81,7 +81,8 @@ export const handler = async (event) => {
         let responseBody;
         if (user["role_id"] === Role.ADMIN) {
           try {
-            [responseBody] = await connection.execute("SELECT * FROM venue");
+            const [venues] = await connection.execute("SELECT * FROM venue");
+            responseBody = { user: user, venues: venues };
           } catch (error) {
             console.error("Database error: ", error);
             return {
@@ -99,7 +100,11 @@ export const handler = async (event) => {
               "SELECT * FROM venue WHERE id = ?",
               [user["venue_id"]]
             );
-            responseBody = { venue: venue, events: events };
+            responseBody = {
+              user: user,
+              venue: venue,
+              events: events,
+            };
           } catch (error) {
             console.error("Database error: ", error);
             return {
