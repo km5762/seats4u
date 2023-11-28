@@ -30,7 +30,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const [showNum, setShowNum] = useState(0);
 
     const location = useLocation();
-    console.log(receivedData);
+    console.log(location);
     const receivedData = location.state;
     console.log(receivedData);
 
