@@ -20,7 +20,7 @@ export async function createVenueC(manager, name, leftR, leftC, rightR, rightC, 
         // const data = await res.json();
         // console.log(data.insertId)
     } catch (error) {
-        console.error("Error occurred during login:", error);
+        console.error("Error occurred during creating venue:", error);
     }
 
 
@@ -43,7 +43,7 @@ export async function deleteVenueC(manager, id){
         const data = await res.json();
         console.log(data)
     } catch (error) {
-        console.error("Error occurred during login:", error);
+        console.error("Error occurred during deleting venue:", error);
     }
 
     manager.deleteVenue();
