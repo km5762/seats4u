@@ -30,9 +30,16 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const [showNum, setShowNum] = useState(0);
 
     const location = useLocation();
-    console.log(location);
-    const receivedData = location.state;
-    console.log(receivedData);
+    const receivedData = location.state.userData;
+
+
+    React.useEffect(() => {
+        if (receivedData && Array.isArray(receivedData.venue) && receivedData.venue.length > 0) {
+            const firstVenue = receivedData.venue[0];
+            setVenueName(firstVenue.name); // Assuming 'name' holds the venue name
+            setVenueCreated(true);
+        }
+    }, [receivedData]);
 
     const creatingVenue = () => {
         setVenueCreating(true);
@@ -117,7 +124,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
 
         {loggedInUser ? (
             <div>
-                {!venueCreating && loggedInUser ? (
+                {venueCreating && loggedInUser ? (
                     <div className="center-container">
                         <p>No Venue Yet</p>
                         <p>Please Create a Venue</p>
