@@ -1,57 +1,79 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, BrowserRouter as Router} from "react-router-dom";
 import "../App.css"; // Import the CSS file
+import {VenueManager, Administratot} from '../model/Model';
 
-const Login = ({ onLogin, loadingMessage }) => {
+
+
+const Login = ({ setLoggedInUser}) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState(null); // Track the selected circle
   const navigate = useNavigate();
+  const [loadingMessage, setLoadingMessage] = useState(""); // Track loading message
 
-  const handleClick = async () => {
-    // Access onLogin function here
-    await onLogin(username, password);
+  
+  const handleLogin = async () => {
+    // Simulate login logic (you would typically perform an API call here)
+
+    setLoadingMessage("Logging in... This might take some seconds.");
+    console.log(username, password);
+    try {
+      const res = await fetch(
+        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/signin",
+        {
+          credentials: "include",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: username, password: password }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (data && data.user) {
+        if (data.user.role_id === 2) {
+          if (data.venue && data.venue.length > 0) {
+            if (data.venue.length === 1) {
+              const singleVenue = data.venue[0];
+              console.log("Only one venue found:", singleVenue);
+              // Venue manager with a single venue
+              navigate('/manager');
+            } else if (data.venue.length === 0) {
+              const multipleVenues = data.venue;
+              console.log("Multiple venues found:", multipleVenues);
+              // Venue manager with 0 Venues
+              navigate('/manager');
+            }
+          } else {
+            console.log("No venues found in the response");
+          }
+
+          // Set the logged-in user
+          setLoggedInUser(data.user);
+        } else if (data.user.role_id === 1) {
+          // Redirect to '/admin'
+          navigate('/admin');
+        } else {
+          console.log("User doesn't have the required role for this action");
+        }
+      } else {
+        console.log("Invalid user data or role information");
+      }
+    } catch (error) {
+      console.error("Error occurred during login:", error);
+    }
+    // For simplicity, just set the logged-in user to the entered username
+    // setLoggedInUser({ username, role });
   };
-
-  // Mapping between circle numbers and roles
-  // const circleRoleMap = {
-  //   1: "Customer",
-  //   2: "Manager",
-  //   3: "Administrator",
-  // };
-
-  // const handleLogin = () => {
-
-  //   setLoadingMessage("Logging in... This might take some seconds."); // Set loading message
-
-  //   if (username && password && role !== null) {
-  //     onLogin(username, password);
-
-  //     // Redirect based on the selected circle
-  //     switch (role) {
-  //       case 1:
-  //         navigate("/");
-  //         break;
-  //       case 2:
-  //         navigate("/manager");
-  //         break;
-  //       case 3:
-  //         navigate("/admin");
-  //         break;
-  //       default:
-  //         break;
-  //     }
-  //   } else {
-  //     alert("Please enter both username and password.");
-    // }
-  // };
-
+  
   const handleCircleClick = (roleNumber, e) => {
     e.preventDefault();
     setRole(roleNumber);
   };
 
   return (
+    
     <div>
       <div className="center-container">
         <img src="/pictures/logo.png" alt="Logo" width="250" height="100" />
@@ -83,10 +105,9 @@ const Login = ({ onLogin, loadingMessage }) => {
               <span className="circle-text">{circleRoleMap[roleNumber]}</span>
             </div>
           ))}
-        </div> */}
-
+        </div> */}        
+        <button onClick={handleLogin} >Login</button>
         {loadingMessage && <div className="loading-message">{loadingMessage}</div>}
-        <button onClick={handleClick}>Login</button>
       </div>
     </div>
   );
