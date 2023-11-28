@@ -21,7 +21,7 @@ export const handler = async (event) => {
 
     return {
       statusCode: 200,
-      body: venues,
+      body: JSON.stringify(venues),
     };
   } catch (error) {
     console.error("Database error: ", error);
