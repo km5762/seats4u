@@ -53,6 +53,7 @@ const Login = ({ setLoggedInUser}) => {
         } else if (data.user.role_id === 1) {
           // Redirect to '/admin'
           navigate('/admin', { state: { userData: data } });
+          setLoggedInUser(data.user);
         } else {
           console.log("User doesn't have the required role for this action");
         }

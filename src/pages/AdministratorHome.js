@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import SearchBar from '../component/SearchBar';
 import { Administrator } from '../model/Model';
 
@@ -9,9 +9,15 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const location = useLocation();
+  const receivedData = location.state.userData;
+  console.log(receivedData);
+
   const handleSearch = () => {
     console.log(`Search query: ${searchQuery}`);
   };
+
+  administrator.venues = receivedData.venues
   
   return (
     <div>
@@ -34,11 +40,12 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                   {administrator.venues.length ? (
                   <div className='middle-container'>
                     <p>You have {administrator.venues.length} venues.</p>
+                    <p>-------------------------------------------------</p>
                     {administrator.venues.map((venue, index) => (
                     <div key={index}>
                         <p>Venue Name: {administrator.venues[index].name}</p>
                         <p>Venue List of shows:</p>
-                        {administrator.venues[index].shows.length ? (
+                        {/* {administrator.venues[index].shows.length ? (
                           <div>
                           {administrator.venues[index].shows.map((show, j) => (
                             <div key={j}>
@@ -49,7 +56,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                           )
                           :(
                             <div>No shows yet</div>
-                          )}
+                          )} */}
                         <p>-------------------------------------------------</p>
                     </div>
                     ))}
