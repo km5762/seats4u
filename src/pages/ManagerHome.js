@@ -30,12 +30,21 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const [showNum, setShowNum] = useState(0);
 
     const location = useLocation();
-    console.log(location);
-    const receivedData = location.state;
-    console.log(receivedData);
+    const receivedData = location.state.userData;
+
+
+    React.useEffect(() => {
+        if (receivedData && Array.isArray(receivedData.venue) && receivedData.venue.length > 0) {
+            const firstVenue = receivedData.venue[0];
+            setVenueName(firstVenue.name); 
+            setVenueCreated(true);
+        }
+    }, [receivedData]);
 
     const creatingVenue = () => {
         setVenueCreating(true);
+        console.log("venueCreating ", venueCreating);
+        console.log("venueCreated ", venueCreated);
     };
 
     const createVenue = () => {
@@ -56,6 +65,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
         setRightCol('');
         setCenterRow('');
         setCenterCol('');
+        setShowCreating(false);
         setShowCreated(false);
         setShowNum(0);
         console.log(manager.venue);
@@ -117,7 +127,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
 
         {loggedInUser ? (
             <div>
-                {!venueCreating && loggedInUser ? (
+                {!venueCreating && !venueCreated ? (
                     <div className="center-container">
                         <p>No Venue Yet</p>
                         <p>Please Create a Venue</p>
@@ -125,7 +135,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                     </div>
                 ) : (
                     <div>
-                        {!venueCreated ? (
+                        {!venueCreated && venueCreating ? (
                             <div>
                                 <div className="left-container">
                                     <input type="text" value={venueName} onChange={(e) => setVenueName(e.target.value)} placeholder="Venue Name"/> <p></p>
