@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import SearchBar from '../component/SearchBar';
 import { Administrator } from '../model/Model';
-import { listVenuesC } from '../controller/Controller';
 
 const AdminHome = ({ loggedInUser, onLogout }) => {
 
@@ -12,12 +11,6 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
 
   const handleSearch = () => {
     console.log(`Search query: ${searchQuery}`);
-  };
-
-  const listVenues = () => {
-    listVenuesC(administrator);
-    console.log(administrator)
-    console.log(administrator.venues);
   };
   
   return (

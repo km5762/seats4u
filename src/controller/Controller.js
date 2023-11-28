@@ -1,5 +1,4 @@
 import { Seat, Row, Section, Venue} from '../model/Model.js'
-import { post } from "./Api"
 
 export function createVenueC(manager, name, leftR, leftC, rightR, rightC, centerR, centerC){
     manager.createVenue(name);
