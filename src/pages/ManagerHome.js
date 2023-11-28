@@ -36,7 +36,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     React.useEffect(() => {
         if (receivedData && Array.isArray(receivedData.venue) && receivedData.venue.length > 0) {
             const firstVenue = receivedData.venue[0];
-            setVenueName(firstVenue.name); // Assuming 'name' holds the venue name
+            setVenueName(firstVenue.name); 
             setVenueCreated(true);
         }
     }, [receivedData]);
