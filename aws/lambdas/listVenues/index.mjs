@@ -1,11 +1,7 @@
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
-import jwt from "jsonwebtoken";
-import fs from "fs";
 
 dotenv.config();
-
-const jwtSecret = fs.readFileSync("private.key");
 
 let connection;
 try {
@@ -20,17 +16,18 @@ try {
 }
 
 export const handler = async (event) => {
-  console.log(event);
-  //   const cookie = event.headers.cookie;
-  //   if (!cookie) {
-  //     return {
-  //       statusCode: 401,
-  //       body: JSON.stringify({ error: "Cookie missing" }),
-  //     };
-  //   }
-  //   const token = cookie.split("=")[1];
-  //   let user
-  //   try {
-  //     {venueId} = jwt.verify(token, jwtSecret)
-  //   }
+  try {
+    const [venues] = await connection.execute("SELECT * FROM venue");
+
+    return {
+      statusCode: 200,
+      body: venues,
+    };
+  } catch (error) {
+    console.error("Database error: ", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Internal server error" }),
+    };
+  }
 };
