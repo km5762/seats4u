@@ -39,14 +39,10 @@ const Login = ({ setLoggedInUser}) => {
               console.log("Only one venue found:", singleVenue);
               // Venue manager with a single venue
               navigate('/manager');
-            } else if (data.venue.length === 0) {
-              const multipleVenues = data.venue;
-              console.log("Multiple venues found:", multipleVenues);
-              // Venue manager with 0 Venues
-              navigate('/manager');
-            }
+            } 
           } else {
             console.log("No venues found in the response");
+            navigate('/manager');
           }
 
           // Set the logged-in user
