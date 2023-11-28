@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate, BrowserRouter as Router} from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import "../App.css"; // Import the CSS file
-import {VenueManager, Administratot} from '../model/Model';
+import {VenueManager, Administrator} from '../model/Model';
 
 
 
@@ -38,18 +38,22 @@ const Login = ({ setLoggedInUser}) => {
               const singleVenue = data.venue[0];
               console.log("Only one venue found:", singleVenue);
               // Venue manager with a single venue
-              navigate('/manager');
+              navigate('/manager', { state: { userData: data } });
+              
             } 
           } else {
             console.log("No venues found in the response");
-            navigate('/manager');
+            navigate('/manager', { state: { userData: data } });
+            console.log(res);
+            console.log(data);
           }
 
           // Set the logged-in user
           setLoggedInUser(data.user);
         } else if (data.user.role_id === 1) {
           // Redirect to '/admin'
-          navigate('/admin');
+          navigate('/admin', { state: { userData: data } });
+          setLoggedInUser(data.user);
         } else {
           console.log("User doesn't have the required role for this action");
         }
