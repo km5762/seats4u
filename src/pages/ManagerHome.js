@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { createVenueC, deleteVenueC, createShowC } from '../controller/Controller';
 import BlockCanvas from '../boundary/Boundary';
 import { VenueManager } from '../model/Model';
@@ -7,7 +7,9 @@ import { VenueManager } from '../model/Model';
 const ManagerHome = ({ loggedInUser, onLogout }) => {
 
     const [manager, setManager] = React.useState(new VenueManager());
+    
 
+    
     const [venueCreating, setVenueCreating] = useState(false);
     const [venueCreated, setVenueCreated] = useState(false);
 
@@ -26,6 +28,11 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const [showDate, setShowDate] = useState('');
     const [showTime, setShowTime] = useState('');
     const [showNum, setShowNum] = useState(0);
+
+    const location = useLocation();
+    console.log(receivedData);
+    const receivedData = location.state;
+    console.log(receivedData);
 
     const creatingVenue = () => {
         setVenueCreating(true);
