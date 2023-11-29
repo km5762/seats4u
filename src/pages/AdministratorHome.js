@@ -6,6 +6,7 @@ import { Administrator } from "../model/Model";
 const AdminHome = ({ loggedInUser, onLogout }) => {
   const [administrator, setAdministrator] = React.useState(new Administrator());
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const location = useLocation();
   const receivedData = location.state.userData;
@@ -18,6 +19,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
   };
 
   async function listVenues() {
+    setLoading(true);
     const res = await fetch(
       "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/listvenues",
       {
@@ -29,6 +31,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
     const venues = await res.json();
     console.log(venues);
     setVenues(venues);
+    setLoading(false);
   }
 
   administrator.venues = receivedData.venues;
@@ -53,14 +56,18 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
             </div>
 
             <div className="middle-container">
-              <button onClick={listVenues}>Refresh</button>
-              {administrator.venues.length ? (
+              {loading ? (
+                <p>loading... </p>
+              ) : (
+                <button onClick={listVenues}>Refresh</button>
+              )}
+              {venues.length ? (
                 <div className="middle-container">
                   <p>You have {venues.length} venues.</p>
                   <p>-------------------------------------------------</p>
                   {venues.map((venue, index) => (
                     <div key={index}>
-                      <p>Venue Name: {administrator.venues[index].name}</p>
+                      <p>Venue Name: {venues[index].name}</p>
                       <p>Venue List of shows:</p>
                       {/* {administrator.venues[index].shows.length ? (
                           <div>
