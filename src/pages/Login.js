@@ -16,7 +16,8 @@ const Login = ({ setLoggedInUser}) => {
   
   const handleLogin = async () => {
     // Simulate login logic (you would typically perform an API call here)
-
+    
+    setLoginError("");
     setLoadingMessage("Logging in... This might take some seconds.");
     console.log(username, password);
     try {
@@ -39,11 +40,15 @@ const Login = ({ setLoggedInUser}) => {
               const singleVenue = data.venue[0];
               console.log("Only one venue found:", singleVenue);
               // Venue manager with a single venue
+              setLoginError("");
+              setLoadingMessage("");
               navigate('/manager', { state: { userData: data } });
               
             } 
           } else {
             console.log("No venues found in the response");
+            setLoginError("");
+            setLoadingMessage("");
             navigate('/manager', { state: { userData: data } });
             console.log(res);
             console.log(data);
@@ -53,12 +58,15 @@ const Login = ({ setLoggedInUser}) => {
           setLoggedInUser(data.user);
         } else if (data.user.role_id === 1) {
           // Redirect to '/admin'
+          setLoginError("");
+          setLoadingMessage("");
           navigate('/admin', { state: { userData: data } });
           setLoggedInUser(data.user);
         } else {
           console.log("User doesn't have the required role for this action");
         }
       } else {
+        setLoadingMessage("");
         setLoginError("Credential doesn't exist or the password/user might be incorrect");
         console.log("Invalid user data or role information");
       }
