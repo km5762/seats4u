@@ -132,7 +132,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                 <div>
                     <p>Welcome back, {loggedInUser.role} {loggedInUser.username}! Now you may manage.</p>
                     <button onClick={onLogout}>Logout</button>
-                    <Link to="/">Customer View</Link>
+                    {/* <Link to="/">Customer View</Link> */}
                 </div>
             ) : (
                 <div>
@@ -232,7 +232,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
             </div>
         )}
 
-        <div className="lower-right-text">
+        {/* <div className="lower-right-text">
             {loggedInUser && loggedInUser.role === "Administrator" ? (
                 <div>
                     <p>Now you are in Manager view.</p>
@@ -241,7 +241,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
             ) : (
                 <p></p>
             )}
-        </div>
+        </div> */}
 
     </div>
   );

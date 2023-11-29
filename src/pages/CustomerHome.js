@@ -31,7 +31,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
           )}
         </div>
 
-        <div className="lower-right-text">
+        {/* <div className="lower-right-text">
           {loggedInUser && loggedInUser.role === "Manager" ? (
             <div>
               <p>Now you are in Customer view.</p>
@@ -49,7 +49,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
           ) : (
               <p></p>
           )}
-        </div>
+        </div> */}
     </div>
   );
 };
