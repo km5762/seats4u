@@ -78,3 +78,7 @@
   margin: 20px; /* Optional: Add margin for spacing */
 }
 
+.error-message {
+  color: red;
+  margin-top: 5px;
+}

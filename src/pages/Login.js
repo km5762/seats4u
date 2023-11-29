@@ -11,6 +11,7 @@ const Login = ({ setLoggedInUser}) => {
   const [role, setRole] = useState(null); // Track the selected circle
   const navigate = useNavigate();
   const [loadingMessage, setLoadingMessage] = useState(""); // Track loading message
+  const [loginError, setLoginError] = useState("");
 
   
   const handleLogin = async () => {
@@ -58,6 +59,7 @@ const Login = ({ setLoggedInUser}) => {
           console.log("User doesn't have the required role for this action");
         }
       } else {
+        setLoginError("Credential doesn't exist or the password/user might be incorrect");
         console.log("Invalid user data or role information");
       }
     } catch (error) {
@@ -108,6 +110,7 @@ const Login = ({ setLoggedInUser}) => {
         </div> */}        
         <button onClick={handleLogin} >Login</button>
         {loadingMessage && <div className="loading-message">{loadingMessage}</div>}
+        {loginError && <div className="error-message">{loginError}</div>} 
       </div>
     </div>
   );
