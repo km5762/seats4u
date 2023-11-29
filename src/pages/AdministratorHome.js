@@ -51,8 +51,8 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                 you may administrate.
               </p>
               <button onClick={onLogout}>Logout</button>
-              <Link to="/">Customer View</Link>
-              <Link to="/manager">Manager View</Link>
+              {/* <Link to="/">Customer View</Link>
+              <Link to="/manager">Manager View</Link> */}
             </div>
 
             <div className="middle-container">
