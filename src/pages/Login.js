@@ -16,10 +16,9 @@ const Login = ({ setLoggedInUser}) => {
   
   const handleLogin = async () => {
     // Simulate login logic (you would typically perform an API call here)
-    
+
     setLoginError("");
     setLoadingMessage("Logging in... This might take some seconds.");
-    console.log(username, password);
     try {
       const res = await fetch(
         "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/signin",
