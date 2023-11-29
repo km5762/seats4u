@@ -110,7 +110,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
         const day = parseInt((date - month * 10000) / 100, 10);
         const year = date - month * 10000 - day * 100 + 2000;
 
-        return <p>Date: {month} / {day} / {year}</p>
+        return <p>Date: Month {month} / Day {day} / Year {year}</p>
     }
 
     const displayTime = (time) => {
@@ -198,7 +198,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                 <input type="number" value={showDate} onChange={(e) => setShowDate(parseInt(e.target.value, 10))} placeholder="Show Date in MMDDYY Format"/><p></p>
                 <input type="number" value={showTime} onChange={(e) => setShowTime(parseInt(e.target.value, 10))} placeholder="Show Time in HHMM Format"/><p></p>
                 <p>Confirm the information: </p>
-                <p>Show Name: {showName}</p> <p>Show Date: {showDate}</p> <p>Show Time: {showTime}</p> 
+                <p>Show Name: {showName}</p> {displayDate(showDate)} {displayTime(showTime)}
                 <button onClick={createShow}>Submit</button>
                 <button>Add block</button>
                 <button>Delete block</button>

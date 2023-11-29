@@ -57,6 +57,13 @@ export async function createShowC(manager, name, date, time){
     manager.venue.addShow(name, date, time);
     console.log(manager);
 
+    const month = parseInt(date / 10000, 10);
+    const day = parseInt((date - month * 10000) / 100, 10);
+    const year = date - month * 10000 - day * 100 + 2000;
+    date = year * 10000000000 + month * 100000000 + day * 1000000 + time * 100
+
+    console.log(date)
+
     try {
         const res = await fetch(
         "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/createevent",
