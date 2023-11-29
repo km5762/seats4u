@@ -69,6 +69,10 @@ export class VenueManager {
     deleteVenue(){
         this.venue = null
     }
+
+    addId(id){
+        this.id = id;
+    }
 }
 
 export class Administrator{

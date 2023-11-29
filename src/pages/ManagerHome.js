@@ -29,18 +29,34 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const [showTime, setShowTime] = useState('');
     const [showNum, setShowNum] = useState(0);
 
+
+    const [venueId, setVenueId] = useState(0);
+
     const location = useLocation();
     const receivedData = location.state.userData;
-
+   
 
     React.useEffect(() => {
         if (receivedData && Array.isArray(receivedData.venue) && receivedData.venue.length > 0) {
             const firstVenue = receivedData.venue[0];
             manager.createVenue(firstVenue.name);
+            manager.addId(firstVenue.id);
+            // setVenueId(firstVenue.id);
             setVenueName(firstVenue.name); 
             setVenueCreated(true);
         }
     }, [receivedData]);
+
+
+
+    // React.useEffect(() => {
+    //     if (receivedData && Array.isArray(receivedData.venue) && receivedData.venue.length > 0) {
+    //         const firstVenue = receivedData.venue[0];
+    //         manager.createVenue(firstVenue.name);
+    //         setVenueName(firstVenue.name); 
+    //         setVenueCreated(true);
+    //     }
+    // }, [receivedData]);
 
     const creatingVenue = () => {
         setVenueCreating(true);
