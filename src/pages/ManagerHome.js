@@ -517,101 +517,121 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     }
   
     return (
-  
-      <div>
-        {!venueCreated ? (
-          <div>
-            <div style={{ position: 'absolute', left: 100, top:100 }}>
-                <input type="text" value={venueName} onChange={(e) => setVenueName(e.target.value)} placeholder="Venue Name"/> <p></p>
-                <input type="number" value={leftRow} onChange={handleLeftRowChange} placeholder="left row number"/><p></p>
-                <input type="number" value={leftCol} onChange={handleLeftColChange} placeholder="left col number"/><p></p>
-                <input type="number" value={centerRow} onChange={handleCenterRowChange} placeholder="center row number"/><p></p>
-                <input type="number" value={centerCol} onChange={handleCenterColChange} placeholder="center col number"/><p></p>
-                <input type="number" value={rightRow} onChange={handleRightRowChange} placeholder="right row number"/><p></p>
-                <input type="number" value={rightCol} onChange={handleRightColChange} placeholder="right col number"/><p></p>
-                <p>Confirm the information: </p>
-                <p>Venue Name: {venueName}</p> <p>Left Row: {leftRow}</p> <p>Left Col: {leftCol}</p> <p>Center Row: {centerRow}</p> 
-                <p>Center Col: {centerCol}</p> <p>Right Row: {rightRow}</p> <p>Right Col: {rightCol}</p> 
-                <button onClick={createVenue}>Submit</button>
+        <div>
+            <div className="center-container">
+                <img src='/pictures/logo.png' alt="Logo" width="250" height="100" />
             </div>
-            <div style={{ position: 'absolute', right: 100, top:100 }}>
-                <h3>Venue Layout</h3>
-                <div style={{ display: 'flex' }}>
-                  <Section title="Left" rows={leftRow} cols={leftCol} canSelect={false}/>
-                  <Section title="Center" rows={centerRow} cols={centerCol} canSelect={false}/>
-                  <Section title="Right" rows={rightRow} cols={rightCol} canSelect={false}/>
-                </div>
-            </div>
-          </div>
-        ):(
-          <div>
-            <div>
-            <div>
-            {!showCreating ? (
-              <div>
-                <div>
-                  {!selectedShow && (
-                    <div style={{ position: 'absolute', left: 100, top:50 }}>
-                      <h3>Your list of shows</h3>
-                      <p>You have {showNum} shows</p>
-                      <button onClick={creatingShow}>Create show</button>
-                    </div>)
-                  }
-                  <div style={{ position: 'absolute', left: 100, top:200 }}>
-                    {!selectedShow && shows.map((show, index) => (
-                      <Show key={index} {...show} onClick={() => handleShowClick(index)} />
-                    ))}
-                  </div>
-                  {selectedShow && (
+
+            <div className="upper-right-text">
+                {loggedInUser ? (
                     <div>
-                      <div style={{ position: 'absolute', left: 100, top:50 }}>
-                        <h2>Selected Show</h2>
-                        <p><strong>Show:</strong> {selectedShow.name}</p>
-                        <p><strong>Date:</strong> {selectedShow.date}</p>
-                        <p><strong>Time:</strong> {selectedShow.time}</p>
-                        <button onClick={handleUnselectShow}>unselectShow</button>
-                        <button onClick={handleDeleteShow}>deleteShow</button>
-                      </div>
-                      <div style={{ position: 'absolute', right: 100, top:100 }}>
-                        <h3>Venue Layout</h3>
-                        <div style={{ display: 'flex' }}>
-                          <Section title="Left" rows={leftRow} cols={leftCol} canSelect={true}/>
-                          <Section title="Center" rows={centerRow} cols={centerCol} canSelect={true}/>
-                          <Section title="Right" rows={rightRow} cols={rightCol} canSelect={true}/>
-                        </div>
-                      </div>
+                        <p>Welcome back, {loggedInUser.role} {loggedInUser.username}! Now you may manage.</p>
+                        <button onClick={onLogout}>Logout</button>
+                        {/* <Link to="/">Customer View</Link> */}
                     </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-            <div>
-              <div style={{ position: 'absolute', left: 100, top:50 }}>
-                <input type="text" value={showName} onChange={(e) => setShowName(e.target.value)} placeholder="Show Name"/> <p></p>
-                <input type="number" value={showDate} onChange={(e) => setShowDate(parseInt(e.target.value, 10))} placeholder="Show Date in MMDDYY Format"/><p></p>
-                <input type="number" value={showTime} onChange={(e) => setShowTime(parseInt(e.target.value, 10))} placeholder="Show Time in HHMM Format"/><p></p>
-                <p>Confirm the information: </p>
-                <p>Show Name: {showName}</p> {displayDate(showDate)} {displayTime(showTime)}
-                <button onClick={createShow}>Submit</button>
-              </div>
-              <div style={{ position: 'absolute', right: 100, top:100 }}>
-                <h3>Venue Layout</h3>
-                <div style={{ display: 'flex' }}>
-                  <Section title="Left" rows={leftRow} cols={leftCol} canSelect={false}/>
-                  <Section title="Center" rows={centerRow} cols={centerCol} canSelect={false}/>
-                  <Section title="Right" rows={rightRow} cols={rightCol} canSelect={false}/>
-                </div>
-              </div>
+                ) : (
+                    <div>
+                        <p>Logged out</p>
+                        <Link to="/">Go back to home page</Link>
+                        <p>Or <Link to="/login">log in</Link> again here</p>
+                    </div>
+                )}
             </div>
-            )
-            }
-          </div>
-        </div>
             
-      </div>
-        )
-      }
-    </div>
+            {loggedInUser && (
+            <div>
+                {!venueCreated ? (
+                    <div>
+                        <div style={{ position: 'absolute', left: 100, top:100 }}>
+                            <input type="text" value={venueName} onChange={(e) => setVenueName(e.target.value)} placeholder="Venue Name"/> <p></p>
+                            <input type="number" value={leftRow} onChange={handleLeftRowChange} placeholder="left row number"/><p></p>
+                            <input type="number" value={leftCol} onChange={handleLeftColChange} placeholder="left col number"/><p></p>
+                            <input type="number" value={centerRow} onChange={handleCenterRowChange} placeholder="center row number"/><p></p>
+                            <input type="number" value={centerCol} onChange={handleCenterColChange} placeholder="center col number"/><p></p>
+                            <input type="number" value={rightRow} onChange={handleRightRowChange} placeholder="right row number"/><p></p>
+                            <input type="number" value={rightCol} onChange={handleRightColChange} placeholder="right col number"/><p></p>
+                            <p>Confirm the information: </p>
+                            <p>Venue Name: {venueName}</p> <p>Left Row: {leftRow}</p> <p>Left Col: {leftCol}</p> <p>Center Row: {centerRow}</p> 
+                            <p>Center Col: {centerCol}</p> <p>Right Row: {rightRow}</p> <p>Right Col: {rightCol}</p> 
+                            <button onClick={createVenue}>Submit</button>
+                        </div>
+                        <div style={{ position: 'absolute', right: 100, top:100 }}>
+                            <h3>Venue Layout</h3>
+                            <div style={{ display: 'flex' }}>
+                            <Section title="Left" rows={leftRow} cols={leftCol} canSelect={false}/>
+                            <Section title="Center" rows={centerRow} cols={centerCol} canSelect={false}/>
+                            <Section title="Right" rows={rightRow} cols={rightCol} canSelect={false}/>
+                            </div>
+                        </div>
+                    </div>
+                ):(
+                <div>
+                    
+                    <div>
+                    {!showCreating ? (
+                        <div>
+                            <div>
+                                {!selectedShow && (
+                                    <div style={{ position: 'absolute', left: 100, top:50 }}>
+                                    <h3>Your list of shows</h3>
+                                    <p>You have {showNum} shows</p>
+                                    <button onClick={creatingShow}>Create show</button>
+                                    </div>)
+                                }
+                                <div style={{ position: 'absolute', left: 100, top:200 }}>
+                                    {!selectedShow && shows.map((show, index) => (
+                                    <Show key={index} {...show} onClick={() => handleShowClick(index)} />
+                                    ))}
+                                </div>
+                                {selectedShow && (
+                                    <div>
+                                        <div style={{ position: 'absolute', left: 100, top:50 }}>
+                                            <h2>Selected Show</h2>
+                                            <p><strong>Show:</strong> {selectedShow.name}</p>
+                                            <p><strong>Date:</strong> {selectedShow.date}</p>
+                                            <p><strong>Time:</strong> {selectedShow.time}</p>
+                                            <button onClick={handleUnselectShow}>unselectShow</button>
+                                            <button onClick={handleDeleteShow}>deleteShow</button>
+                                        </div>
+                                        <div style={{ position: 'absolute', right: 100, top:100 }}>
+                                            <h3>Venue Layout</h3>
+                                            <div style={{ display: 'flex' }}>
+                                            <Section title="Left" rows={leftRow} cols={leftCol} canSelect={true}/>
+                                            <Section title="Center" rows={centerRow} cols={centerCol} canSelect={true}/>
+                                            <Section title="Right" rows={rightRow} cols={rightCol} canSelect={true}/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        <div>
+                            <div style={{ position: 'absolute', left: 100, top:50 }}>
+                                <input type="text" value={showName} onChange={(e) => setShowName(e.target.value)} placeholder="Show Name"/> <p></p>
+                                <input type="number" value={showDate} onChange={(e) => setShowDate(parseInt(e.target.value, 10))} placeholder="Show Date in MMDDYY Format"/><p></p>
+                                <input type="number" value={showTime} onChange={(e) => setShowTime(parseInt(e.target.value, 10))} placeholder="Show Time in HHMM Format"/><p></p>
+                                <p>Confirm the information: </p>
+                                <p>Show Name: {showName}</p> {displayDate(showDate)} {displayTime(showTime)}
+                                <button onClick={createShow}>Submit</button>
+                            </div>
+                            <div style={{ position: 'absolute', right: 100, top:100 }}>
+                                <h3>Venue Layout</h3>
+                                <div style={{ display: 'flex' }}>
+                                <Section title="Left" rows={leftRow} cols={leftCol} canSelect={false}/>
+                                <Section title="Center" rows={centerRow} cols={centerCol} canSelect={false}/>
+                                <Section title="Right" rows={rightRow} cols={rightCol} canSelect={false}/>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    </div> 
+                </div>
+                )}
+            </div>
+            )}
+            
+        </div>
     )
   };
   
