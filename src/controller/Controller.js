@@ -53,36 +53,38 @@ export async function deleteVenueC(manager){
     manager.deleteVenue();
 }
 
-export async function createShowC(manager, name, date, time){
+export async function createShowC(manager, name, date, time) {
     manager.venue.addShow(name, date, time);
-    console.log(manager);
 
-    const month = parseInt(date / 10000, 10);
-    const day = parseInt((date - month * 10000) / 100, 10);
-    const year = date - month * 10000 - day * 100 + 2000;
-    date = year * 10000000000 + month * 100000000 + day * 1000000 + time * 100
+    const year = Math.floor(date / 10000);
+    const month = Math.floor((date % 10000) / 100);
+    const day = date % 100;
 
-    console.log(date)
+    const hours = Math.floor(time / 100);
+    const minutes = time % 100;
+
+    const isoDateString = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
+
+    const isoDate = new Date(isoDateString);
 
     try {
         const res = await fetch(
-        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/createevent",
-        {
-            credentials: "include",
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                "name": name, 
-                "venueId": manager.id,
-                "date": date
-            }),
-        }
+            "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/createevent",
+            {
+                credentials: "include",
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: name,
+                    venueId: manager.id,
+                    date: isoDate.toISOString(), //sends the date UTC
+                }),
+            }
         );
 
         // const data = await res.json();
         // console.log(data.insertId)
     } catch (error) {
-        console.error("Error occurred during login:", error);
+        console.error("Error occurred during creating a show:", error);
     }
-
 }

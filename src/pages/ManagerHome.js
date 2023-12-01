@@ -105,20 +105,48 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
         setShowCreated(true);
     }
 
+    const formatDateTime = (date, time) => {
+        const year = Math.floor(date / 10000);
+        const month = Math.floor((date % 10000) / 100);
+        const day = date % 100;
+    
+        const hours = Math.floor(time / 100);
+        const minutes = time % 100;
+    
+        return `${year.toString().padStart(2, '0')}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    };
+    
+    const handleDateTimeChange = (datetimeString) => {
+        const selectedDate = new Date(datetimeString); // Convert string to Date object
+        if (!isNaN(selectedDate)) {
+            // Check if the conversion was successful
+            const year = selectedDate.getFullYear(); // Extract YYYY
+            const month = selectedDate.getMonth() + 1; // GetMonth is zero-based
+            const day = selectedDate.getDate();
+    
+            const hours = selectedDate.getHours();
+            const minutes = selectedDate.getMinutes();
+    
+            // Convert date and time to your desired format and update state variables
+            setShowDate(year * 10000 + month * 100 + day);
+            setShowTime(hours * 100 + minutes);
+        }
+    };
+    
+
     const displayDate = (date) => {
-        const month = parseInt(date / 10000, 10);
-        const day = parseInt((date - month * 10000) / 100, 10);
-        const year = date - month * 10000 - day * 100 + 2000;
-
-        return <p>Date: Month {month} / Day {day} / Year {year}</p>
-    }
-
+        const year = Math.floor(date / 10000);
+        const month = Math.floor((date % 10000) / 100);
+        const day = date % 100;
+        return `Date: Month ${month.toString().padStart(2, '0')} / Day ${day.toString().padStart(2, '0')} / Year ${year}`;
+    };
+    
     const displayTime = (time) => {
-        const hour = parseInt(time / 100, 10);
-        const minute = time - hour * 100
-
-        return <p>Time: {hour} : {minute}</p>
-    }
+        const hour = Math.floor(time / 100);
+        const minute = time % 100;
+        return `Time: ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+    };
+    
 
   return (
     <div>
@@ -195,10 +223,13 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
         {loggedInUser && showCreating ? (
             <div className="left-container">
                 <input type="text" value={showName} onChange={(e) => setShowName(e.target.value)} placeholder="Show Name"/> <p></p>
-                <input type="number" value={showDate} onChange={(e) => setShowDate(parseInt(e.target.value, 10))} placeholder="Show Date in MMDDYY Format"/><p></p>
-                <input type="number" value={showTime} onChange={(e) => setShowTime(parseInt(e.target.value, 10))} placeholder="Show Time in HHMM Format"/><p></p>
+                {/* <input type="number" value={showDate} onChange={(e) => setShowDate(parseInt(e.target.value, 10))} placeholder="Show Date in MMDDYY Format"/><p></p> */}
+                <input type="datetime-local" value={formatDateTime(showDate, showTime)} onChange={(e) => handleDateTimeChange(e.target.value)} placeholder="Show Date and Time"/>
+                {/* <input type="datetime-local" value={showDate} onChange={(e) => setShowDate(parseInt(e.target.value, 10))} placeholder="Show Date in MMDDYY Format"/> */}
+                {/* <input type="number" value={showTime} onChange={(e) => setShowTime(parseInt(e.target.value, 10))} placeholder="Show Time in HHMM Format"/><p></p> */}
                 <p>Confirm the information: </p>
-                <p>Show Name: {showName}</p> {displayDate(showDate)} {displayTime(showTime)}
+                <p>Show Name: {showName}</p> 
+                <p>{displayDate(showDate)} {displayTime(showTime)}</p>
                 <button onClick={createShow}>Submit</button>
                 <button>Add block</button>
                 <button>Delete block</button>
@@ -221,8 +252,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                     {manager.venue.shows.map((show, index) => (
                     <div key={index}>
                         <p>Show Name: {show.name}</p>
-                        {displayDate(show.date)}
-                        {displayTime(show.time)}
+                        <p>{displayDate(show.date)} {displayTime(show.time)}</p>
                     </div>
                     ))}
                 </div>
