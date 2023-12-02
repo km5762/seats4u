@@ -410,7 +410,24 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
   
     const createVenue = () => {
       setVenueCreated(true);
-      };
+      createVenueC(manager, venueName, leftRow, leftCol, rightRow, rightCol, centerRow, centerCol);
+    };
+
+    const deleteVenue = () => {
+        deleteVenueC(manager);
+        setVenueCreated(false);
+        setVenueName('');
+        setLeftRow('');
+        setLeftCol('');
+        setRightRow('');
+        setRightCol('');
+        setCenterRow('');
+        setCenterCol('');
+        setShowCreating(false);
+        setShowNum(0);
+        console.log(manager.venue);
+        onLogout(); 
+  };
   
     const handleLeftRowChange = (e) => {
       const value = parseInt(e.target.value, 10);
@@ -488,12 +505,18 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     }
   
     const createShow = () => {
-      const month = parseInt(showDate / 10000, 10);
-      const day = parseInt((showDate - month * 10000) / 100, 10);
-      const year = showDate - month * 10000 - day * 100 + 2000;
-      const hour = parseInt(showTime / 100, 10);
-      const minute = showTime - hour * 100
-      addShow({ name: showName, date: `${year}-${month}-${day}`, time: `${hour}:${minute}` });
+      // const month = parseInt(showDate / 10000, 10);
+      // const day = parseInt((showDate - month * 10000) / 100, 10);
+      // const year = showDate - month * 10000 - day * 100 + 2000;
+      // const hour = parseInt(showTime / 100, 10);
+      // const minute = showTime - hour * 100;
+      const year = Math.floor(showDate / 10000);
+      const month = Math.floor((showDate % 10000) / 100);
+      const day = showDate % 100;
+      const hours = Math.floor(showTime / 100);
+      const minutes = showTime % 100;
+      createShowC(manager,showName, showDate, showTime);
+      addShow({ name: showName, date: `${year}-${month}-${day}`, time: `${hours}:${minutes}` });
       setShowName('');
       setShowDate('');
       setShowTime('');
@@ -602,6 +625,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                     <h3>Your list of shows</h3>
                                     <p>You have {showNum} shows</p>
                                     <button onClick={creatingShow}>Create show</button>
+                                    <button onClick={deleteVenue}>Delete Venue</button>
                                     </div>)
                                 }
                                 <div style={{ position: 'absolute', left: 100, top:200 }}>
@@ -637,8 +661,12 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                 <input type="text" value={showName} onChange={(e) => setShowName(e.target.value)} placeholder="Show Name"/> <p></p>
                                 <input type="datetime-local" value={formatDateTime(showDate, showTime)} onChange={(e) => handleDateTimeChange(e.target.value)} placeholder="Show Date and Time"/>
                                 <p>Confirm the information: </p>
-                                <p>Show Name: {showName}</p> {displayDate(showDate)} {displayTime(showTime)}
-                                <button onClick={createShow}>Submit</button>
+                                <p>Show Name: {showName}</p> 
+                                <p>{displayDate(showDate)}</p>
+                                <p>{displayTime(showTime)}</p>
+                                <div>
+                                  <button onClick={createShow}>Submit</button>
+                                </div>
                             </div>
                             <div style={{ position: 'absolute', right: 100, top:100 }}>
                                 <h3>Venue Layout</h3>
