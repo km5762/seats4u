@@ -110,3 +110,22 @@ export async function createShowC(manager, name, date, time) {
         console.error("Error occurred during creating a show:", error);
     }
 }
+
+export async function activateShowC(showToActivate) {
+    try {
+        const res = await fetch(
+            "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/activateevent",
+            {
+                credentials: "include",
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(showToActivate),
+            }
+        );
+
+        const data = await res.json();
+        console.log(data);
+    } catch (error) {
+        console.error("Error occurred while activating show:", error);
+    }
+}
