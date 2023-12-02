@@ -53,6 +53,22 @@ export class Venue {
         let show = new Show(name, date, time);
         this.shows.push(show);
     }
+
+    deleteShow(showToDelete) {
+        const initialShowCount = this.shows.length;
+        this.shows = this.shows.filter(show => {
+            return !(show.name === showToDelete.name && 
+                     show.date === showToDelete.date && 
+                     show.time === showToDelete.time);
+        });
+    
+        const deletedShowCount = initialShowCount - this.shows.length;
+        if (deletedShowCount > 0) {
+            console.log(`Deleted show: Name '${showToDelete.name}', Date '${showToDelete.date}', Time '${showToDelete.time}'.`);
+        } else {
+            console.log(`No matching show found for deletion.`);
+        }
+    }    //Use find()??
 }
 
 export class VenueManager {

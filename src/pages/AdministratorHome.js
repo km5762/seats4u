@@ -3,6 +3,20 @@ import { Link, useLocation } from "react-router-dom";
 import SearchBar from "../component/SearchBar";
 import { Administrator } from "../model/Model";
 
+// Show component representing a rectangular block
+const Venue = ({ name,  onClick }) => (
+  <div style={{ 
+    border: '1px solid black', 
+    padding: '10px', 
+    marginBottom: '10px', 
+    cursor: 'pointer',
+    width: '200px', // Set a fixed width for each block
+    boxSizing: 'border-box', // Include padding and border in the width calculation
+  }} onClick={onClick}>
+    <p><strong>Venue:</strong> {name}</p>
+  </div>
+);
+
 const AdminHome = ({ loggedInUser, onLogout }) => {
   const [administrator, setAdministrator] = React.useState(new Administrator());
   const [searchQuery, setSearchQuery] = useState("");
@@ -13,9 +27,21 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
   console.log(receivedData);
 
   const [venues, setVenues] = useState(location.state.userData.venues);
+  const [selectedVenue, setSelectedVenue] = useState(null);
 
   const handleSearch = () => {
     console.log(`Search query: ${searchQuery}`);
+  };
+
+  const handleVenueClick = (index) => {
+    console.log(venues);
+    setSelectedVenue(venues[index]);
+    console.log(venues[index]);
+    console.log(venues);
+  };
+
+  const handleUnselectVenue = () => {
+    setSelectedVenue(null);
   };
 
   async function listVenues() {
@@ -59,31 +85,39 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
               {loading ? (
                 <p>loading... </p>
               ) : (
-                <button onClick={listVenues}>Refresh</button>
+                  <div>
+                    <button onClick={listVenues}>Refresh</button>
+                  </div>
               )}
               {venues.length ? (
-                <div className="middle-container">
-                  <p>You have {venues.length} venues.</p>
-                  <p>-------------------------------------------------</p>
-                  {venues.map((venue, index) => (
-                    <div key={index}>
-                      <p>Venue Name: {venues[index].name}</p>
-                      <p>Venue List of shows:</p>
-                      {/* {administrator.venues[index].shows.length ? (
-                          <div>
-                          {administrator.venues[index].shows.map((show, j) => (
-                            <div key={j}>
-                                {administrator.venues[index].shows[j].name}
-                            </div>
-                            ))}
-                          </div>
-                          )
-                          :(
-                            <div>No shows yet</div>
-                          )} */}
-                      <p>-------------------------------------------------</p>
-                    </div>
-                  ))}
+                <div>
+                  <div style={{ position: 'absolute', left: 625, top:200 }}>
+                    {!selectedVenue && venues.map((venue, index) => (
+                      <div>
+                        <h3>List of venues:</h3>
+                        <Venue key={index} {...venue} onClick={() => handleVenueClick(index)} />
+                      </div>
+                      ))}
+                  </div>
+                  <div className="middle-container">
+                    {selectedVenue && (
+                      <div>
+                        <p><strong>Selected Venue:</strong> {selectedVenue.name}</p>
+                        <button onClick={handleUnselectVenue}>unselectVenue</button>
+                      </div>
+                    )}
+                  </div>
+                  {/* <div className="middle-container">
+                    <p>You have {venues.length} venues.</p>
+                    <p>-------------------------------------------------</p>
+                    {venues.map((venue, index) => (
+                      <div key={index}>
+                        <p>Venue Name: {venues[index].name}</p>
+                        <p>Venue List of shows:</p>
+                        <p>-------------------------------------------------</p>
+                      </div>
+                    ))}
+                  </div> */}
                 </div>
               ) : (
                 <div>No venues yet</div>
