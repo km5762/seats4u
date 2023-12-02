@@ -130,6 +130,17 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
             setVenueName(firstVenue.name); 
             setVenueCreated(true);
         }
+
+        if (receivedData && receivedData.events && receivedData.events.length > 0) {
+            const events = receivedData.events;
+    
+            const showsFromEvents = events.map((event, index) => {
+                const { id, name, date, time } = event;
+                return { id, name, date, time,};
+            });
+    
+            setShows(showsFromEvents);
+        }
     }, [receivedData]);
 
     // venues
@@ -255,14 +266,12 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     
       // Call createShowC with await if it returns a Promise
       createShowC(manager, showName, showDate, showTime).then((id) => {
-        console.log(id);
     
         // Set manager.showId after the asynchronous operation completes
         manager.showId = id;
     
         // Use setTimeout to introduce a delay
         setTimeout(() => {
-          console.log(manager.showId);
     
           // Access manager.showId after the delay
           addShow({

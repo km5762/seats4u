@@ -108,11 +108,8 @@ export async function createShowC(manager, name, date, time) {
         console.log(data.eventId);
 
         manager.showId = data.eventId;
-        console.log(manager.showId);
         manager.venue.addShow(data.eventId, name, date, time);
         return data.eventId;
-        // const data = await res.json();
-        // console.log(data.insertId)
 
     } catch (error) {
         console.error("Error occurred during creating a show:", error);
@@ -122,7 +119,6 @@ export async function createShowC(manager, name, date, time) {
 
 export async function activateShowC(activateShow) {
     try {
-        console.log(activateShow)
         console.log(activateShow.id)
         const res = await fetch(
             "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/activateevent",
@@ -130,12 +126,9 @@ export async function activateShowC(activateShow) {
                 credentials: "include",
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ "eventId": activateShow.id}),
+                body: JSON.stringify({ eventId: activateShow.id}),
             }
         );
-
-        const data = await res.json();
-        console.log(data);
     } catch (error) {
         console.error("Error occurred while activating show:", error);
     }
