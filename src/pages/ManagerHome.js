@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { createVenueC, deleteVenueC, createShowC } from '../controller/Controller';
+import { createVenueC, deleteVenueC, createShowC, deleteShowC } from '../controller/Controller';
 import BlockCanvas from '../boundary/Boundary';
 import { VenueManager } from '../model/Model';
 
@@ -245,7 +245,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       const hours = Math.floor(showTime / 100);
       const minutes = showTime % 100;
       createShowC(manager,showName, showDate, showTime);
-      addShow({ name: showName, date: `${year}-${month}-${day}`, time: `${hours}:${minutes}` });
+      addShow({id: manager.showId, name: showName, date: `${year}-${month}-${day}`, time: `${hours}:${minutes}` });
       setShowName('');
       setShowDate('');
       setShowTime('');

@@ -45,7 +45,7 @@ export async function deleteVenueC(manager){
         );
 
         const data = await res.json();
-        console.log(data)
+        console.log(data);
     } catch (error) {
         console.error("Error occurred during deleting venue:", error);
     }
@@ -104,8 +104,10 @@ export async function createShowC(manager, name, date, time) {
             }
         );
 
-        // const data = await res.json();
-        // console.log(data.insertId)
+        const data = await res.json();
+        console.log(data.eventId);
+        manager.addShowId(data.eventId);
+
     } catch (error) {
         console.error("Error occurred during creating a show:", error);
     }

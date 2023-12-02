@@ -30,7 +30,8 @@ export class Show {
     //     this.active = active
     //     this.block_layout = block_layout
     // }
-    constructor(name, date, time){
+    constructor(id , name, date, time){
+        this.id = id
         this.name = name
         this.date = date
         this.time = time
@@ -88,6 +89,9 @@ export class VenueManager {
 
     addId(id){
         this.id = id;
+    }
+    addShowId(id){
+        this.showId = id;
     }
 }
 
