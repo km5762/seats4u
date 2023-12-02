@@ -133,9 +133,6 @@ export async function activateShowC(activateShow) {
                 body: JSON.stringify({ "eventId": activateShow.id}),
             }
         );
-
-        const data = await res.json();
-        console.log(data);
     } catch (error) {
         console.error("Error occurred while activating show:", error);
     }
