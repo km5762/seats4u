@@ -91,7 +91,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
               )}
               {venues.length ? (
                 <div>
-                  <div style={{ position: 'absolute', left: 625, top:200 }}>
+                  <div style={{ position: 'absolute', left: 640, top:200 }}>
                     {!selectedVenue && (
                       <div>
                         <h3>You have {venues.length} venues.</h3>
