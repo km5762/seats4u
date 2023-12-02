@@ -15,9 +15,8 @@ const Role = Object.freeze({ ADMIN: 1, VENUE_MANAGER: 2 });
 
 export const handler = function (event, context, callback) {
   const cookie = event.headers.cookie;
-  console.log(cookie);
 
-  let user;
+  let user = { roleId: undefined };
   if (cookie) {
     const token = cookie.split("=")[1];
 
@@ -28,7 +27,7 @@ export const handler = function (event, context, callback) {
     }
   }
 
-  switch (user ? user.roleId : undefined) {
+  switch (user.roleId) {
     case Role.ADMIN:
       callback(null, generatePolicy("user", "Allow", event.routeArn, user));
       break;
