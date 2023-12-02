@@ -108,8 +108,8 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
       boxSizing: 'border-box', // Include padding and border in the width calculation
     }} onClick={onClick}>
       <p><strong>Show:</strong> {name}</p>
-      <p><strong>Date:</strong> {date}</p>
-      <p><strong>Time:</strong> {time}</p>
+      <p><strong>Date:</strong> {date.split("T")[0]}</p>
+      <p><strong>Time:</strong> {date.split("T")[1]}</p>
       <p><strong>Id:</strong> {id}</p>
     </div>
   );
