@@ -35,12 +35,12 @@ export async function deleteVenueC(manager){
 
     try {
         const res = await fetch(
-        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/deleteevent",
+        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/deletevenue",
         {
             credentials: "include",
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ venueId: manager.id }),              
+            body: JSON.stringify({ venueId: manager.id }),
         }
         );
 

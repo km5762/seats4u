@@ -68,7 +68,7 @@ export class Venue {
         } else {
             console.log(`No matching show found for deletion.`);
         }
-    }              //Use find()??
+    }    //Use find()??
 }
 
 export class VenueManager {
