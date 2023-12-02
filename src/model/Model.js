@@ -30,7 +30,8 @@ export class Show {
     //     this.active = active
     //     this.block_layout = block_layout
     // }
-    constructor(name, date, time){
+    constructor(id , name, date, time){
+        this.id = id
         this.name = name
         this.date = date
         this.time = time
@@ -49,8 +50,8 @@ export class Venue {
         this.shows = []
     }
 
-    addShow(name, date, time){
-        let show = new Show(name, date, time);
+    addShow(id, name, date, time){
+        let show = new Show(id,name, date, time);
         this.shows.push(show);
     }
 

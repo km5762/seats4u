@@ -99,7 +99,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                       </div>
                     )}
                     {!selectedVenue && venues.map((venue, index) => (
-                      <div>
+
                         <Venue key={index} {...venue} onClick={() => handleVenueClick(index)} />
                       </div>
                       ))}
