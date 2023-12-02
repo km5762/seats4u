@@ -50,8 +50,8 @@ export class Venue {
         this.shows = []
     }
 
-    addShow(name, date, time){
-        let show = new Show(name, date, time);
+    addShow(id, name, date, time){
+        let show = new Show(id,name, date, time);
         this.shows.push(show);
     }
 

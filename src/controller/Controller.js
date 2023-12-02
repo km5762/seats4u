@@ -76,7 +76,7 @@ export async function deleteShowC(manager, showToDelete) {
 }
 
 export async function createShowC(manager, name, date, time) {
-    manager.venue.addShow(name, date, time);
+    
 
     const year = Math.floor(date / 10000);
     const month = Math.floor((date % 10000) / 100);
@@ -107,6 +107,7 @@ export async function createShowC(manager, name, date, time) {
         const data = await res.json();
         console.log(data.eventId);
         manager.addShowId(data.eventId);
+        manager.addShow(data.eventId, name, date, time);
 
     } catch (error) {
         console.error("Error occurred during creating a show:", error);
