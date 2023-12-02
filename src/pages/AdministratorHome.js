@@ -92,9 +92,14 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
               {venues.length ? (
                 <div>
                   <div style={{ position: 'absolute', left: 625, top:200 }}>
+                  {!selectedVenue ? (
+                    <div>
+                    <h3>List of venues:</h3>
+                    </div>
+                  ) : (<div></div>)}
                     {!selectedVenue && venues.map((venue, index) => (
                       <div>
-                        <h3>List of venues:</h3>
+                        {/* <h3>List of venues:</h3> */}
                         <Venue key={index} {...venue} onClick={() => handleVenueClick(index)} />
                       </div>
                       ))}

@@ -45,7 +45,7 @@ export async function deleteVenueC(manager){
         );
 
         const data = await res.json();
-        console.log(data)
+        console.log(data);
     } catch (error) {
         console.error("Error occurred during deleting venue:", error);
     }
@@ -76,7 +76,7 @@ export async function deleteShowC(manager, showToDelete) {
 }
 
 export async function createShowC(manager, name, date, time) {
-    manager.venue.addShow(name, date, time);
+    
 
     const year = Math.floor(date / 10000);
     const month = Math.floor((date % 10000) / 100);
@@ -104,22 +104,27 @@ export async function createShowC(manager, name, date, time) {
             }
         );
 
-        // const data = await res.json();
-        // console.log(data.insertId)
+        const data = await res.json();
+        console.log(data.eventId);
+        manager.addShowId(data.eventId);
+        manager.venue.addShow(data.eventId, name, date, time);
+
     } catch (error) {
         console.error("Error occurred during creating a show:", error);
     }
 }
 
-export async function activateShowC(showToActivate) {
+export async function activateShowC(activateShow) {
     try {
+        console.log(activateShow)
+        console.log(activateShow.id)
         const res = await fetch(
             "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/activateevent",
             {
                 credentials: "include",
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ eventId: showToActivate}),
+                body: JSON.stringify({ "eventId": activateShow.id}),
             }
         );
 
