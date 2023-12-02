@@ -227,8 +227,9 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       setSelectedShow(null);
     };
   
-    const handleDeleteShow = (showToDelete) => {
-      deleteShowC(manager, showToDelete);
+    const handleDeleteShow = () => {
+      console.log(selectedShow.id)
+      deleteShowC(manager, selectedShow);
       setShows(prevShows => prevShows.filter(show => show !== selectedShow));
       setSelectedShow(null);
       setShowNum(prevNum => prevNum - 1);
