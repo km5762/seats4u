@@ -42,7 +42,8 @@ const Login = ({ setLoggedInUser}) => {
               setLoginError("");
               setLoadingMessage("");
               navigate('/manager', { state: { userData: data } });
-              
+              console.log(res);
+              console.log(data);
             } 
           } else {
             console.log("No venues found in the response");

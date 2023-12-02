@@ -130,12 +130,11 @@ export async function activateShowC(activateShow) {
                 credentials: "include",
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ "eventId": activateShow.id}),
+                body: JSON.stringify({ eventId: activateShow.id}),
             }
         );
 
-        const data = await res.json();
-        console.log(data);
+
     } catch (error) {
         console.error("Error occurred while activating show:", error);
     }

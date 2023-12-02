@@ -130,6 +130,17 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
             setVenueName(firstVenue.name); 
             setVenueCreated(true);
         }
+
+        if (receivedData && receivedData.events && receivedData.events.length > 0) {
+            const events = receivedData.events;
+    
+            const showsFromEvents = events.map((event, index) => {
+                const { id, name, date, time } = event;
+                return { id, name, date, time,};
+            });
+    
+            setShows(showsFromEvents);
+        }
     }, [receivedData]);
 
     // venues
