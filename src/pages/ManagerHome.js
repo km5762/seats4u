@@ -109,7 +109,7 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
     }} onClick={onClick}>
       <p><strong>Show:</strong> {name}</p>
       <p><strong>Date:</strong> {date.split("T")[0]}</p>
-      <p><strong>Time:</strong> {date.split("T")[1]}</p>
+      <p><strong>Time:</strong> {date.split("T")[1].split("Z")[0]}</p>
       <p><strong>Id:</strong> {id}</p>
     </div>
   );
