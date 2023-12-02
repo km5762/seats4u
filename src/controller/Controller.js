@@ -62,11 +62,11 @@ export async function deleteShowC(manager, showToDelete) {
                 credentials: "include",
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(showToDelete),
+                body: JSON.stringify({ eventId: showToDelete.id}),
             }
         );
 
-        const data = await res.json();
+        const data = await res.text();
         console.log(data);
     } catch (error) {
         console.error("Error occurred during deleting show:", error);
@@ -106,11 +106,17 @@ export async function createShowC(manager, name, date, time) {
 
         const data = await res.json();
         console.log(data.eventId);
-        manager.addShowId(data.eventId);
+
+        manager.showId = data.eventId;
+        console.log(manager.showId);
         manager.venue.addShow(data.eventId, name, date, time);
+        return data.eventId;
+        // const data = await res.json();
+        // console.log(data.insertId)
 
     } catch (error) {
         console.error("Error occurred during creating a show:", error);
+        return null;
     }
 }
 
