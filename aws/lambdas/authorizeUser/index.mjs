@@ -44,7 +44,16 @@ export const handler = function (event, context, callback) {
       }
       break;
     default:
-      callback("Error: Invalid roleId"); // Return a 500 Invalid token response
+      if (
+        event.routeArn.includes("listvenues") ||
+        event.routeArn.includes("showavailableseats") ||
+        event.routeArn.includes("purchaseseats") ||
+        event.routeArn.includes("listevents")
+      ) {
+        callback(null, generatePolicy("user", "Allow", event.routeArn, user));
+      } else {
+        callback(null, generatePolicy("user", "Deny", event.routeArn, user));
+      }
   }
 };
 
