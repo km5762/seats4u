@@ -101,7 +101,6 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                     {!selectedVenue && venues.map((venue, index) => (
 
                         <Venue key={index} {...venue} onClick={() => handleVenueClick(index)} />
-                      </div>
                       ))}
                   </div>
                   <div className="middle-container">
