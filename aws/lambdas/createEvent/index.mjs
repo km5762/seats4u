@@ -56,13 +56,14 @@ export const handler = async (event) => {
     user.roleId === Role.ADMIN
   ) {
     try {
-      await connection.execute(
+      const [res] = await connection.execute(
         "INSERT INTO event (venue_id, name, date) VALUES (?, ?, ?)",
         [venueId, name, date]
       );
 
       return {
         statusCode: 200,
+        body: JSON.stringify({ eventId: res.insertId }),
       };
     } catch (error) {
       console.error("Database error: ", error);
