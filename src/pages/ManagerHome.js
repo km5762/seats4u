@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { createVenueC, deleteVenueC, createShowC } from '../controller/Controller';
+import { createVenueC, deleteVenueC, createShowC, activateShowC } from '../controller/Controller';
 import BlockCanvas from '../boundary/Boundary';
 import { VenueManager } from '../model/Model';
 
@@ -227,7 +227,8 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       setSelectedShow(null);
     };
   
-    const handleDeleteShow = () => {
+    const handleDeleteShow = (showToDelete) => {
+      deleteShowC(manager, showToDelete);
       setShows(prevShows => prevShows.filter(show => show !== selectedShow));
       setSelectedShow(null);
       setShowNum(prevNum => prevNum - 1);
@@ -235,6 +236,11 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
   
     const creatingShow = () => {
       setShowCreating(true);
+    }
+
+    const activateShow = () => {
+      activateShowC(selectedShow)
+      console.log(selectedShow)
     }
   
     const createShow = () => {
@@ -370,6 +376,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                             <p><strong>Date:</strong> {selectedShow.date}</p>
                                             <p><strong>Time:</strong> {selectedShow.time}</p>
                                             <button onClick={handleUnselectShow}>unselectShow</button>
+                                            <button onClick={activateShow}>activateShow</button>
                                             <button onClick={handleDeleteShow}>deleteShow</button>
                                         </div>
                                         <div style={{ position: 'absolute', right: 100, top:100 }}>
