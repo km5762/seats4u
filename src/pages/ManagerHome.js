@@ -98,7 +98,7 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
   };
   
   // Show component representing a rectangular block
-  const Show = ({ name, date, time, onClick }) => (
+  const Show = ({ name, date, time, onClick, id }) => (
     <div style={{ 
       border: '1px solid black', 
       padding: '10px', 
@@ -110,6 +110,7 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
       <p><strong>Show:</strong> {name}</p>
       <p><strong>Date:</strong> {date}</p>
       <p><strong>Time:</strong> {time}</p>
+      <p><strong>Id:</strong> {id}</p>
     </div>
   );
 
@@ -239,6 +240,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       setShowCreating(true);
     }
 
+
     const activateShow = () => {
       activateShowC(selectedShow)
       console.log(selectedShow)
@@ -250,14 +252,37 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       const day = showDate % 100;
       const hours = Math.floor(showTime / 100);
       const minutes = showTime % 100;
-      createShowC(manager,showName, showDate, showTime);
-      addShow({id: manager.showId, name: showName, date: `${year}-${month}-${day}`, time: `${hours}:${minutes}` });
-      setShowName('');
-      setShowDate('');
-      setShowTime('');
-      setShowNum(prevNum => prevNum + 1);
-      setShowCreating(false);
-    }
+    
+      // Call createShowC with await if it returns a Promise
+      createShowC(manager, showName, showDate, showTime).then((id) => {
+        console.log(id);
+    
+        // Set manager.showId after the asynchronous operation completes
+        manager.showId = id;
+    
+        // Use setTimeout to introduce a delay
+        setTimeout(() => {
+          console.log(manager.showId);
+    
+          // Access manager.showId after the delay
+          addShow({
+            name: showName,
+            date: `${year}-${month}-${day}`,
+            time: `${hours}:${minutes}`,
+            id: manager.showId,
+          });
+    
+          setShowName('');
+          setShowDate('');
+          setShowTime('');
+          setShowNum((prevNum) => prevNum + 1);
+          setShowCreating(false);
+    
+          console.log(manager.showId);
+        }, 2000);
+      });
+    };
+
 
     const formatDateTime = (date, time) => {
         const year = Math.floor(date / 10000);
@@ -364,7 +389,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                     <button onClick={deleteVenue}>Delete Venue</button>
                                     </div>)
                                 }
-                                <div style={{ position: 'absolute', left: 100, top:200 }}>
+                                <div style={{ position: 'absolute', left: 100, top:250 }}>
                                     {!selectedShow && shows.map((show, index) => (
                                     <Show key={index} {...show} onClick={() => handleShowClick(index)} />
                                     ))}
