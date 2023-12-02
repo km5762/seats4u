@@ -36,8 +36,7 @@ export const handler = function (event, context, callback) {
     case Role.VENUE_MANAGER:
       if (
         event.routeArn.includes("listvenues") ||
-        event.routeArn.includes("generateshowsreport") ||
-        event.routeArn.includes("deleteevent")
+        event.routeArn.includes("generateshowsreport")
       ) {
         callback(null, generatePolicy("user", "Deny", event.routeArn, user));
       } else {
