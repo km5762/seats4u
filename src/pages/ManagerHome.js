@@ -255,14 +255,12 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     
       // Call createShowC with await if it returns a Promise
       createShowC(manager, showName, showDate, showTime).then((id) => {
-        console.log(id);
     
         // Set manager.showId after the asynchronous operation completes
         manager.showId = id;
     
         // Use setTimeout to introduce a delay
         setTimeout(() => {
-          console.log(manager.showId);
     
           // Access manager.showId after the delay
           addShow({
