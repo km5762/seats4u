@@ -22,26 +22,25 @@ export const handler = function (event, context, callback) {
 
   const token = cookie.split("=")[1];
 
-  let roleId;
+  let user;
   try {
-    ({ roleId } = jwt.verify(token, jwtSecret));
+    user = jwt.verify(token, jwtSecret);
   } catch (error) {
     callback(error);
   }
 
-  switch (roleId) {
+  switch (user.roleId) {
     case Role.ADMIN:
-      callback(null, generatePolicy("user", "Allow", event.routeArn));
+      callback(null, generatePolicy("user", "Allow", event.routeArn, user));
       break;
     case Role.VENUE_MANAGER:
       if (
-        event.routeArn.includes("createvenue") ||
-        event.routeArn.includes("deletevenue") ||
-        event.routeArn.includes("createshow")
+        event.routeArn.includes("listvenues") ||
+        event.routeArn.includes("generateshowsreport")
       ) {
-        callback(null, generatePolicy("user", "Allow", event.routeArn));
+        callback(null, generatePolicy("user", "Deny", event.routeArn, user));
       } else {
-        callback(null, generatePolicy("user", "Deny", event.routeArn));
+        callback(null, generatePolicy("user", "Allow", event.routeArn, user));
       }
       break;
     default:
@@ -50,7 +49,7 @@ export const handler = function (event, context, callback) {
 };
 
 // Help function to generate an IAM policy
-var generatePolicy = function (principalId, effect, resource) {
+var generatePolicy = function (principalId, effect, resource, context) {
   var authResponse = {};
 
   authResponse.principalId = principalId;
@@ -67,10 +66,6 @@ var generatePolicy = function (principalId, effect, resource) {
   }
 
   // Optional output with custom properties of the String, Number or Boolean type.
-  authResponse.context = {
-    stringKey: "stringval",
-    numberKey: 123,
-    booleanKey: true,
-  };
+  authResponse.context = context;
   return authResponse;
 };
