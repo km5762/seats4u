@@ -15,21 +15,20 @@ const Role = Object.freeze({ ADMIN: 1, VENUE_MANAGER: 2 });
 
 export const handler = function (event, context, callback) {
   const cookie = event.headers.cookie;
-
-  if (!cookie) {
-    callback("Error: Cookie missing");
-  }
-
-  const token = cookie.split("=")[1];
+  console.log(cookie);
 
   let user;
-  try {
-    user = jwt.verify(token, jwtSecret);
-  } catch (error) {
-    callback(error);
+  if (cookie) {
+    const token = cookie.split("=")[1];
+
+    try {
+      user = jwt.verify(token, jwtSecret);
+    } catch (error) {
+      callback(error);
+    }
   }
 
-  switch (user.roleId) {
+  switch (user ? user.roleId : undefined) {
     case Role.ADMIN:
       callback(null, generatePolicy("user", "Allow", event.routeArn, user));
       break;
