@@ -106,11 +106,16 @@ export async function createShowC(manager, name, date, time) {
 
         const data = await res.json();
         console.log(data.eventId);
-        manager.addShowId(data.eventId);
-        manager.venue.addShow(data.eventId, name, date, time);
+        manager.showId = data.eventId;
+        console.log(manager.showId);
+
+        return data.eventId;
+        // const data = await res.json();
+        // console.log(data.insertId)
 
     } catch (error) {
         console.error("Error occurred during creating a show:", error);
+        return null;
     }
 }
 

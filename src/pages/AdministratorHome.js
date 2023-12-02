@@ -92,14 +92,14 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
               {venues.length ? (
                 <div>
                   <div style={{ position: 'absolute', left: 625, top:200 }}>
-                  {!selectedVenue ? (
-                    <div>
-                    <h3>List of venues:</h3>
-                    </div>
-                  ) : (<div></div>)}
-                    {!selectedVenue && venues.map((venue, index) => (
+                    {!selectedVenue && (
                       <div>
-                        {/* <h3>List of venues:</h3> */}
+                        <h3>You have {venues.length} venues.</h3>
+                        <h4>List of venues:</h4>
+                      </div>
+                    )}
+                    {!selectedVenue && venues.map((venue, index) => (
+
                         <Venue key={index} {...venue} onClick={() => handleVenueClick(index)} />
                       </div>
                       ))}
@@ -107,22 +107,13 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                   <div className="middle-container">
                     {selectedVenue && (
                       <div>
-                        <p><strong>Selected Venue:</strong> {selectedVenue.name}</p>
+                        <p><strong>Selected Venue:</strong></p>
+                        <p><strong>Name:</strong> {selectedVenue.name} <strong>Id:</strong> {selectedVenue.id}</p>
                         <button onClick={handleUnselectVenue}>unselectVenue</button>
+                        
                       </div>
                     )}
                   </div>
-                  {/* <div className="middle-container">
-                    <p>You have {venues.length} venues.</p>
-                    <p>-------------------------------------------------</p>
-                    {venues.map((venue, index) => (
-                      <div key={index}>
-                        <p>Venue Name: {venues[index].name}</p>
-                        <p>Venue List of shows:</p>
-                        <p>-------------------------------------------------</p>
-                      </div>
-                    ))}
-                  </div> */}
                 </div>
               ) : (
                 <div>No venues yet</div>

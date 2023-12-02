@@ -90,6 +90,7 @@ export class VenueManager {
     addId(id){
         this.id = id;
     }
+
     addShowId(id){
         this.showId = id;
     }
