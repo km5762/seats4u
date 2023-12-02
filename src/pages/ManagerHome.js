@@ -127,7 +127,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
             const hours = selectedDate.getHours();
             const minutes = selectedDate.getMinutes();
     
-            // Convert date and time to your desired format and update state variables
+            // Convert date and time
             setShowDate(year * 10000 + month * 100 + day);
             setShowTime(hours * 100 + minutes);
         }

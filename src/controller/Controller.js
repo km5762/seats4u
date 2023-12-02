@@ -35,12 +35,12 @@ export async function deleteVenueC(manager){
 
     try {
         const res = await fetch(
-        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/deletevenue",
+        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/deleteevent",
         {
             credentials: "include",
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ venueId: manager.id }),
+            body: JSON.stringify({ venueId: manager.id }),              
         }
         );
 
@@ -51,6 +51,28 @@ export async function deleteVenueC(manager){
     }
 
     manager.deleteVenue();
+}
+
+
+export async function deleteShowC(manager, showToDelete) {
+    try {
+        const res = await fetch(
+            "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/deleteevent",
+            {
+                credentials: "include",
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(showToDelete),
+            }
+        );
+
+        const data = await res.json();
+        console.log(data);
+    } catch (error) {
+        console.error("Error occurred during deleting show:", error);
+    }
+
+    manager.venue.deleteShow(showToDelete);
 }
 
 export async function createShowC(manager, name, date, time) {
