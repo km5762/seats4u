@@ -227,7 +227,8 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       setSelectedShow(null);
     };
   
-    const handleDeleteShow = () => {
+    const handleDeleteShow = (showToDelete) => {
+      deleteShowC(manager, showToDelete);
       setShows(prevShows => prevShows.filter(show => show !== selectedShow));
       setSelectedShow(null);
       setShowNum(prevNum => prevNum - 1);
@@ -370,7 +371,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                             <p><strong>Date:</strong> {selectedShow.date}</p>
                                             <p><strong>Time:</strong> {selectedShow.time}</p>
                                             <button onClick={handleUnselectShow}>unselectShow</button>
-                                            <button onClick={handleDeleteShow}>deleteShow</button>
+                                            <button onClick={handleDeleteShow(selectedShow)}>deleteShow</button>
                                         </div>
                                         <div style={{ position: 'absolute', right: 100, top:100 }}>
                                             <h3>Venue Layout</h3>
