@@ -108,8 +108,8 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
       boxSizing: 'border-box', // Include padding and border in the width calculation
     }} onClick={onClick}>
       <p><strong>Show:</strong> {name}</p>
-      <p><strong>Date:</strong> {date}</p>
-      <p><strong>Time:</strong> {time}</p>
+      <p><strong>Date:</strong> {new Date(date).toLocaleDateString()}</p>
+      <p><strong>Time:</strong> {new Date(date).toLocaleTimeString()}</p>
       {/* <p><strong>Date:</strong> {date.split("T")[0]}</p>
       <p><strong>Time:</strong> {date.split("T")[1].split("Z")[0]}</p> */}
       <p><strong>Id:</strong> {id}</p>
@@ -414,8 +414,8 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                         <div style={{ position: 'absolute', left: 100, top:50 }}>
                                             <h2>Selected Show</h2>
                                             <p><strong>Show:</strong> {selectedShow.name}</p>
-                                            <p><strong>Date:</strong> {selectedShow.date}</p>
-                                            <p><strong>Time:</strong> {selectedShow.time}</p>
+                                            <p><strong>Date:</strong> {new Date(selectedShow.date).toLocaleDateString()}</p>
+                                            <p><strong>Time:</strong> {new Date(selectedShow.date).toLocaleTimeString()}</p>
                                             <button onClick={handleUnselectShow}>unselectShow</button>
                                             <button onClick={activateShow}>activateShow</button>
                                             <button onClick={handleDeleteShow}>deleteShow</button>
