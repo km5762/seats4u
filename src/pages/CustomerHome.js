@@ -29,7 +29,11 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
   const [listOfShows, setListOfShows] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
 
+  const [loadingSearch, setLoadingSearch] = useState(false);
+  const [loadingList, setLoadingList] = useState(false);
+
   async function handleSearch(query) {
+    setLoadingSearch(true);
     setSearchQuery((prevQuery) => {
   
       // Define an async function to perform the API call
@@ -49,6 +53,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
           console.log(data);
           setSearch(true);
           setList(false);
+          setLoadingSearch(false);
           setSearchResults(data.events);
         } catch (error) {
             console.error("Error occurred while searching show:", error);
@@ -64,7 +69,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
   }
 
   async function listActiveShows() {
-    //setLoading(true);
+    setLoadingList(true);
     const res = await fetch(
       "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/listevents",
       {
@@ -77,11 +82,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
     setSearch(false);
     setList(true);
     setListOfShows(data.events);
-    // console.log(data);
-    // console.log(data.events);
-    // console.log(data.events[0].name)
-    // setSearchResults(venues);
-    //setLoading(false);
+    setLoadingList(false);
   }
 
 
@@ -93,9 +94,21 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
 
         <div className="center-container">
               <h4>For customers, you may search shows by (partial) show name and venue name here</h4>
-              <SearchBar onSearch={handleSearch} /> 
+              {loadingSearch ? (
+                <p>loading... </p>
+              ) : (
+                  <div>
+                    <SearchBar onSearch={handleSearch} /> 
+                  </div>
+              )}
               <h4>Otherwise, you may list all active shows here</h4>
-              <button onClick={listActiveShows}>List Active Shows</button>
+              {loadingList ? (
+                <p>loading... </p>
+              ) : (
+                  <div>
+                    <button onClick={listActiveShows}>List Active Shows</button>
+                  </div>
+              )}
           </div>
         
         <div className="upper-right-text">
