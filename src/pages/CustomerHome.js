@@ -2,9 +2,29 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import SearchBar from '../component/SearchBar';
 
+// Show component representing a rectangular block
+const Show = ({ name, date, time, venue }) => (
+  <div style={{ 
+    border: '1px solid black', 
+    padding: '10px', 
+    marginBottom: '10px', 
+    cursor: 'pointer',
+    width: '200px', // Set a fixed width for each block
+    boxSizing: 'border-box', // Include padding and border in the width calculation
+  }}>
+    <p><strong>Show:</strong> {name}</p>
+    <p><strong>Date:</strong> {date}</p>
+    <p><strong>Time:</strong> {time}</p>
+    <p><strong>Venue:</strong> {venue}</p>
+    {/* <p><strong>Date:</strong> {date.split("T")[0]}</p>
+    <p><strong>Time:</strong> {date.split("T")[1].split("Z")[0]}</p> */}
+  </div>
+);
+
 const CustomerHome = ({ loggedInUser, onLogout }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
   async function handleSearch(query) {
     setSearchQuery((prevQuery) => {
@@ -22,12 +42,12 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                   body: JSON.stringify({ "searchQuery": query}),
               }
           );
+          const data= await res.json();
+          console.log(data);
+          setSearchResults(data.events);
         } catch (error) {
             console.error("Error occurred while searching show:", error);
         }
-  
-        // Continue with any other logic after the API call
-        console.log('API call completed');
       };
   
       // Call the async function immediately
@@ -58,6 +78,18 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
           ) : (
               <p>You can view the shows. Please <Link to="/login">log in</Link> to purchase tickets.</p>
           )}
+        </div>
+
+        <div style={{ position: 'absolute', left: 100, top: 250, display: 'flex', flexWrap: 'wrap' }}>
+          {searchResults.map((event, index) => (
+            <Show
+              key={index}
+              name={event.event_name}
+              date={new Date(event.event_date).toLocaleDateString()}
+              time={new Date(event.event_date).toLocaleTimeString()}
+              venue={event.venue_name}
+            />
+          ))}
         </div>
 
         {/* <div className="lower-right-text">

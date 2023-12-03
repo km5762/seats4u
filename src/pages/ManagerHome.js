@@ -395,12 +395,12 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                     <div style={{ position: 'absolute', left: 100, top:50 }}>
                                     <h3>Your Venue: {venueName}</h3>
                                     <h3>Your list of shows</h3>
-                                    <p>You have {showNum} shows</p>
+                                    <p>You have {shows.length} shows</p>
                                     <button onClick={creatingShow}>Create show</button>
                                     <button onClick={deleteVenue}>Delete Venue</button>
                                     </div>)
                                 }
-                                <div style={{ position: 'absolute', left: 100, top:250 }}>
+                                <div style={{ position: 'absolute', left: 100, top:250, display: 'flex', flexWrap: 'wrap' }}>
                                     {!selectedShow && shows.map((show, index) => (
                                     <Show key={index} {...show} onClick={() => handleShowClick(index)} />
                                     ))}
