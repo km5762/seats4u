@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import SearchBar from "../component/SearchBar";
+// import SearchBar from "../component/SearchBar";
 import SpecificSearchBar from "../component/SpecificSearchBar";
 import { Administrator } from "../model/Model";
+import { deleteShowAdminC } from '../controller/Controller';
 
 // Show component representing a rectangular block
-const Show = ({ name, date, time, venue }) => (
+const Show = ({ name, date, time, venue, onClick, id }) => (
   <div style={{ 
     border: '1px solid black', 
     padding: '10px', 
@@ -13,11 +14,12 @@ const Show = ({ name, date, time, venue }) => (
     cursor: 'pointer',
     width: '200px', // Set a fixed width for each block
     boxSizing: 'border-box', // Include padding and border in the width calculation
-  }}>
+  }} onClick={onClick}>
     <p><strong>Show:</strong> {name}</p>
     <p><strong>Date:</strong> {date}</p>
     <p><strong>Time:</strong> {time}</p>
     <p><strong>Venue:</strong> {venue}</p>
+    <p><strong>Id:</strong> {id}</p>
     {/* <p><strong>Date:</strong> {date.split("T")[0]}</p>
     <p><strong>Time:</strong> {date.split("T")[1].split("Z")[0]}</p> */}
   </div>
@@ -115,6 +117,23 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
 
   administrator.venues = receivedData.venues;
 
+  const [selectedShow, setSelectedShow] = useState(null);
+
+  const handleShowClick = (index) => {
+    setSelectedShow(listOfShows[index]);
+  };
+
+  const handleUnselectShow = () => {
+    setSelectedShow(null);
+  };
+
+  const handleDeleteShow = () => {
+    console.log(selectedShow.event_id)
+    deleteShowAdminC(selectedShow.event_id);
+    setListOfShows(prevShows => prevShows.filter(show => show !== selectedShow));
+    setSelectedShow(null);
+  };
+
   return (
     <div>
       <div className="center-container">
@@ -172,15 +191,30 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                         <button onClick={handleUnselectVenue}>unselectVenue</button>
                         <SpecificSearchBar onSearch={handleSearch} initialSearchQuery={selectedVenue.name} />
                         <div style={{display: 'flex', flexWrap: 'wrap'}}>
-                          {listOfShows.map((event, index) => (
+                          {!selectedShow && listOfShows.map((event, index) => (
                             <Show
                               key={index}
                               name={event.event_name}
                               date={new Date(event.event_date).toLocaleDateString()}
                               time={new Date(event.event_date).toLocaleTimeString()}
                               venue={event.venue_name}
+                              id={event.event_id}
+                              onClick={() => handleShowClick(index)}
                             />
                           ))}
+                          {selectedShow && (
+                            <div>
+                              <Show
+                                name={selectedShow.event_name}
+                                date={new Date(selectedShow.event_date).toLocaleDateString()}
+                                time={new Date(selectedShow.event_date).toLocaleTimeString()}
+                                venue={selectedShow.venue_name}
+                                id={selectedShow.event_id}
+                              />
+                              <button onClick={handleUnselectShow}>unselectShow</button>
+                              <button onClick={handleDeleteShow}>deleteShow</button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
