@@ -60,32 +60,6 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
       return query;
     });
   }
-  
-  // async function handleSearch(query) {
-  //   setSearchQuery(query);
-
-  //   // Use the callback function to log the updated value
-  //   setSearchQuery((updatedQuery) => {
-  //     console.log(`Search query: ${updatedQuery}`);
-  //   });
-  
-  //   // Now, `searchQuery` will have the updated value
-  //   console.log(`Search query (outside callback): ${searchQuery}`);
-
-  //   try {
-  //     const res = await fetch(
-  //         "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/searchevents",
-  //         {
-  //             credentials: "include",
-  //             method: "POST",
-  //             headers: { "Content-Type": "application/json" },
-  //             body: JSON.stringify({ "searchQuery": searchQuery}),
-  //         }
-  //     );
-  //   } catch (error) {
-  //       console.error("Error occurred while searching show:", error);
-  //   }
-  // };
 
   const handleVenueClick = (index) => {
     console.log(venues);
