@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import SearchBar from '../component/SearchBar';
 
 // Show component representing a rectangular block
-const Show = ({ name, date, time, venue }) => (
+const Show = ({ name, date, time, venue, onClick }) => (
   <div style={{ 
     border: '1px solid black', 
     padding: '10px', 
@@ -11,7 +11,7 @@ const Show = ({ name, date, time, venue }) => (
     cursor: 'pointer',
     width: '200px', // Set a fixed width for each block
     boxSizing: 'border-box', // Include padding and border in the width calculation
-  }}>
+  }} onClick={onClick}>
     <p><strong>Show:</strong> {name}</p>
     <p><strong>Date:</strong> {date}</p>
     <p><strong>Time:</strong> {time}</p>
@@ -31,6 +31,25 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
 
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [loadingList, setLoadingList] = useState(false);
+
+  const [selectedShow, setSelectedShow] = useState(null);
+  const [selectedShowList, setSelectedShowList] = useState(null);
+
+  const handleShowClick = (index) => {
+    setSelectedShow(searchResults[index]);
+  };
+
+  const handleShowClickList = (index) => {
+    setSelectedShowList(listOfShows[index]);
+  };
+
+  const handleUnselectShow = () => {
+    setSelectedShow(null);
+  };
+
+  const handleUnselectShowList = () => {
+    setSelectedShowList(null);
+  };
 
   async function handleSearch(query) {
     setLoadingSearch(true);
@@ -92,7 +111,8 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
           <img src='/pictures/logo.png' alt="Logo" width="250" height="100" />
         </div>
 
-        <div className="center-container">
+        {!selectedShow && !selectedShowList && (
+          <div className="center-container">
               <h4>For customers, you may search shows by (partial) show name and venue name here</h4>
               {loadingSearch ? (
                 <p>loading... </p>
@@ -110,37 +130,63 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                   </div>
               )}
           </div>
+        )}
         
         <div className="upper-right-text">
-          {loggedInUser ? (
+          {/* {loggedInUser ? (
             <div>
               <p>Welcome back, {loggedInUser.role} {loggedInUser.username}! Now you may purchase tickets.</p>
               <button onClick={onLogout}>Logout</button>
             </div>
           ) : (
               <p>Please <Link to="/login">log in</Link> here.</p>
-          )}
+          )} */}
+          <p>Please <Link to="/login">log in</Link> here.</p>
         </div>
 
         <div style={{ position: 'absolute', left: 100, top: 350, display: 'flex', flexWrap: 'wrap' }}>
-          {search && searchResults.map((event, index) => (
+          {search && !selectedShow && searchResults.map((event, index) => (
             <Show
               key={index}
               name={event.event_name}
               date={new Date(event.event_date).toLocaleDateString()}
               time={new Date(event.event_date).toLocaleTimeString()}
               venue={event.venue_name}
+              onClick={() => handleShowClick(index)}
             />
           ))}
-          {list && listOfShows.map((event, index) => (
+          {selectedShow && (
+            <div>
+              <Show
+                name={selectedShow.event_name}
+                date={new Date(selectedShow.event_date).toLocaleDateString()}
+                time={new Date(selectedShow.event_date).toLocaleTimeString()}
+                venue={selectedShow.venue_name}
+              />
+              <button onClick={handleUnselectShow}>unselectShow</button>
+            </div>
+          )}
+          {list && !selectedShowList && listOfShows.map((event, index) => (
             <Show
               key={index}
               name={event.name}
               date={new Date(event.date).toLocaleDateString()}
               time={new Date(event.date).toLocaleTimeString()}
               venue={event.venue_id}
+              onClick={() => handleShowClickList(index)}
             />
           ))}
+          {selectedShowList && (
+            <div>
+              <Show
+                name={selectedShowList.name}
+                date={new Date(selectedShowList.date).toLocaleDateString()}
+                time={new Date(selectedShowList.date).toLocaleTimeString()}
+                venue={selectedShowList.venue_id}
+              />
+              <button onClick={handleUnselectShowList}>unselectShow</button>
+            </div>
+          )}
         </div>
 
         {/* <div className="lower-right-text">
