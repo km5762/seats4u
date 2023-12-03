@@ -1,7 +1,27 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import SearchBar from "../component/SearchBar";
+import SpecificSearchBar from "../component/SpecificSearchBar";
 import { Administrator } from "../model/Model";
+
+// Show component representing a rectangular block
+const Show = ({ name, date, time, venue }) => (
+  <div style={{ 
+    border: '1px solid black', 
+    padding: '10px', 
+    marginBottom: '10px', 
+    cursor: 'pointer',
+    width: '200px', // Set a fixed width for each block
+    boxSizing: 'border-box', // Include padding and border in the width calculation
+  }}>
+    <p><strong>Show:</strong> {name}</p>
+    <p><strong>Date:</strong> {date}</p>
+    <p><strong>Time:</strong> {time}</p>
+    <p><strong>Venue:</strong> {venue}</p>
+    {/* <p><strong>Date:</strong> {date.split("T")[0]}</p>
+    <p><strong>Time:</strong> {date.split("T")[1].split("Z")[0]}</p> */}
+  </div>
+);
 
 // Show component representing a rectangular block
 const Venue = ({ name,  onClick }) => (
@@ -29,6 +49,8 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
   const [venues, setVenues] = useState(location.state.userData.venues);
   const [selectedVenue, setSelectedVenue] = useState(null);
 
+  const [listOfShows, setListOfShows] = useState([]);
+
   async function handleSearch(query) {
     setSearchQuery((prevQuery) => {
   
@@ -45,6 +67,8 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                   body: JSON.stringify({ "searchQuery": query}),
               }
           );
+          const data = await res.json();
+          setListOfShows(data.events);
         } catch (error) {
             console.error("Error occurred while searching show:", error);
         }
@@ -70,6 +94,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
 
   const handleUnselectVenue = () => {
     setSelectedVenue(null);
+    setListOfShows([]);
   };
 
   async function listVenues() {
@@ -98,7 +123,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
       <div>
         {loggedInUser && (
           <div style={{ position: 'absolute', left: 650, top:120 }}>
-              <SearchBar onSearch={handleSearch} /> 
+              {/* <SearchBar onSearch={handleSearch} />  */}
           </div>
         )}
       </div>
@@ -145,7 +170,18 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                         <p><strong>Selected Venue:</strong></p>
                         <p><strong>Name:</strong> {selectedVenue.name} <strong>Id:</strong> {selectedVenue.id}</p>
                         <button onClick={handleUnselectVenue}>unselectVenue</button>
-                        
+                        <SpecificSearchBar onSearch={handleSearch} initialSearchQuery={selectedVenue.name} />
+                        <div style={{display: 'flex', flexWrap: 'wrap'}}>
+                          {listOfShows.map((event, index) => (
+                            <Show
+                              key={index}
+                              name={event.event_name}
+                              date={new Date(event.event_date).toLocaleDateString()}
+                              time={new Date(event.event_date).toLocaleTimeString()}
+                              venue={event.venue_name}
+                            />
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>

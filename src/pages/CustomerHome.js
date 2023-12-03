@@ -118,7 +118,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
               <button onClick={onLogout}>Logout</button>
             </div>
           ) : (
-              <p>You can view the shows. Please <Link to="/login">log in</Link> to purchase tickets.</p>
+              <p>Please <Link to="/login">log in</Link> here.</p>
           )}
         </div>
 
