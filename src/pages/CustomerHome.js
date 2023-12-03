@@ -92,8 +92,9 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
         </div>
 
         <div className="center-container">
-              <h3>For customers, you may search shows by (partial) show name and venue name here</h3>
+              <h4>For customers, you may search shows by (partial) show name and venue name here</h4>
               <SearchBar onSearch={handleSearch} /> 
+              <h4>Otherwise, you may list all active shows here</h4>
               <button onClick={listActiveShows}>List Active Shows</button>
           </div>
         
@@ -108,7 +109,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
           )}
         </div>
 
-        <div style={{ position: 'absolute', left: 100, top: 250, display: 'flex', flexWrap: 'wrap' }}>
+        <div style={{ position: 'absolute', left: 100, top: 350, display: 'flex', flexWrap: 'wrap' }}>
           {search && searchResults.map((event, index) => (
             <Show
               key={index}

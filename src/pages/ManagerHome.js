@@ -123,6 +123,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const location = useLocation();
     const receivedData = location.state.userData;
    
+    const [loading, setLoading] = useState(false);
 
     React.useEffect(() => {
         if (receivedData && Array.isArray(receivedData.venue) && receivedData.venue.length > 0) {
@@ -266,6 +267,8 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       const hours = Math.floor(showTime / 100);
       const minutes = showTime % 100;
     
+      setLoading(true);
+
       // Call createShowC with await if it returns a Promise
       createShowC(manager, showName, showDate, showTime).then((id) => {
     
@@ -288,6 +291,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
           setShowTime('');
           setShowNum((prevNum) => prevNum + 1);
           setShowCreating(false);
+          setLoading(false);
     
           console.log(manager.showId);
         }, 2000);
@@ -437,9 +441,13 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                 <p>Show Name: {showName}</p> 
                                 <p>{displayDate(showDate)}</p>
                                 <p>{displayTime(showTime)}</p>
-                                <div>
-                                  <button onClick={createShow}>Submit</button>
-                                </div>
+                                {loading ? (
+                                      <p>loading... </p>
+                                    ) : (
+                                        <div>
+                                          <button onClick={createShow}>Submit</button>
+                                        </div>
+                                    )}
                             </div>
                             <div style={{ position: 'absolute', right: 100, top:100 }}>
                                 <h3>Venue Layout</h3>
