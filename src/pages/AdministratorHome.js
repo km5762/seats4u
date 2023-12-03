@@ -29,9 +29,63 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
   const [venues, setVenues] = useState(location.state.userData.venues);
   const [selectedVenue, setSelectedVenue] = useState(null);
 
-  const handleSearch = () => {
-    console.log(`Search query: ${searchQuery}`);
-  };
+  async function handleSearch(query) {
+    setSearchQuery((prevQuery) => {
+  
+      // Define an async function to perform the API call
+      const fetchData = async () => {
+        try {
+          console.log(`Search query: ${query}`);
+          const res = await fetch(
+              "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/searchevents",
+              {
+                  credentials: "include",
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ "searchQuery": query}),
+              }
+          );
+        } catch (error) {
+            console.error("Error occurred while searching show:", error);
+        }
+  
+        // Continue with any other logic after the API call
+        console.log('API call completed');
+      };
+  
+      // Call the async function immediately
+      fetchData();
+  
+      // Return the new state value to update the state
+      return query;
+    });
+  }
+  
+  // async function handleSearch(query) {
+  //   setSearchQuery(query);
+
+  //   // Use the callback function to log the updated value
+  //   setSearchQuery((updatedQuery) => {
+  //     console.log(`Search query: ${updatedQuery}`);
+  //   });
+  
+  //   // Now, `searchQuery` will have the updated value
+  //   console.log(`Search query (outside callback): ${searchQuery}`);
+
+  //   try {
+  //     const res = await fetch(
+  //         "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/searchevents",
+  //         {
+  //             credentials: "include",
+  //             method: "POST",
+  //             headers: { "Content-Type": "application/json" },
+  //             body: JSON.stringify({ "searchQuery": searchQuery}),
+  //         }
+  //     );
+  //   } catch (error) {
+  //       console.error("Error occurred while searching show:", error);
+  //   }
+  // };
 
   const handleVenueClick = (index) => {
     console.log(venues);
@@ -66,6 +120,13 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
     <div>
       <div className="center-container">
         <img src="/pictures/logo.png" alt="Logo" width="250" height="100" />
+      </div>
+      <div>
+        {loggedInUser && (
+          <div style={{ position: 'absolute', left: 650, top:120 }}>
+              <SearchBar onSearch={handleSearch} /> 
+          </div>
+        )}
       </div>
 
       <div>
@@ -129,10 +190,6 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
           </div>
         )}
       </div>
-
-      {/* <div className="center-container">
-          <SearchBar onSearch={handleSearch} /> 
-        </div> */}
     </div>
   );
 };
