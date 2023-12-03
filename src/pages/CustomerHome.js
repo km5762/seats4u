@@ -23,7 +23,10 @@ const Show = ({ name, date, time, venue }) => (
 
 const CustomerHome = ({ loggedInUser, onLogout }) => {
 
+  const [search, setSearch] = useState(false);
+  const [list, setList] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [listOfShows, setListOfShows] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
 
   async function handleSearch(query) {
@@ -44,6 +47,8 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
           );
           const data= await res.json();
           console.log(data);
+          setSearch(true);
+          setList(false);
           setSearchResults(data.events);
         } catch (error) {
             console.error("Error occurred while searching show:", error);
@@ -58,6 +63,27 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
     });
   }
 
+  async function listActiveShows() {
+    //setLoading(true);
+    const res = await fetch(
+      "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/listevents",
+      {
+        credentials: "include",
+        method: "GET",
+      }
+    );
+
+    const data = await res.json();
+    setSearch(false);
+    setList(true);
+    setListOfShows(data.events);
+    // console.log(data);
+    // console.log(data.events);
+    // console.log(data.events[0].name)
+    // setSearchResults(venues);
+    //setLoading(false);
+  }
+
 
   return (
     <div>
@@ -65,8 +91,10 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
           <img src='/pictures/logo.png' alt="Logo" width="250" height="100" />
         </div>
 
-        <div style={{ position: 'absolute', left: 650, top:120 }}>
+        <div className="center-container">
+              <h3>For customers, you may search shows by (partial) show name and venue name here</h3>
               <SearchBar onSearch={handleSearch} /> 
+              <button onClick={listActiveShows}>List Active Shows</button>
           </div>
         
         <div className="upper-right-text">
@@ -81,13 +109,22 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
         </div>
 
         <div style={{ position: 'absolute', left: 100, top: 250, display: 'flex', flexWrap: 'wrap' }}>
-          {searchResults.map((event, index) => (
+          {search && searchResults.map((event, index) => (
             <Show
               key={index}
               name={event.event_name}
               date={new Date(event.event_date).toLocaleDateString()}
               time={new Date(event.event_date).toLocaleTimeString()}
               venue={event.venue_name}
+            />
+          ))}
+          {list && listOfShows.map((event, index) => (
+            <Show
+              key={index}
+              name={event.name}
+              date={new Date(event.date).toLocaleDateString()}
+              time={new Date(event.date).toLocaleTimeString()}
+              venue={event.venue_id}
             />
           ))}
         </div>
