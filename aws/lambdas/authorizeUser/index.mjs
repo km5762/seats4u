@@ -43,7 +43,7 @@ export const handler = function (event, context, callback) {
       break;
     default:
       if (
-        event.routeArn.includes("listvenues") ||
+        event.routeArn.includes("searchevents") ||
         event.routeArn.includes("showavailableseats") ||
         event.routeArn.includes("purchaseseats") ||
         event.routeArn.includes("listevents")
