@@ -190,7 +190,9 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                         <p><strong>Selected Venue:</strong></p>
                         <p><strong>Name:</strong> {selectedVenue.name} <strong>Id:</strong> {selectedVenue.id}</p>
                         <button onClick={handleUnselectVenue}>unselectVenue</button>
+                        {!selectedShow && (
                         <SpecificSearchBar onSearch={handleSearch} initialSearchQuery={selectedVenue.name} />
+                        )}
                         <div style={{display: 'flex', flexWrap: 'wrap'}}>
                           {!selectedShow && listOfShows.map((event, index) => (
                             <Show
