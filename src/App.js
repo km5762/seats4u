@@ -24,8 +24,24 @@ const App = () => {
   
 
   const handleLogout = () => {
-    // Reset the loggedInUser state to null upon logout
-    setLoggedInUser(null);
+      // Reset the loggedInUser state to null upon logout
+      setLoggedInUser(null);
+      // Define an async function to perform the API call
+      const fetchData = async () => {
+        const res = await fetch(
+          "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/logoutuser",
+          {
+            credentials: "include",
+            method: "GET",
+          }
+        );
+  
+        // Continue with any other logic after the API call
+        console.log('Logout API call completed');
+      };
+
+      // Call the async function immediately
+      fetchData();
   };
 
   return (
