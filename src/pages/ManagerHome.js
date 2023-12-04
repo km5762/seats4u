@@ -376,10 +376,19 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       );
   
       const data = await res.json();
-      //setSearch(false);
-      //setList(true);
-      setShows(data.events);
-      //setLoadingList(false);
+
+      // setShows(data.events);
+      setShows([]);
+      data.events.map(event => {
+        // Call addShow for each event
+        addShow({
+          name: event.name,
+          date: new Date(event.date).toLocaleDateString(),
+          time: new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
+          id: event.id,
+          active: event.active,
+        });});
+      
     }
   
     return (
