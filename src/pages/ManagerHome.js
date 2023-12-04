@@ -98,7 +98,7 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
   };
   
   // Show component representing a rectangular block
-  const Show = ({ name, date, time, onClick, id }) => (
+  const Show = ({ name, date, time, onClick, id, active }) => (
     <div style={{ 
       border: '1px solid black', 
       padding: '10px', 
@@ -108,8 +108,9 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
       boxSizing: 'border-box', // Include padding and border in the width calculation
     }} onClick={onClick}>
       <p><strong>Show:</strong> {name}</p>
-      <p><strong>Date:</strong> {new Date(date).toLocaleDateString()}</p>
-      <p><strong>Time:</strong> {new Date(date).toLocaleTimeString()}</p>
+      <p><strong>Date:</strong> {date}</p>
+      <p><strong>Time:</strong> {time}</p>
+      <p><strong>Status:</strong> {active}</p>
       {/* <p><strong>Date:</strong> {date.split("T")[0]}</p>
       <p><strong>Time:</strong> {date.split("T")[1].split("Z")[0]}</p> */}
       <p><strong>Id:</strong> {id}</p>
@@ -160,7 +161,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
           const showsFromEvents = uniqueEvents
             .filter(event => event.date) // Filter out events without a date
             .map((event) => {
-              const { id, name, date } = event;
+              const { id, name, date, active } = event;
               const utcDate = new Date(date);
       
               const localDate = utcDate.toLocaleDateString();
@@ -171,6 +172,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                 name,
                 date: localDate,
                 time: localTime,
+                active,
               };
             });
       
@@ -278,6 +280,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
 
 
     const activateShow = () => {
+        selectedShow.active = 1;
       activateShowC(selectedShow)
       console.log(selectedShow)
     }
@@ -305,6 +308,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                 date: `${year}-${month}-${day}`,
                 time: `${hours}:${minutes}`,
                 id: manager.showId,
+                active: 0,
             });
         
             setShowName('');
