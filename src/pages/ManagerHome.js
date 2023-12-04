@@ -457,8 +457,8 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                         <div style={{ position: 'absolute', left: 100, top:50 }}>
                                             <h2>Selected Show</h2>
                                             <p><strong>Show:</strong> {selectedShow.name}</p>
-                                            <p><strong>Date:</strong> {new Date(selectedShow.date).toLocaleDateString()}</p>
-                                            <p><strong>Time:</strong> {new Date(selectedShow.date).toLocaleTimeString()}</p>
+                                            <p><strong>Date:</strong> {selectedShow.date}</p>
+                                            <p><strong>Time:</strong> {selectedShow.time}</p>
                                             <button onClick={handleUnselectShow}>unselectShow</button>
                                             <button onClick={activateShow}>activateShow</button>
                                             <button onClick={handleDeleteShow}>deleteShow</button>
