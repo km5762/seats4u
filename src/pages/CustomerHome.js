@@ -54,8 +54,9 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
       if (canSelect) {
         // Check if the seat is already selected
         const isSeatSelected = selectedSeats.some(seat => seat.row === row && seat.col === col);
+        const isSeatBlocked = blockedSeats.some(seat => seat.row === row && seat.col === col);
   
-        if (!isSeatSelected) {
+        if (!isSeatSelected && !isSeatBlocked) {
           // Add the selected seat to the list
           setSelectedSeats(prevSeats => [...prevSeats, { row, col }]);
         } else {
@@ -69,9 +70,9 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
       if (selectedSeats.length > 0) {         //TODO CHANGE LOGIC TO PURCHASE SEAT 
         console.log(title);
         console.log(selectedSeats);
-        // setBlockedSeats(prevSeats => [...prevSeats, ...selectedSeats]);   
-        // setBlocks(prevBlocks => [...prevBlocks, selectedSeats]);
-        // setSelectedSeats([]);
+        setBlockedSeats(prevSeats => [...prevSeats, ...selectedSeats]);   
+        setBlocks(prevBlocks => [...prevBlocks, selectedSeats]);
+        setSelectedSeats([]);
       }
     };
   
