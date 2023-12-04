@@ -46,6 +46,7 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
 
   // Section component containing a grid of seats
   const Section = ({ title, rows, cols, canSelect }) => {
+    const [selectedSeatsCost, setSelectedseatsCost] = useState([])
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [blockedSeats, setBlockedSeats] = useState([]);
     const [blocks, setBlocks] = useState([]);
@@ -100,6 +101,7 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
             {selectedSeats.map((seat, index) => (
               <p key={index}>{`Row: ${String.fromCharCode(64 + seat.row).toUpperCase()}, Column: ${seat.col}`}</p>
             ))}
+           <p>Total Cost = ${selectedSeatsCost.reduce((seatsCost, currentValue) => seatsCost + currentValue, 0,)}.00</p>
             <button onClick={purchaseSeats}>Purchase Seats</button>
           </div>
         )}
