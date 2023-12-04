@@ -108,8 +108,10 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
       boxSizing: 'border-box', // Include padding and border in the width calculation
     }} onClick={onClick}>
       <p><strong>Show:</strong> {name}</p>
-      <p><strong>Date:</strong> {date}</p>
-      <p><strong>Time:</strong> {time}</p>
+      <p><strong>Date:</strong> {new Date(date).toLocaleDateString()}</p>
+      <p><strong>Time:</strong> {new Date(date).toLocaleTimeString()}</p>
+      {/* <p><strong>Date:</strong> {date.split("T")[0]}</p>
+      <p><strong>Time:</strong> {date.split("T")[1].split("Z")[0]}</p> */}
       <p><strong>Id:</strong> {id}</p>
     </div>
   );
@@ -121,27 +123,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const location = useLocation();
     const receivedData = location.state.userData;
    
-
-    React.useEffect(() => {
-        if (receivedData && Array.isArray(receivedData.venue) && receivedData.venue.length > 0) {
-            const firstVenue = receivedData.venue[0];
-            manager.createVenue(firstVenue.name);
-            manager.addId(firstVenue.id);
-            setVenueName(firstVenue.name); 
-            setVenueCreated(true);
-        }
-
-        if (receivedData && receivedData.events && receivedData.events.length > 0) {
-            const events = receivedData.events;
-    
-            const showsFromEvents = events.map((event, index) => {
-                const { id, name, date, time } = event;
-                return { id, name, date, time,};
-            });
-    
-            setShows(showsFromEvents);
-        }
-    }, [receivedData]);
+    const [loading, setLoading] = useState(false);
 
     // venues
     const [venueCreated, setVenueCreated] = useState(false);
@@ -152,6 +134,55 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const [rightCol, setRightCol] = useState('');
     const [centerRow, setCenterRow] = useState('');
     const [centerCol, setCenterCol] = useState('');
+    const [showCreating, setShowCreating] = useState(false);
+    const [showName, setShowName] = useState('');
+    const [showDate, setShowDate] = useState('');
+    const [showTime, setShowTime] = useState('');
+    const [showNum, setShowNum] = useState(0);
+    const [initialShowCount, setInitialShowCount] = useState(0);
+    const [submitLoading, setSubmitLoading] = useState(false);
+
+    React.useEffect(() => {
+        if (receivedData && Array.isArray(receivedData.venue) && receivedData.venue.length > 0) {
+          const firstVenue = receivedData.venue[0];
+          manager.createVenue(firstVenue.name);
+          manager.addId(firstVenue.id);
+          setVenueName(firstVenue.name);
+          setVenueCreated(true);
+        }
+      
+        if (receivedData && receivedData.events && receivedData.events.length > 0) {
+          const events = receivedData.events;
+    
+          // Filter unique events by ID
+          const uniqueEvents = [...new Map(events.map(event => [event.id, event])).values()];
+    
+          const showsFromEvents = uniqueEvents
+            .filter(event => event.date) // Filter out events without a date
+            .map((event) => {
+              const { id, name, date } = event;
+              const utcDate = new Date(date);
+      
+              const localDate = utcDate.toLocaleDateString();
+              const localTime = utcDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      
+              return {
+                id,
+                name,
+                date: localDate,
+                time: localTime,
+              };
+            });
+      
+          setShows(showsFromEvents);
+          if (initialShowCount === 0) {
+            setInitialShowCount(uniqueEvents.length);
+            setShowNum(uniqueEvents.length);
+        }
+        }
+    }, [receivedData]);
+    
+  
   
     const createVenue = () => {
       setVenueCreated(true);
@@ -224,13 +255,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       setShows((prevShows) => [...prevShows, newShow]);
     };
   
-    const [showCreating, setShowCreating] = useState(false);
-  
-    const [showName, setShowName] = useState('');
-    const [showDate, setShowDate] = useState('');
-    const [showTime, setShowTime] = useState('');
-    const [showNum, setShowNum] = useState(0);
-  
+    
     const handleShowClick = (index) => {
       setSelectedShow(shows[index]);
     };
@@ -258,37 +283,39 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     }
   
     const createShow = () => {
-      const year = Math.floor(showDate / 10000);
-      const month = Math.floor((showDate % 10000) / 100);
-      const day = showDate % 100;
-      const hours = Math.floor(showTime / 100);
-      const minutes = showTime % 100;
+        setSubmitLoading(true);
+        const year = Math.floor(showDate / 10000);
+        const month = Math.floor((showDate % 10000) / 100);
+        const day = showDate % 100;
+        const hours = Math.floor(showTime / 100);
+        const minutes = showTime % 100;
+        
+        // Call createShowC with await if it returns a Promise
+        createShowC(manager, showName, showDate, showTime).then((id) => {
     
-      // Call createShowC with await if it returns a Promise
-      createShowC(manager, showName, showDate, showTime).then((id) => {
-    
-        // Set manager.showId after the asynchronous operation completes
-        manager.showId = id;
-    
-        // Use setTimeout to introduce a delay
-        setTimeout(() => {
-    
-          // Access manager.showId after the delay
-          addShow({
-            name: showName,
-            date: `${year}-${month}-${day}`,
-            time: `${hours}:${minutes}`,
-            id: manager.showId,
-          });
-    
-          setShowName('');
-          setShowDate('');
-          setShowTime('');
-          setShowNum((prevNum) => prevNum + 1);
-          setShowCreating(false);
-    
-          console.log(manager.showId);
-        }, 2000);
+            // Set manager.showId after the asynchronous operation completes
+            manager.showId = id;
+        
+            // Use setTimeout to introduce a delay
+            setTimeout(() => {
+        
+            // Access manager.showId after the delay
+            addShow({
+                name: showName,
+                date: `${year}-${month}-${day}`,
+                time: `${hours}:${minutes}`,
+                id: manager.showId,
+            });
+        
+            setShowName('');
+            setShowDate('');
+            setShowTime('');
+            setShowNum((prevNum) => prevNum + 1);
+            setShowCreating(false);
+            setSubmitLoading(false);
+            console.log(manager.showId);
+            }, 2000);
+
       });
     };
 
@@ -333,6 +360,23 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
         const minute = time % 100;
         return `Time: ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
     };
+
+    async function listShows() {
+      //setLoadingList(true);
+      const res = await fetch(
+        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/listevents",
+        {
+          credentials: "include",
+          method: "GET",
+        }
+      );
+  
+      const data = await res.json();
+      //setSearch(false);
+      //setList(true);
+      setShows(data.events);
+      //setLoadingList(false);
+    }
   
     return (
         <div>
@@ -393,12 +437,13 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                     <div style={{ position: 'absolute', left: 100, top:50 }}>
                                     <h3>Your Venue: {venueName}</h3>
                                     <h3>Your list of shows</h3>
-                                    <p>You have {showNum} shows</p>
+                                    <p>You have {shows.length} shows</p>
                                     <button onClick={creatingShow}>Create show</button>
                                     <button onClick={deleteVenue}>Delete Venue</button>
+                                    <button onClick={listShows}>Refresh</button>
                                     </div>)
                                 }
-                                <div style={{ position: 'absolute', left: 100, top:250 }}>
+                                <div style={{ position: 'absolute', left: 100, top:250, display: 'flex', flexWrap: 'wrap' }}>
                                     {!selectedShow && shows.map((show, index) => (
                                     <Show key={index} {...show} onClick={() => handleShowClick(index)} />
                                     ))}
@@ -408,8 +453,8 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                         <div style={{ position: 'absolute', left: 100, top:50 }}>
                                             <h2>Selected Show</h2>
                                             <p><strong>Show:</strong> {selectedShow.name}</p>
-                                            <p><strong>Date:</strong> {selectedShow.date}</p>
-                                            <p><strong>Time:</strong> {selectedShow.time}</p>
+                                            <p><strong>Date:</strong> {new Date(selectedShow.date).toLocaleDateString()}</p>
+                                            <p><strong>Time:</strong> {new Date(selectedShow.date).toLocaleTimeString()}</p>
                                             <button onClick={handleUnselectShow}>unselectShow</button>
                                             <button onClick={activateShow}>activateShow</button>
                                             <button onClick={handleDeleteShow}>deleteShow</button>
@@ -437,6 +482,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                 <p>{displayTime(showTime)}</p>
                                 <div>
                                   <button onClick={createShow}>Submit</button>
+                                  {submitLoading && <p>Please wait, this might take some seconds...</p>}
                                 </div>
                             </div>
                             <div style={{ position: 'absolute', right: 100, top:100 }}>
