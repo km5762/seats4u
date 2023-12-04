@@ -98,7 +98,7 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
   };
   
   // Show component representing a rectangular block
-  const Show = ({ name, date, time, onClick, id }) => (
+  const Show = ({ name, date, time, onClick, id, active }) => (
     <div style={{ 
       border: '1px solid black', 
       padding: '10px', 
@@ -108,8 +108,9 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
       boxSizing: 'border-box', // Include padding and border in the width calculation
     }} onClick={onClick}>
       <p><strong>Show:</strong> {name}</p>
-      <p><strong>Date:</strong> {new Date(date).toLocaleDateString()}</p>
-      <p><strong>Time:</strong> {new Date(date).toLocaleTimeString()}</p>
+      <p><strong>Date:</strong> {date}</p>
+      <p><strong>Time:</strong> {time}</p>
+      <p><strong>Status:</strong> {active}</p>
       {/* <p><strong>Date:</strong> {date.split("T")[0]}</p>
       <p><strong>Time:</strong> {date.split("T")[1].split("Z")[0]}</p> */}
       <p><strong>Id:</strong> {id}</p>
@@ -160,7 +161,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
           const showsFromEvents = uniqueEvents
             .filter(event => event.date) // Filter out events without a date
             .map((event) => {
-              const { id, name, date } = event;
+              const { id, name, date, active } = event;
               const utcDate = new Date(date);
       
               const localDate = utcDate.toLocaleDateString();
@@ -171,6 +172,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                 name,
                 date: localDate,
                 time: localTime,
+                active,
               };
             });
       
@@ -278,6 +280,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
 
 
     const activateShow = () => {
+        selectedShow.active = 1;
       activateShowC(selectedShow)
       console.log(selectedShow)
     }
@@ -305,6 +308,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                 date: `${year}-${month}-${day}`,
                 time: `${hours}:${minutes}`,
                 id: manager.showId,
+                active: 0,
             });
         
             setShowName('');
@@ -372,10 +376,19 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       );
   
       const data = await res.json();
-      //setSearch(false);
-      //setList(true);
-      setShows(data.events);
-      //setLoadingList(false);
+
+      // setShows(data.events);
+      setShows([]);
+      data.events.map(event => {
+        // Call addShow for each event
+        addShow({
+          name: event.name,
+          date: new Date(event.date).toLocaleDateString(),
+          time: new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
+          id: event.id,
+          active: event.active,
+        });});
+      
     }
   
     return (
@@ -440,7 +453,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                     <p>You have {shows.length} shows</p>
                                     <button onClick={creatingShow}>Create show</button>
                                     <button onClick={deleteVenue}>Delete Venue</button>
-                                    <button onClick={listShows}>Refresh</button>
+                                    {/* <button onClick={listShows}>Refresh</button> */}
                                     </div>)
                                 }
                                 <div style={{ position: 'absolute', left: 100, top:250, display: 'flex', flexWrap: 'wrap' }}>
@@ -453,8 +466,8 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                         <div style={{ position: 'absolute', left: 100, top:50 }}>
                                             <h2>Selected Show</h2>
                                             <p><strong>Show:</strong> {selectedShow.name}</p>
-                                            <p><strong>Date:</strong> {new Date(selectedShow.date).toLocaleDateString()}</p>
-                                            <p><strong>Time:</strong> {new Date(selectedShow.date).toLocaleTimeString()}</p>
+                                            <p><strong>Date:</strong> {selectedShow.date}</p>
+                                            <p><strong>Time:</strong> {selectedShow.time}</p>
                                             <button onClick={handleUnselectShow}>unselectShow</button>
                                             <button onClick={activateShow}>activateShow</button>
                                             <button onClick={handleDeleteShow}>deleteShow</button>

@@ -73,7 +73,8 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
           setSearch(true);
           setList(false);
           setLoadingSearch(false);
-          setSearchResults(data.events);
+          const filteredEvents = data.events.filter(event => event.event_active);
+          setSearchResults(filteredEvents);
         } catch (error) {
             console.error("Error occurred while searching show:", error);
         }
@@ -100,7 +101,8 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
     const data = await res.json();
     setSearch(false);
     setList(true);
-    setListOfShows(data.events);
+    const filteredEvents = data.events.filter(event => event.active);
+    setListOfShows(filteredEvents);
     setLoadingList(false);
   }
 
@@ -145,12 +147,12 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
         </div>
 
         <div style={{ position: 'absolute', left: 100, top: 350, display: 'flex', flexWrap: 'wrap' }}>
-          {search && !selectedShow && searchResults.map((event, index) => (
+          {search && !selectedShow && searchResults && searchResults.map((event, index) => (
             <Show
               key={index}
               name={event.event_name}
               date={new Date(event.event_date).toLocaleDateString()}
-              time={new Date(event.event_date).toLocaleTimeString()}
+              time={new Date(event.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
               venue={event.venue_name}
               onClick={() => handleShowClick(index)}
             />
@@ -160,7 +162,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
               <Show
                 name={selectedShow.event_name}
                 date={new Date(selectedShow.event_date).toLocaleDateString()}
-                time={new Date(selectedShow.event_date).toLocaleTimeString()}
+                time={new Date(selectedShow.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                 venue={selectedShow.venue_name}
               />
               <button onClick={handleUnselectShow}>unselectShow</button>
@@ -171,7 +173,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
               key={index}
               name={event.name}
               date={new Date(event.date).toLocaleDateString()}
-              time={new Date(event.date).toLocaleTimeString()}
+              time={new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
               venue={event.venue_id}
               onClick={() => handleShowClickList(index)}
             />
@@ -181,7 +183,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
               <Show
                 name={selectedShowList.name}
                 date={new Date(selectedShowList.date).toLocaleDateString()}
-                time={new Date(selectedShowList.date).toLocaleTimeString()}
+                time={new Date(selectedShowList.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                 venue={selectedShowList.venue_id}
               />
               <button onClick={handleUnselectShowList}>unselectShow</button>

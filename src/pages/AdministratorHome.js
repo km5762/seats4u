@@ -6,7 +6,7 @@ import { Administrator } from "../model/Model";
 import { deleteShowAdminC } from '../controller/Controller';
 
 // Show component representing a rectangular block
-const Show = ({ name, date, time, venue, onClick, id }) => (
+const Show = ({ name, date, time, venue, onClick, id, active }) => (
   <div style={{ 
     border: '1px solid black', 
     padding: '10px', 
@@ -19,6 +19,7 @@ const Show = ({ name, date, time, venue, onClick, id }) => (
     <p><strong>Date:</strong> {date}</p>
     <p><strong>Time:</strong> {time}</p>
     <p><strong>Venue:</strong> {venue}</p>
+    <p><strong>Status:</strong> {active}</p>
     <p><strong>Id:</strong> {id}</p>
     {/* <p><strong>Date:</strong> {date.split("T")[0]}</p>
     <p><strong>Time:</strong> {date.split("T")[1].split("Z")[0]}</p> */}
@@ -189,16 +190,19 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                         <p><strong>Selected Venue:</strong></p>
                         <p><strong>Name:</strong> {selectedVenue.name} <strong>Id:</strong> {selectedVenue.id}</p>
                         <button onClick={handleUnselectVenue}>unselectVenue</button>
+                        {!selectedShow && (
                         <SpecificSearchBar onSearch={handleSearch} initialSearchQuery={selectedVenue.name} />
+                        )}
                         <div style={{display: 'flex', flexWrap: 'wrap'}}>
                           {!selectedShow && listOfShows.map((event, index) => (
                             <Show
                               key={index}
                               name={event.event_name}
                               date={new Date(event.event_date).toLocaleDateString()}
-                              time={new Date(event.event_date).toLocaleTimeString()}
+                              time={new Date(event.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                               venue={event.venue_name}
                               id={event.event_id}
+                              active={event.event_active}
                               onClick={() => handleShowClick(index)}
                             />
                           ))}
@@ -207,8 +211,9 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                               <Show
                                 name={selectedShow.event_name}
                                 date={new Date(selectedShow.event_date).toLocaleDateString()}
-                                time={new Date(selectedShow.event_date).toLocaleTimeString()}
+                                time={new Date(selectedShow.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                                 venue={selectedShow.venue_name}
+                                active={selectedShow.event_active}
                                 id={selectedShow.event_id}
                               />
                               <button onClick={handleUnselectShow}>unselectShow</button>
