@@ -161,7 +161,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
         </div>
 
         <div style={{ position: 'absolute', left: 100, top: 350, display: 'flex', flexWrap: 'wrap' }}>
-          {search && !selectedShow && searchResults.map((event, index) => (
+          {search && !selectedShow && searchResults && searchResults.map((event, index) => (
             <Show
               key={index}
               name={event.event_name}
