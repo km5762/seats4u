@@ -65,10 +65,11 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
   
     const purchaseSeats = () => {
       if (selectedSeats.length > 0) {         //TODO CHANGE LOGIC TO PURCHASE SEAT 
+        console.log(title);
         console.log(selectedSeats);
-        setBlockedSeats(prevSeats => [...prevSeats, ...selectedSeats]);   
-        setBlocks(prevBlocks => [...prevBlocks, selectedSeats]);
-        setSelectedSeats([]);
+        // setBlockedSeats(prevSeats => [...prevSeats, ...selectedSeats]);   
+        // setBlocks(prevBlocks => [...prevBlocks, selectedSeats]);
+        // setSelectedSeats([]);
       }
     };
   
@@ -267,14 +268,14 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                 venue={selectedShow.venue_name}
               /> 
               <button onClick={handleUnselectShow}>unselectShow</button>
-              <div style={{ position: 'absolute', right: 100, top:100 }}>
-                            <h3>Venue Layout</h3>
-                            {/* <div style={{ display: 'flex' }}>
-                            <Section title="Left" rows={leftRow} cols={leftCol} canSelect={true}/>
-                            <Section title="Center" rows={centerRow} cols={centerCol} canSelect={true}/>
-                            <Section title="Right" rows={rightRow} cols={rightCol} canSelect={true}/>
-                            </div> */}
-                        </div>
+              <div style={{ position: 'absolute', left: 600 , top: -200 }}>
+                  <h3>Venue Layout</h3>
+                  <div style={{ display: 'flex' }}>
+                  <Section title="Left" rows={5} cols={5} canSelect={true}/>
+                  <Section title="Center" rows={5} cols={5} canSelect={true}/>
+                  <Section title="Right" rows={5} cols={5} canSelect={true}/>
+                  </div>
+              </div>
             </div>
             
           )}
@@ -297,14 +298,14 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                 venue={selectedShowList.venue_id}
               />
               <button onClick={handleUnselectShowList}>unselectShow</button>
-              <div style={{ position: 'absolute', left: 1000 , top: -100 }}>
-                            <h3>Venue Layout</h3>
-                            <div style={{ display: 'flex' }}>
-                            <Section title="Left" rows={5} cols={5} canSelect={true}/>
-                            <Section title="Center" rows={5} cols={5} canSelect={true}/>
-                            <Section title="Right" rows={5} cols={5} canSelect={true}/>
-                            </div>
-                        </div>
+              <div style={{ position: 'absolute', left: 600 , top: -200 }}>
+                  <h3>Venue Layout</h3>
+                  <div style={{ display: 'flex' }}>
+                  <Section title="Left" rows={5} cols={5} canSelect={true}/>
+                  <Section title="Center" rows={5} cols={5} canSelect={true}/>
+                  <Section title="Right" rows={5} cols={5} canSelect={true}/>
+                  </div>
+              </div>
             </div>
           )}
         </div>
