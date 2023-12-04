@@ -366,6 +366,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     };
 
     async function listShows() {
+      // console.log(manager.id);
       //setLoadingList(true);
       const res = await fetch(
         "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/listevents",
@@ -381,7 +382,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       setShows([]);
       data.events.map(event => {
         // Call addShow for each event
-        addShow({
+        event.venue_id === manager.id && addShow({
           name: event.name,
           date: new Date(event.date).toLocaleDateString(),
           time: new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
@@ -453,7 +454,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                     <p>You have {shows.length} shows</p>
                                     <button onClick={creatingShow}>Create show</button>
                                     <button onClick={deleteVenue}>Delete Venue</button>
-                                    {/* <button onClick={listShows}>Refresh</button> */}
+                                    <button onClick={listShows}>Refresh</button>
                                     </div>)
                                 }
                                 <div style={{ position: 'absolute', left: 100, top:250, display: 'flex', flexWrap: 'wrap' }}>

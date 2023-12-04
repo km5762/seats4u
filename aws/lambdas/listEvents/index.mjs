@@ -22,7 +22,7 @@ export const handler = async (event) => {
 
   try {
     const query =
-      user.roleId === Role.ADMIN
+      user.roleId === Role.ADMIN || user.roleId === Role.VENUE_MANAGER
         ? "SELECT * FROM event"
         : "SELECT * FROM event WHERE active";
 
