@@ -46,20 +46,18 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
 
   // Section component containing a grid of seats
   const Section = ({ title, rows, cols, canSelect }) => {
-    const [selectedSeatsCost, setSelectedseatsCost] = useState([])
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [blockedSeats, setBlockedSeats] = useState([]);
     const [blocks, setBlocks] = useState([]);
   
-    const handleSeatClick = (row, col) => {
+    const handleSeatClick = (row, col, cost) => {
       if (canSelect) {
         // Check if the seat is already selected
         const isSeatSelected = selectedSeats.some(seat => seat.row === row && seat.col === col);
         const isSeatBlocked = blockedSeats.some(seat => seat.row === row && seat.col === col);
-  
         if (!isSeatSelected && !isSeatBlocked) {
           // Add the selected seat to the list
-          setSelectedSeats(prevSeats => [...prevSeats, { row, col }]);
+          setSelectedSeats(prevSeats => [...prevSeats, { row, col, cost }]);
         } else {
           // Remove the selected seat from the list if it's already selected
           setSelectedSeats(prevSeats => prevSeats.filter(seat => !(seat.row === row && seat.col === col)));
@@ -87,7 +85,7 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
                 key={`${rowIndex}-${colIndex}`}
                 row={rowIndex + 1}
                 col={colIndex + 1}
-                onClick={() => handleSeatClick(rowIndex + 1, colIndex + 1)}
+                onClick={() => handleSeatClick(rowIndex + 1, colIndex + 1, 5)}
                 selected={selectedSeats.some(seat => seat.row === rowIndex + 1 && seat.col === colIndex + 1)}
                 blocked={blockedSeats.some(seat => seat.row === rowIndex + 1 && seat.col === colIndex + 1)}
               />
@@ -101,7 +99,8 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
             {selectedSeats.map((seat, index) => (
               <p key={index}>{`Row: ${String.fromCharCode(64 + seat.row).toUpperCase()}, Column: ${seat.col}`}</p>
             ))}
-           <p>Total Cost = ${selectedSeatsCost.reduce((seatsCost, currentValue) => seatsCost + currentValue, 0,)}.00</p>
+           <p>Total Cost = ${selectedSeats.reduce(
+            (costSoFar, currentSeat) => costSoFar + currentSeat.cost, 0,)}.00</p>
             <button onClick={purchaseSeats}>Purchase Seats</button>
           </div>
         )}
