@@ -453,7 +453,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                     <p>You have {shows.length} shows</p>
                                     <button onClick={creatingShow}>Create show</button>
                                     <button onClick={deleteVenue}>Delete Venue</button>
-                                    <button onClick={listShows}>Refresh</button>
+                                    {/* <button onClick={listShows}>Refresh</button> */}
                                     </div>)
                                 }
                                 <div style={{ position: 'absolute', left: 100, top:250, display: 'flex', flexWrap: 'wrap' }}>
