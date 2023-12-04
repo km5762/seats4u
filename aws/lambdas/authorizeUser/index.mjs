@@ -20,10 +20,12 @@ export const handler = function (event, context, callback) {
   if (cookie) {
     const token = cookie.split("=")[1];
 
-    try {
-      user = jwt.verify(token, jwtSecret);
-    } catch (error) {
-      callback(error);
+    if (token) {
+      try {
+        user = jwt.verify(token, jwtSecret);
+      } catch (error) {
+        callback(error);
+      }
     }
   }
 
