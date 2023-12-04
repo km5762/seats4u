@@ -122,27 +122,6 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const receivedData = location.state.userData;
    
 
-    React.useEffect(() => {
-        if (receivedData && Array.isArray(receivedData.venue) && receivedData.venue.length > 0) {
-            const firstVenue = receivedData.venue[0];
-            manager.createVenue(firstVenue.name);
-            manager.addId(firstVenue.id);
-            setVenueName(firstVenue.name); 
-            setVenueCreated(true);
-        }
-
-        if (receivedData && receivedData.events && receivedData.events.length > 0) {
-            const events = receivedData.events;
-    
-            const showsFromEvents = events.map((event, index) => {
-                const { id, name, date, time } = event;
-                return { id, name, date, time,};
-            });
-    
-            setShows(showsFromEvents);
-        }
-    }, [receivedData]);
-
     // venues
     const [venueCreated, setVenueCreated] = useState(false);
     const [venueName, setVenueName] = useState('');
@@ -152,6 +131,55 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const [rightCol, setRightCol] = useState('');
     const [centerRow, setCenterRow] = useState('');
     const [centerCol, setCenterCol] = useState('');
+    const [showCreating, setShowCreating] = useState(false);
+    const [showName, setShowName] = useState('');
+    const [showDate, setShowDate] = useState('');
+    const [showTime, setShowTime] = useState('');
+    const [showNum, setShowNum] = useState(0);
+    const [initialShowCount, setInitialShowCount] = useState(0);
+    const [submitLoading, setSubmitLoading] = useState(false);
+
+    React.useEffect(() => {
+        if (receivedData && Array.isArray(receivedData.venue) && receivedData.venue.length > 0) {
+          const firstVenue = receivedData.venue[0];
+          manager.createVenue(firstVenue.name);
+          manager.addId(firstVenue.id);
+          setVenueName(firstVenue.name);
+          setVenueCreated(true);
+        }
+      
+        if (receivedData && receivedData.events && receivedData.events.length > 0) {
+          const events = receivedData.events;
+    
+          // Filter unique events by ID
+          const uniqueEvents = [...new Map(events.map(event => [event.id, event])).values()];
+    
+          const showsFromEvents = uniqueEvents
+            .filter(event => event.date) // Filter out events without a date
+            .map((event) => {
+              const { id, name, date } = event;
+              const utcDate = new Date(date);
+      
+              const localDate = utcDate.toLocaleDateString();
+              const localTime = utcDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      
+              return {
+                id,
+                name,
+                date: localDate,
+                time: localTime,
+              };
+            });
+      
+          setShows(showsFromEvents);
+          if (initialShowCount === 0) {
+            setInitialShowCount(uniqueEvents.length);
+            setShowNum(uniqueEvents.length);
+        }
+        }
+    }, [receivedData]);
+    
+  
   
     const createVenue = () => {
       setVenueCreated(true);
@@ -224,13 +252,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       setShows((prevShows) => [...prevShows, newShow]);
     };
   
-    const [showCreating, setShowCreating] = useState(false);
-  
-    const [showName, setShowName] = useState('');
-    const [showDate, setShowDate] = useState('');
-    const [showTime, setShowTime] = useState('');
-    const [showNum, setShowNum] = useState(0);
-  
+    
     const handleShowClick = (index) => {
       setSelectedShow(shows[index]);
     };
@@ -258,37 +280,38 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     }
   
     const createShow = () => {
-      const year = Math.floor(showDate / 10000);
-      const month = Math.floor((showDate % 10000) / 100);
-      const day = showDate % 100;
-      const hours = Math.floor(showTime / 100);
-      const minutes = showTime % 100;
+        setSubmitLoading(true);
+        const year = Math.floor(showDate / 10000);
+        const month = Math.floor((showDate % 10000) / 100);
+        const day = showDate % 100;
+        const hours = Math.floor(showTime / 100);
+        const minutes = showTime % 100;
+        
+        // Call createShowC with await if it returns a Promise
+        createShowC(manager, showName, showDate, showTime).then((id) => {
     
-      // Call createShowC with await if it returns a Promise
-      createShowC(manager, showName, showDate, showTime).then((id) => {
-    
-        // Set manager.showId after the asynchronous operation completes
-        manager.showId = id;
-    
-        // Use setTimeout to introduce a delay
-        setTimeout(() => {
-    
-          // Access manager.showId after the delay
-          addShow({
-            name: showName,
-            date: `${year}-${month}-${day}`,
-            time: `${hours}:${minutes}`,
-            id: manager.showId,
-          });
-    
-          setShowName('');
-          setShowDate('');
-          setShowTime('');
-          setShowNum((prevNum) => prevNum + 1);
-          setShowCreating(false);
-    
-          console.log(manager.showId);
-        }, 2000);
+            // Set manager.showId after the asynchronous operation completes
+            manager.showId = id;
+        
+            // Use setTimeout to introduce a delay
+            setTimeout(() => {
+        
+            // Access manager.showId after the delay
+            addShow({
+                name: showName,
+                date: `${year}-${month}-${day}`,
+                time: `${hours}:${minutes}`,
+                id: manager.showId,
+            });
+        
+            setShowName('');
+            setShowDate('');
+            setShowTime('');
+            setShowNum((prevNum) => prevNum + 1);
+            setShowCreating(false);
+            setSubmitLoading(false);
+            console.log(manager.showId);
+            }, 2000);
       });
     };
 
@@ -437,6 +460,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                 <p>{displayTime(showTime)}</p>
                                 <div>
                                   <button onClick={createShow}>Submit</button>
+                                  {submitLoading && <p>Please wait, this might take some seconds...</p>}
                                 </div>
                             </div>
                             <div style={{ position: 'absolute', right: 100, top:100 }}>
