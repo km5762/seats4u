@@ -34,6 +34,8 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
         ? 'lightblue' // Light blue when selected and not blocked
         : blocked && !selected
         ? 'blue' // Blue when blocked and not selected
+        : selected && blocked
+        ? 'blue' // Blue when both selected and blocked
         : 'white', // White when neither selected nor blocked
     }}
     onClick={() => onClick(row, col)}
