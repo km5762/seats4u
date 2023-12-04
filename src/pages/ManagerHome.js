@@ -360,6 +360,23 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
         const minute = time % 100;
         return `Time: ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
     };
+
+    async function listShows() {
+      //setLoadingList(true);
+      const res = await fetch(
+        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/listevents",
+        {
+          credentials: "include",
+          method: "GET",
+        }
+      );
+  
+      const data = await res.json();
+      //setSearch(false);
+      //setList(true);
+      setShows(data.events);
+      //setLoadingList(false);
+    }
   
     return (
         <div>
@@ -423,6 +440,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                     <p>You have {shows.length} shows</p>
                                     <button onClick={creatingShow}>Create show</button>
                                     <button onClick={deleteVenue}>Delete Venue</button>
+                                    <button onClick={listShows}>Refresh</button>
                                     </div>)
                                 }
                                 <div style={{ position: 'absolute', left: 100, top:250, display: 'flex', flexWrap: 'wrap' }}>
