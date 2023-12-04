@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import SearchBar from '../component/SearchBar';
+import BlockCanvas from '../boundary/Boundary';
 
 // Show component representing a rectangular block
 const Show = ({ name, date, time, venue, onClick }) => (
@@ -21,6 +22,98 @@ const Show = ({ name, date, time, venue, onClick }) => (
   </div>
 );
 
+const Seat = ({ row, col, onClick, selected, blocked }) => (
+  <div
+    style={{
+      border: '1px solid black',
+      padding: '4px',
+      margin: '2px',
+      cursor: 'pointer',
+      backgroundColor:
+      selected && !blocked
+        ? 'lightblue' // Light blue when selected and not blocked
+        : blocked && !selected
+        ? 'blue' // Blue when blocked and not selected
+        : 'white', // White when neither selected nor blocked
+    }}
+    onClick={() => onClick(row, col)}
+  >
+    {`${String.fromCharCode(64 + row).toUpperCase()}-${col}`}
+  </div>
+);
+
+  // Section component containing a grid of seats
+  const Section = ({ title, rows, cols, canSelect }) => {
+    const [selectedSeats, setSelectedSeats] = useState([]);
+    const [blockedSeats, setBlockedSeats] = useState([]);
+    const [blocks, setBlocks] = useState([]);
+  
+    const handleSeatClick = (row, col) => {
+      if (canSelect) {
+        // Check if the seat is already selected
+        const isSeatSelected = selectedSeats.some(seat => seat.row === row && seat.col === col);
+  
+        if (!isSeatSelected) {
+          // Add the selected seat to the list
+          setSelectedSeats(prevSeats => [...prevSeats, { row, col }]);
+        } else {
+          // Remove the selected seat from the list if it's already selected
+          setSelectedSeats(prevSeats => prevSeats.filter(seat => !(seat.row === row && seat.col === col)));
+        }
+      }
+    };
+  
+    const purchaseSeats = () => {
+      if (selectedSeats.length > 0) {         //TODO CHANGE LOGIC TO PURCHASE SEAT 
+        console.log(selectedSeats);
+        setBlockedSeats(prevSeats => [...prevSeats, ...selectedSeats]);   
+        setBlocks(prevBlocks => [...prevBlocks, selectedSeats]);
+        setSelectedSeats([]);
+      }
+    };
+  
+    return (
+      <div style={{ padding: '4px' }}>
+        <h4>{title}</h4>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+          {Array.from({ length: rows }, (_, rowIndex) => (
+            Array.from({ length: cols }, (_, colIndex) => (
+              <Seat
+                key={`${rowIndex}-${colIndex}`}
+                row={rowIndex + 1}
+                col={colIndex + 1}
+                onClick={() => handleSeatClick(rowIndex + 1, colIndex + 1)}
+                selected={selectedSeats.some(seat => seat.row === rowIndex + 1 && seat.col === colIndex + 1)}
+                blocked={blockedSeats.some(seat => seat.row === rowIndex + 1 && seat.col === colIndex + 1)}
+              />
+            ))
+          ))}
+        </div>
+  
+        {selectedSeats.length > 0 && (
+          <div>
+            <h3>Selected Seats</h3>
+            {selectedSeats.map((seat, index) => (
+              <p key={index}>{`Row: ${String.fromCharCode(64 + seat.row).toUpperCase()}, Column: ${seat.col}`}</p>
+            ))}
+            <button onClick={purchaseSeats}>Purchase Seats</button>
+          </div>
+        )}
+        {blocks.length > 0 && blocks.map((block, index) => (
+            <div>
+              <p>Block</p>
+              <span key={index}>
+                {block.length > 0 &&
+                  block.map((seat, j) => (
+                    <p key={j}>{`${String.fromCharCode(64 + seat.row).toUpperCase()}-${seat.col}`}</p>
+                  ))}
+              </span>
+            </div>
+          ))}
+      </div>
+    );
+  };
+
 const CustomerHome = ({ loggedInUser, onLogout }) => {
 
   const [search, setSearch] = useState(false);
@@ -34,6 +127,14 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
 
   const [selectedShow, setSelectedShow] = useState(null);
   const [selectedShowList, setSelectedShowList] = useState(null);
+  const [leftRow, setLeftRow] = useState('');
+  const [leftCol, setLeftCol] = useState('');
+  const [rightRow, setRightRow] = useState('');
+  const [rightCol, setRightCol] = useState('');
+  const [centerRow, setCenterRow] = useState('');
+  const [centerCol, setCenterCol] = useState('');
+
+  
 
   const handleShowClick = (index) => {
     setSelectedShow(searchResults[index]);
@@ -73,7 +174,8 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
           setSearch(true);
           setList(false);
           setLoadingSearch(false);
-          setSearchResults(data.events);
+          const filteredEvents = data.events.filter(event => event.event_active);
+          setSearchResults(filteredEvents);
         } catch (error) {
             console.error("Error occurred while searching show:", error);
         }
@@ -86,10 +188,6 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
       return query;
     });
   }
-
-  const addShow = (newShow) => {
-    setListOfShows((prevShows) => [...prevShows, newShow]);
-  };
 
   async function listActiveShows() {
     setLoadingList(true);
@@ -104,22 +202,11 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
     const data = await res.json();
     setSearch(false);
     setList(true);
-    setListOfShows([]);
-
-    data.events.map(event => {
-      // Call addShow for each event
-      event.active && addShow({
-        name: event.name,
-        date: new Date(event.date).toLocaleDateString(),
-        time: new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
-        venue: event.venue_id,
-        active: event.active,
-      });}); 
-   
-    
+    const filteredEvents = data.events.filter(event => event.active);
+    setListOfShows(filteredEvents);
     setLoadingList(false);
   }
-
+   
 
   return (
     <div>
@@ -161,7 +248,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
         </div>
 
         <div style={{ position: 'absolute', left: 100, top: 350, display: 'flex', flexWrap: 'wrap' }}>
-          {search && !selectedShow && searchResults.map((event, index) => (
+          {search && !selectedShow && searchResults && searchResults.map((event, index) => (
             <Show
               key={index}
               name={event.event_name}
@@ -178,9 +265,18 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                 date={new Date(selectedShow.event_date).toLocaleDateString()}
                 time={new Date(selectedShow.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                 venue={selectedShow.venue_name}
-              />
+              /> 
               <button onClick={handleUnselectShow}>unselectShow</button>
+              <div style={{ position: 'absolute', right: 100, top:100 }}>
+                            <h3>Venue Layout</h3>
+                            {/* <div style={{ display: 'flex' }}>
+                            <Section title="Left" rows={leftRow} cols={leftCol} canSelect={true}/>
+                            <Section title="Center" rows={centerRow} cols={centerCol} canSelect={true}/>
+                            <Section title="Right" rows={rightRow} cols={rightCol} canSelect={true}/>
+                            </div> */}
+                        </div>
             </div>
+            
           )}
           {list && !selectedShowList && listOfShows.map((event, index) => (
             <Show
@@ -201,6 +297,14 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                 venue={selectedShowList.venue_id}
               />
               <button onClick={handleUnselectShowList}>unselectShow</button>
+              <div style={{ position: 'absolute', left: 1000 , top: -100 }}>
+                            <h3>Venue Layout</h3>
+                            <div style={{ display: 'flex' }}>
+                            <Section title="Left" rows={5} cols={5} canSelect={true}/>
+                            <Section title="Center" rows={5} cols={5} canSelect={true}/>
+                            <Section title="Right" rows={5} cols={5} canSelect={true}/>
+                            </div>
+                        </div>
             </div>
           )}
         </div>
