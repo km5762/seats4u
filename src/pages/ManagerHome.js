@@ -108,8 +108,10 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
       boxSizing: 'border-box', // Include padding and border in the width calculation
     }} onClick={onClick}>
       <p><strong>Show:</strong> {name}</p>
-      <p><strong>Date:</strong> {date}</p>
-      <p><strong>Time:</strong> {time}</p>
+      <p><strong>Date:</strong> {new Date(date).toLocaleDateString()}</p>
+      <p><strong>Time:</strong> {new Date(date).toLocaleTimeString()}</p>
+      {/* <p><strong>Date:</strong> {date.split("T")[0]}</p>
+      <p><strong>Time:</strong> {date.split("T")[1].split("Z")[0]}</p> */}
       <p><strong>Id:</strong> {id}</p>
     </div>
   );
@@ -121,6 +123,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const location = useLocation();
     const receivedData = location.state.userData;
    
+    const [loading, setLoading] = useState(false);
 
     // venues
     const [venueCreated, setVenueCreated] = useState(false);
@@ -312,6 +315,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
             setSubmitLoading(false);
             console.log(manager.showId);
             }, 2000);
+
       });
     };
 
@@ -416,12 +420,12 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                     <div style={{ position: 'absolute', left: 100, top:50 }}>
                                     <h3>Your Venue: {venueName}</h3>
                                     <h3>Your list of shows</h3>
-                                    <p>You have {showNum} shows</p>
+                                    <p>You have {shows.length} shows</p>
                                     <button onClick={creatingShow}>Create show</button>
                                     <button onClick={deleteVenue}>Delete Venue</button>
                                     </div>)
                                 }
-                                <div style={{ position: 'absolute', left: 100, top:250 }}>
+                                <div style={{ position: 'absolute', left: 100, top:250, display: 'flex', flexWrap: 'wrap' }}>
                                     {!selectedShow && shows.map((show, index) => (
                                     <Show key={index} {...show} onClick={() => handleShowClick(index)} />
                                     ))}
@@ -431,8 +435,8 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                         <div style={{ position: 'absolute', left: 100, top:50 }}>
                                             <h2>Selected Show</h2>
                                             <p><strong>Show:</strong> {selectedShow.name}</p>
-                                            <p><strong>Date:</strong> {selectedShow.date}</p>
-                                            <p><strong>Time:</strong> {selectedShow.time}</p>
+                                            <p><strong>Date:</strong> {new Date(selectedShow.date).toLocaleDateString()}</p>
+                                            <p><strong>Time:</strong> {new Date(selectedShow.date).toLocaleTimeString()}</p>
                                             <button onClick={handleUnselectShow}>unselectShow</button>
                                             <button onClick={activateShow}>activateShow</button>
                                             <button onClick={handleDeleteShow}>deleteShow</button>

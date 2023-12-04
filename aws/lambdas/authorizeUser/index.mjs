@@ -16,17 +16,15 @@ const Role = Object.freeze({ ADMIN: 1, VENUE_MANAGER: 2 });
 export const handler = function (event, context, callback) {
   const cookie = event.headers.cookie;
 
-  if (!cookie) {
-    callback("Error: Cookie missing");
-  }
+  let user = { roleId: undefined };
+  if (cookie) {
+    const token = cookie.split("=")[1];
 
-  const token = cookie.split("=")[1];
-
-  let user;
-  try {
-    user = jwt.verify(token, jwtSecret);
-  } catch (error) {
-    callback(error);
+    try {
+      user = jwt.verify(token, jwtSecret);
+    } catch (error) {
+      callback(error);
+    }
   }
 
   switch (user.roleId) {

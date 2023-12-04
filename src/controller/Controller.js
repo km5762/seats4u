@@ -75,6 +75,22 @@ export async function deleteShowC(manager, showToDelete) {
     manager.venue.deleteShow(showToDelete);
 }
 
+export async function deleteShowAdminC(showToDeleteID) {
+    try {
+        const res = await fetch(
+            "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/deleteevent",
+            {
+                credentials: "include",
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ eventId: showToDeleteID}),
+            }
+        );
+    } catch (error) {
+        console.error("Error occurred during deleting show:", error);
+    }
+}
+
 export async function createShowC(manager, name, date, time) {
     
 
