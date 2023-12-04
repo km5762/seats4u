@@ -73,7 +73,8 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
           setSearch(true);
           setList(false);
           setLoadingSearch(false);
-          setSearchResults(data.events);
+          const filteredEvents = data.events.filter(event => event.event_active);
+          setSearchResults(filteredEvents);
         } catch (error) {
             console.error("Error occurred while searching show:", error);
         }
@@ -86,10 +87,6 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
       return query;
     });
   }
-
-  const addShow = (newShow) => {
-    setListOfShows((prevShows) => [...prevShows, newShow]);
-  };
 
   async function listActiveShows() {
     setLoadingList(true);
@@ -104,19 +101,8 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
     const data = await res.json();
     setSearch(false);
     setList(true);
-    setListOfShows([]);
-
-    data.events.map(event => {
-      // Call addShow for each event
-      event.active && addShow({
-        name: event.name,
-        date: new Date(event.date).toLocaleDateString(),
-        time: new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
-        venue: event.venue_id,
-        active: event.active,
-      });}); 
-   
-    
+    const filteredEvents = data.events.filter(event => event.active);
+    setListOfShows(filteredEvents);
     setLoadingList(false);
   }
 
