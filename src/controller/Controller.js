@@ -149,3 +149,23 @@ export async function activateShowC(activateShow) {
         console.error("Error occurred while activating show:", error);
     }
 }
+
+
+
+export async function purchaseSeatsC(venueId, showId, seatSelection) {
+    try {
+        const res = await fetch(
+            "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/purchaseseats",
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    "venueId": venueId, 
+                    "showId": showId,
+                    "seatsToPurchase": seatSelection}),
+            }
+        );
+    } catch (error) {
+        console.error("Error occurred while activating show:", error);
+    }
+}
