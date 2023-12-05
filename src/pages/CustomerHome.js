@@ -274,14 +274,14 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                 venue={selectedShow.venue_name}
               /> 
               <button onClick={handleUnselectShow}>unselectShow</button>
-              <div style={{ position: 'absolute', right: 100, top:100 }}>
-                            <h3>Venue Layout</h3>
-                            {/* <div style={{ display: 'flex' }}>
-                            <Section title="Left" rows={leftRow} cols={leftCol} canSelect={true} selectedShowList={selectedShowList}/>
-                            <Section title="Center" rows={centerRow} cols={centerCol} canSelect={true} selectedShowList={selectedShowList}/>
-                            <Section title="Right" rows={rightRow} cols={rightCol} canSelect={true} selectedShowList={selectedShowList}/>
-                            </div> */}
-                        </div>
+              <div style={{ position: 'absolute', left: 600 , top: -200 }}>
+                  <h3>Venue Layout</h3>
+                  <div style={{ display: 'flex' }}>
+                  <Section title="Left" rows={5} cols={5} canSelect={true}/>
+                  <Section title="Center" rows={5} cols={5} canSelect={true}/>
+                  <Section title="Right" rows={5} cols={5} canSelect={true}/>
+                  </div>
+              </div>
             </div>
             
           )}
