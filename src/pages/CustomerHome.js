@@ -47,7 +47,7 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
 );
 
   // Section component containing a grid of seats
-  const Section = ({ title, rows, cols, canSelect, selectedShowList }) => {
+  const Section = ({ title, rows, cols, canSelect, selectedShowList, ticketPrice }) => {
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [blockedSeats, setBlockedSeats] = useState([]);
     const [blocks, setBlocks] = useState([]);
@@ -88,7 +88,7 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
                 key={`${rowIndex}-${colIndex}`}
                 row={rowIndex + 1}
                 col={colIndex + 1}
-                onClick={() => handleSeatClick(rowIndex + 1, colIndex + 1, 5)}
+                onClick={() => handleSeatClick(rowIndex + 1, colIndex + 1, ticketPrice)}
                 selected={selectedSeats.some(seat => seat.row === rowIndex + 1 && seat.col === colIndex + 1)}
                 blocked={blockedSeats.some(seat => seat.row === rowIndex + 1 && seat.col === colIndex + 1)}
               />
@@ -259,6 +259,8 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
     });
   }
 
+  const [ticketPrice, setTicketPrice] = useState(null);
+
   async function listSeats(eventId){
     
     try {
@@ -278,7 +280,12 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
         );
 
         const data = await res.json();
-        console.log(data)
+        let price = parseInt(data[0].price, 10);
+        setTicketPrice(price);
+        // console.log(data);
+        // console.log(data[0]);
+        // console.log(data[0].price);
+
     } catch (error) {
         console.error("Error occurred during creating venue:", error);
     }
@@ -349,9 +356,9 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
               <div style={{ position: 'absolute', left: 600 , top: -200 }}>
                   <h3>Venue Layout</h3>
                   <div style={{ display: 'flex' }}>
-                  <Section title="Left" rows={getLayout(selectedShow.venue_id, 0)} cols={getLayout(selectedShow.venue_id, 1)} canSelect={true}/>
-                  <Section title="Center" rows={getLayout(selectedShow.venue_id, 2)} cols={getLayout(selectedShow.venue_id, 3)} canSelect={true}/>
-                  <Section title="Right" rows={getLayout(selectedShow.venue_id, 4)} cols={getLayout(selectedShow.venue_id, 5)} canSelect={true}/>
+                  <Section title="Left" rows={getLayout(selectedShow.venue_id, 0)} cols={getLayout(selectedShow.venue_id, 1)} canSelect={true} ticketPrice={ticketPrice}/>
+                  <Section title="Center" rows={getLayout(selectedShow.venue_id, 2)} cols={getLayout(selectedShow.venue_id, 3)} canSelect={true} ticketPrice={ticketPrice}/>
+                  <Section title="Right" rows={getLayout(selectedShow.venue_id, 4)} cols={getLayout(selectedShow.venue_id, 5)} canSelect={true} ticketPrice={ticketPrice}/>
                   </div>
               </div>
             </div>
@@ -382,9 +389,9 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
               <div style={{ position: 'absolute', left: 600 , top: -200 }}>
                   <h3>Venue Layout</h3>
                   <div style={{ display: 'flex' }}>
-                  <Section title="Left" rows={getLayout(selectedShowList.venue_id, 0)} cols={getLayout(selectedShowList.venue_id, 1)} canSelect={true}/>
-                  <Section title="Center" rows={getLayout(selectedShowList.venue_id, 2)} cols={getLayout(selectedShowList.venue_id, 3)} canSelect={true}/>
-                  <Section title="Right" rows={getLayout(selectedShowList.venue_id, 4)} cols={getLayout(selectedShowList.venue_id, 5)} canSelect={true}/>
+                  <Section title="Left" rows={getLayout(selectedShowList.venue_id, 0)} cols={getLayout(selectedShowList.venue_id, 1)} canSelect={true} ticketPrice={ticketPrice}/>
+                  <Section title="Center" rows={getLayout(selectedShowList.venue_id, 2)} cols={getLayout(selectedShowList.venue_id, 3)} canSelect={true} ticketPrice={ticketPrice}/>
+                  <Section title="Right" rows={getLayout(selectedShowList.venue_id, 4)} cols={getLayout(selectedShowList.venue_id, 5)} canSelect={true} ticketPrice={ticketPrice}/>
                   </div>
               </div>
             </div>
