@@ -27,17 +27,17 @@ export const handler = async (event) => {
     switch (user.roleId) {
       case Role.VENUE_MANAGER:
         query =
-          "SELECT seat.id, seat.event_id, seat.section_id, seat.available, seat.section_row, seat.section_col, block.price FROM seat JOIN block ON seat.event_id = block.event_id AND seat.section_row BETWEEN block.start_row AND block.end_row JOIN event ON seat.event_id = event.id JOIN venue ON event.venue_id = venue.id WHERE seat.event_id = ? AND (event.active OR event.venue_id = ?)";
+          "SELECT seat.id, seat.event_id, seat.section_id, seat.available, seat.section_row, seat.section_col, block.price FROM seat JOIN block ON (seat.event_id = block.event_id AND (seat.section_row BETWEEN block.start_row AND block.end_row) AND seat.section_id = block.section_id) OR block.section_id IS NULL JOIN event ON seat.event_id = event.id JOIN venue ON event.venue_id = venue.id WHERE seat.event_id = ? AND (event.active OR event.venue_id = ?)";
         queryParams = [eventId, user.venueId];
         break;
       case Role.ADMIN:
         query =
-          "SELECT seat.id, seat.event_id, seat.section_id, seat.available, seat.section_row, seat.section_col, block.price FROM seat JOIN block ON seat.event_id = block.event_id AND seat.section_row BETWEEN block.start_row AND block.end_row JOIN event ON seat.event_id = event.id";
+          "SELECT seat.id, seat.event_id, seat.section_id, seat.available, seat.section_row, seat.section_col, block.price FROM seat JOIN block ON (seat.event_id = block.event_id AND (seat.section_row BETWEEN block.start_row AND block.end_row) AND seat.section_id = block.section_id) OR block.section_id IS NULL JOIN event ON seat.event_id = event.id";
         queryParams = [eventId];
         break;
       default:
         query =
-          "SELECT seat.id, seat.event_id, seat.section_id, seat.available, seat.section_row, seat.section_col, block.price FROM seat JOIN block ON seat.event_id = block.event_id AND seat.section_row BETWEEN block.start_row AND block.end_row JOIN event ON seat.event_id = event.id WHERE event.active";
+          "SELECT seat.id, seat.event_id, seat.section_id, seat.available, seat.section_row, seat.section_col, block.price FROM seat JOIN block ON (seat.event_id = block.event_id AND (seat.section_row BETWEEN block.start_row AND block.end_row) AND seat.section_id = block.section_id) OR block.section_id IS NULL JOIN event ON seat.event_id = event.id WHERE event.active";
         queryParams = [eventId];
         break;
     }
