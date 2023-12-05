@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import SearchBar from '../component/SearchBar';
+import { purchaseSeatsC } from '../controller/Controller';
 import BlockCanvas from '../boundary/Boundary';
 
 // Show component representing a rectangular block
@@ -45,7 +46,7 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
 );
 
   // Section component containing a grid of seats
-  const Section = ({ title, rows, cols, canSelect }) => {
+  const Section = ({ title, rows, cols, canSelect, selectedShowList }) => {
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [blockedSeats, setBlockedSeats] = useState([]);
     const [blocks, setBlocks] = useState([]);
@@ -67,6 +68,7 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
   
     const purchaseSeats = () => {
       if (selectedSeats.length > 0) {         //TODO CHANGE LOGIC TO PURCHASE SEAT 
+        purchaseSeatsC(selectedShowList.venue_id,selectedShowList.venue_id, selectedSeats);
         console.log(title);
         console.log(selectedSeats);
         setBlockedSeats(prevSeats => [...prevSeats, ...selectedSeats]);   
