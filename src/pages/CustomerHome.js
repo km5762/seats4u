@@ -145,14 +145,17 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
     //1: [10, 20],
   });
 
-  // useEffect(() => {
-  //   console.log(layoutDict);
-  // }, [layoutDict]); 
+  useEffect(() => {
+    console.log(layoutDict);
+  }, [layoutDict]); 
 
   // Function to add or update a value in the dictionary
   const updateDict = (key, list) => {
     setLayoutDict((prevDictionary) => {
       const existingSection = prevDictionary[key] || [];
+      if (existingSection.length >= 6) {
+        return prevDictionary; // Do nothing and return the current state
+      }
       const newSection = existingSection.concat(list);
 
       return {
