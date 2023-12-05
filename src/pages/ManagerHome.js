@@ -31,20 +31,34 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
     const [blockedSeats, setBlockedSeats] = useState([]);
     const [blocks, setBlocks] = useState([]);
   
-    const handleSeatClick = (row, col) => {
+    const handleSeatClick = (row, col, maxCols) => {
       if (canSelect) {
         // Check if the seat is already selected
         const isSeatSelected = selectedSeats.some(seat => seat.row === row && seat.col === col);
   
         if (!isSeatSelected) {
           // Add the selected seat to the list
-          setSelectedSeats(prevSeats => [...prevSeats, { row, col }]);
+          // setSelectedSeats(prevSeats => [...prevSeats, { row, col }]);
+          // console.log(row);
+          // console.log(col);
+          for (let col = 1; col < maxCols+1; col++) {
+            setSelectedSeats(prevSeats => [...prevSeats, { row, col }]);
+            console.log(row);
+            console.log(col);
+            console.log(selectedSeats);
+          }
         } else {
           // Remove the selected seat from the list if it's already selected
-          setSelectedSeats(prevSeats => prevSeats.filter(seat => !(seat.row === row && seat.col === col)));
+          for (let col = 1; col < maxCols+1; col++) {
+            setSelectedSeats(prevSeats => prevSeats.filter(seat => !(seat.row === row && seat.col === col)));
+          }
         }
       }
     };
+
+    // useEffect(() => {
+    //   console.log(selectedSeats);
+    // }, [selectedSeats]); 
   
     const addBlock = () => {
       if (selectedSeats.length > 0) {
@@ -65,7 +79,7 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
                 key={`${rowIndex}-${colIndex}`}
                 row={rowIndex + 1}
                 col={colIndex + 1}
-                onClick={() => handleSeatClick(rowIndex + 1, colIndex + 1)}
+                onClick={() => handleSeatClick(rowIndex + 1, colIndex + 1, cols)}
                 selected={selectedSeats.some(seat => seat.row === rowIndex + 1 && seat.col === colIndex + 1)}
                 blocked={blockedSeats.some(seat => seat.row === rowIndex + 1 && seat.col === colIndex + 1)}
               />
