@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { createVenueC, deleteVenueC, createShowC, deleteShowC, activateShowC } from '../controller/Controller';
 import BlockCanvas from '../boundary/Boundary';
@@ -151,37 +151,39 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
           setVenueName(firstVenue.name);
           setVenueCreated(true);
         }
+
+        listShows();
       
-        if (receivedData && receivedData.events && receivedData.events.length > 0) {
-          const events = receivedData.events;
+        // if (receivedData && receivedData.events && receivedData.events.length > 0) {
+        //   const events = receivedData.events;
     
-          // Filter unique events by ID
-          const uniqueEvents = [...new Map(events.map(event => [event.id, event])).values()];
+        //   // Filter unique events by ID
+        //   const uniqueEvents = [...new Map(events.map(event => [event.id, event])).values()];
     
-          const showsFromEvents = uniqueEvents
-            .filter(event => event.date) // Filter out events without a date
-            .map((event) => {
-              const { id, name, date, active } = event;
-              const utcDate = new Date(date);
+        //   const showsFromEvents = uniqueEvents
+        //     .filter(event => event.date) // Filter out events without a date
+        //     .map((event) => {
+        //       const { id, name, date, active } = event;
+        //       const utcDate = new Date(date);
       
-              const localDate = utcDate.toLocaleDateString();
-              const localTime = utcDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+        //       const localDate = utcDate.toLocaleDateString();
+        //       const localTime = utcDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
       
-              return {
-                id,
-                name,
-                date: localDate,
-                time: localTime,
-                active,
-              };
-            });
+        //       return {
+        //         id,
+        //         name,
+        //         date: localDate,
+        //         time: localTime,
+        //         active,
+        //       };
+        //     });
       
-          setShows(showsFromEvents);
-          if (initialShowCount === 0) {
-            setInitialShowCount(uniqueEvents.length);
-            setShowNum(uniqueEvents.length);
-        }
-        }
+        //   setShows(showsFromEvents);
+        //   if (initialShowCount === 0) {
+        //     setInitialShowCount(uniqueEvents.length);
+        //     setShowNum(uniqueEvents.length);
+        // }
+        // }
     }, [receivedData]);
     
   
@@ -365,6 +367,38 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
         return `Time: ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
     };
 
+    const [layoutDict, setLayoutDict] = useState({
+      //1: [10, 20],
+    });
+  
+    // useEffect(() => {
+    //   console.log(layoutDict);
+    // }, [layoutDict]); 
+  
+    // Function to add or update a value in the dictionary
+    const updateDict = (key, list) => {
+      setLayoutDict((prevDictionary) => {
+        const existingSection = prevDictionary[key] || [];
+        if (existingSection.length >= 6) {
+          return prevDictionary; // Do nothing and return the current state
+        }
+        const newSection = existingSection.concat(list);
+  
+        return {
+          ...prevDictionary,
+          [key]: newSection,
+        };
+      });
+    };
+  
+    // Function to retrieve numbers from the dictionary
+    const getLayout = (venueId, num) => {
+      let layout = layoutDict[venueId]
+      console.log(layoutDict[venueId])
+      let result = layout[num]
+      return result;
+    };
+
     async function listShows() {
       // console.log(manager.id);
       //setLoadingList(true);
@@ -389,6 +423,11 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
           id: event.id,
           active: event.active,
         });});
+
+      data.sections.map(section => {
+        // Call addShow for each event
+        section.venue_id === manager.id && updateDict(section.venue_id, [section.row_count, section.col_count]);
+      });
       
     }
   
@@ -476,9 +515,9 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                         <div style={{ position: 'absolute', right: 100, top:100 }}>
                                             <h3>Venue Layout</h3>
                                             <div style={{ display: 'flex' }}>
-                                            <Section title="Left" rows={leftRow} cols={leftCol} canSelect={true}/>
-                                            <Section title="Center" rows={centerRow} cols={centerCol} canSelect={true}/>
-                                            <Section title="Right" rows={rightRow} cols={rightCol} canSelect={true}/>
+                                            <Section title="Left" rows={getLayout(manager.id, 0)} cols={getLayout(manager.id, 1)} canSelect={true}/>
+                                            <Section title="Center" rows={getLayout(manager.id, 2)} cols={getLayout(manager.id, 3)}  canSelect={true}/>
+                                            <Section title="Right" rows={getLayout(manager.id, 4)} cols={getLayout(manager.id, 5)}  canSelect={true}/>
                                             </div>
                                         </div>
                                     </div>
