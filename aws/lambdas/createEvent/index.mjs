@@ -48,7 +48,7 @@ export const handler = async (event) => {
       }
 
       const placeholder = seatValues.map(() => "(?, ?, ?, ?)").join(", ");
-      const query = `INSERT INTO seat (event_id, section_id, section_row, section_col) VALUE ${placeholder}`;
+      const query = `INSERT INTO seat (event_id, section_id, section_row, section_col) VALUES ${placeholder}`;
 
       await connection.execute(query, seatValues.flat());
 
