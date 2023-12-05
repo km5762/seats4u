@@ -54,6 +54,14 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
 
   const [listOfShows, setListOfShows] = useState([]);
 
+  const [hideList, setHideList] = useState(true);
+
+  const hideListOfShows = () => {
+    setHideList(true);
+    setListOfShows([]);
+  }
+
+
   async function handleSearch(query) {
     setSearchQuery((prevQuery) => {
   
@@ -72,6 +80,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
           );
           const data = await res.json();
           setListOfShows(data.events);
+          setHideList(false);
         } catch (error) {
             console.error("Error occurred while searching show:", error);
         }
@@ -98,6 +107,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
   const handleUnselectVenue = () => {
     setSelectedVenue(null);
     setListOfShows([]);
+    setHideList(true);
   };
 
   async function listVenues() {
@@ -190,8 +200,12 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                         <p><strong>Selected Venue:</strong></p>
                         <p><strong>Name:</strong> {selectedVenue.name} <strong>Id:</strong> {selectedVenue.id}</p>
                         <button onClick={handleUnselectVenue}>unselectVenue</button>
-                        {!selectedShow && (
-                        <SpecificSearchBar onSearch={handleSearch} initialSearchQuery={selectedVenue.name} />
+                        <button>generate show report</button>
+                        {!selectedShow && hideList && (
+                          <SpecificSearchBar onSearch={handleSearch} initialSearchQuery={selectedVenue.name} />
+                        )}
+                        {!hideList && (
+                          <button onClick={hideListOfShows}>Hide list</button>
                         )}
                         <div style={{display: 'flex', flexWrap: 'wrap'}}>
                           {!selectedShow && listOfShows.map((event, index) => (
