@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import SearchBar from '../component/SearchBar';
 import { purchaseSeatsC } from '../controller/Controller';
@@ -141,8 +141,35 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
   const [centerRow, setCenterRow] = useState('');
   const [centerCol, setCenterCol] = useState('');
 
-  
+  const [layoutDict, setLayoutDict] = useState({
+    //1: [10, 20],
+  });
 
+  // useEffect(() => {
+  //   console.log(layoutDict);
+  // }, [layoutDict]); 
+
+  // Function to add or update a value in the dictionary
+  const updateDict = (key, list) => {
+    setLayoutDict((prevDictionary) => {
+      const existingSection = prevDictionary[key] || [];
+      const newSection = existingSection.concat(list);
+
+      return {
+        ...prevDictionary,
+        [key]: newSection,
+      };
+    });
+  };
+
+  // Function to retrieve numbers from the dictionary
+  const getLayout = (venueId, num) => {
+    let layout = layoutDict[venueId]
+    console.log(layoutDict[venueId])
+    let result = layout[num]
+    return result;
+  };
+  
   const handleShowClick = (index) => {
     setSelectedShow(searchResults[index]);
   };
@@ -183,6 +210,11 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
           setLoadingSearch(false);
           const filteredEvents = data.events.filter(event => event.event_active);
           setSearchResults(filteredEvents);
+
+          data.sections.map(section => {
+            // Call addShow for each event
+            updateDict(section.venue_id, [section.row_count, section.col_count]);
+          });
         } catch (error) {
             console.error("Error occurred while searching show:", error);
         }
@@ -212,9 +244,13 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
     const filteredEvents = data.events.filter(event => event.active);
     setListOfShows(filteredEvents);
     setLoadingList(false);
+
+    data.sections.map(section => {
+      // Call addShow for each event
+      updateDict(section.venue_id, [section.row_count, section.col_count]);
+    });
   }
    
-
   return (
     <div>
         <div className="center-container">
@@ -274,14 +310,14 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                 venue={selectedShow.venue_name}
               /> 
               <button onClick={handleUnselectShow}>unselectShow</button>
-              <div style={{ position: 'absolute', right: 100, top:100 }}>
-                            <h3>Venue Layout</h3>
-                            {/* <div style={{ display: 'flex' }}>
-                            <Section title="Left" rows={leftRow} cols={leftCol} canSelect={true} selectedShowList={selectedShowList}/>
-                            <Section title="Center" rows={centerRow} cols={centerCol} canSelect={true} selectedShowList={selectedShowList}/>
-                            <Section title="Right" rows={rightRow} cols={rightCol} canSelect={true} selectedShowList={selectedShowList}/>
-                            </div> */}
-                        </div>
+              <div style={{ position: 'absolute', left: 600 , top: -200 }}>
+                  <h3>Venue Layout</h3>
+                  <div style={{ display: 'flex' }}>
+                  <Section title="Left" rows={getLayout(selectedShow.venue_id, 0)} cols={getLayout(selectedShow.venue_id, 1)} canSelect={true}/>
+                  <Section title="Center" rows={getLayout(selectedShow.venue_id, 2)} cols={getLayout(selectedShow.venue_id, 3)} canSelect={true}/>
+                  <Section title="Right" rows={getLayout(selectedShow.venue_id, 4)} cols={getLayout(selectedShow.venue_id, 5)} canSelect={true}/>
+                  </div>
+              </div>
             </div>
             
           )}
@@ -304,14 +340,14 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                 venue={selectedShowList.venue_id}
               />
               <button onClick={handleUnselectShowList}>unselectShow</button>
-              <div style={{ position: 'absolute', left: 1000 , top: -100 }}>
-                            <h3>Venue Layout</h3>
-                            <div style={{ display: 'flex' }}>
-                            <Section title="Left" rows={5} cols={5} canSelect={true} selectedShowList={selectedShowList}/>
-                            <Section title="Center" rows={5} cols={5} canSelect={true} selectedShowList={selectedShowList}/>
-                            <Section title="Right" rows={5} cols={5} canSelect={true} selectedShowList={selectedShowList}/>
-                            </div>
-                        </div>
+              <div style={{ position: 'absolute', left: 600 , top: -200 }}>
+                  <h3>Venue Layout</h3>
+                  <div style={{ display: 'flex' }}>
+                  <Section title="Left" rows={getLayout(selectedShowList.venue_id, 0)} cols={getLayout(selectedShowList.venue_id, 1)} canSelect={true}/>
+                  <Section title="Center" rows={getLayout(selectedShowList.venue_id, 2)} cols={getLayout(selectedShowList.venue_id, 3)} canSelect={true}/>
+                  <Section title="Right" rows={getLayout(selectedShowList.venue_id, 4)} cols={getLayout(selectedShowList.venue_id, 5)} canSelect={true}/>
+                  </div>
+              </div>
             </div>
           )}
         </div>
