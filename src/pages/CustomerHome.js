@@ -5,7 +5,7 @@ import { purchaseSeatsC } from '../controller/Controller';
 import BlockCanvas from '../boundary/Boundary';
 
 // Show component representing a rectangular block
-const Show = ({ name, date, time, venue, onClick }) => (
+const Show = ({ name, date, time, venue, onClick, eventId }) => (
   <div style={{ 
     border: '1px solid black', 
     padding: '10px', 
@@ -18,6 +18,7 @@ const Show = ({ name, date, time, venue, onClick }) => (
     <p><strong>Date:</strong> {date}</p>
     <p><strong>Time:</strong> {time}</p>
     <p><strong>Venue:</strong> {venue}</p>
+    <p><strong>Event ID:</strong> {eventId}</p>
     {/* <p><strong>Date:</strong> {date.split("T")[0]}</p>
     <p><strong>Time:</strong> {date.split("T")[1].split("Z")[0]}</p> */}
   </div>
@@ -175,10 +176,14 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
   
   const handleShowClick = (index) => {
     setSelectedShow(searchResults[index]);
+    let result = searchResults[index];
+    listSeats(result.event_id);
   };
 
   const handleShowClickList = (index) => {
     setSelectedShowList(listOfShows[index]);
+    let result = listOfShows[index];
+    listSeats(result.id);
   };
 
   const handleUnselectShow = () => {
@@ -253,6 +258,31 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
       updateDict(section.venue_id, [section.row_count, section.col_count]);
     });
   }
+
+  async function listSeats(eventId){
+    
+    try {
+        const res = await fetch(
+        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/listseats",
+        {
+            credentials: "include",
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                Accept: "application/json"
+            },
+            body: JSON.stringify({
+                "eventId": eventId
+            }),
+        }
+        );
+
+        const data = await res.json();
+        console.log(data)
+    } catch (error) {
+        console.error("Error occurred during creating venue:", error);
+    }
+  }
    
   return (
     <div>
@@ -301,6 +331,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
               date={new Date(event.event_date).toLocaleDateString()}
               time={new Date(event.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
               venue={event.venue_name}
+              eventId={event.event_id}
               onClick={() => handleShowClick(index)}
             />
           ))}
@@ -311,7 +342,9 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                 date={new Date(selectedShow.event_date).toLocaleDateString()}
                 time={new Date(selectedShow.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                 venue={selectedShow.venue_name}
+                eventId={selectedShow.event_id}
               /> 
+              {/* <button onClick={() => listSeats(selectedShow.event_id)}>List Seats</button> */}
               <button onClick={handleUnselectShow}>unselectShow</button>
               <div style={{ position: 'absolute', left: 600 , top: -200 }}>
                   <h3>Venue Layout</h3>
@@ -331,6 +364,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
               date={new Date(event.date).toLocaleDateString()}
               time={new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
               venue={event.venue_id}
+              eventId={event.id}
               onClick={() => handleShowClickList(index)}
             />
           ))}
@@ -341,7 +375,9 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                 date={new Date(selectedShowList.date).toLocaleDateString()}
                 time={new Date(selectedShowList.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
                 venue={selectedShowList.venue_id}
+                eventId={selectedShowList.id}
               />
+              {/* <button onClick={() => listSeats(selectedShowList.id)}>List Seats</button> */}
               <button onClick={handleUnselectShowList}>unselectShow</button>
               <div style={{ position: 'absolute', left: 600 , top: -200 }}>
                   <h3>Venue Layout</h3>
