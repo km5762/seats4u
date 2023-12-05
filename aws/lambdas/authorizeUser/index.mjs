@@ -24,7 +24,7 @@ export const handler = function (event, context, callback) {
       try {
         user = jwt.verify(token, jwtSecret);
       } catch (error) {
-        callback(error);
+        console.error(error);
       }
     }
   }
@@ -46,7 +46,7 @@ export const handler = function (event, context, callback) {
     default:
       if (
         event.routeArn.includes("searchevents") ||
-        event.routeArn.includes("showavailableseats") ||
+        event.routeArn.includes("listseats") ||
         event.routeArn.includes("purchaseseats") ||
         event.routeArn.includes("listevents")
       ) {
