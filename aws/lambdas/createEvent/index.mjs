@@ -1,13 +1,9 @@
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
-import jwt from "jsonwebtoken";
-import fs from "fs";
 
 dotenv.config();
 
 const Role = Object.freeze({ ADMIN: 1, VENUE_MANAGER: 2 });
-
-const jwtSecret = fs.readFileSync("private.key");
 
 let connection;
 try {
@@ -22,45 +18,41 @@ try {
 }
 
 export const handler = async (event) => {
-  const cookie = event.cookies[0];
+  const user = event.requestContext.authorizer.lambda;
   const { venueId, name, date } = JSON.parse(event.body);
-
-  if (!cookie) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ error: "Cookie missing" }),
-    };
-  }
-
-  if (!venueId || !name || !date) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Missing venueId, name, or date" }),
-    };
-  }
-
-  const token = cookie.split("=")[1];
-
-  let user;
-  try {
-    user = jwt.verify(token, jwtSecret);
-  } catch (error) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ error: "Invalid token" }),
-    };
-  }
 
   if (
     (user.roleId === Role.VENUE_MANAGER && user.venueId === venueId) ||
     user.roleId === Role.ADMIN
   ) {
     try {
+      await connection.query("START TRANSACTION");
+
       const [res] = await connection.execute(
         "INSERT INTO event (venue_id, name, date) VALUES (?, ?, ?)",
         [venueId, name, date]
       );
 
+      const [sections] = await connection.execute(
+        "SELECT id, row_count, col_count FROM section WHERE venue_id = ?",
+        [venueId]
+      );
+
+      const seatValues = [];
+      for (const section of sections) {
+        for (let i = 0; i < section["row_count"]; i++) {
+          for (let j = 0; j < section["col_count"]; j++) {
+            seatValues.push([res.insertId, section["id"], i, j]);
+          }
+        }
+      }
+
+      const placeholder = seatValues.map(() => "(?, ?, ?, ?)").join(", ");
+      const query = `INSERT INTO seat (event_id, section_id, section_row, section_col) VALUE ${placeholder}`;
+
+      await connection.execute(query, seatValues.flat());
+
+      await connection.query("COMMIT");
       return {
         statusCode: 200,
         body: JSON.stringify({ eventId: res.insertId }),
