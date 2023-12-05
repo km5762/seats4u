@@ -444,6 +444,42 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       });
       
     }
+
+    const [ticketPrice, setTicketPrice] = useState(null);
+
+    async function createBlock(){
+    
+      try {
+          const res = await fetch(
+          "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/createblocks",
+          {
+              credentials: "include",
+              method: "POST",
+              headers: { 
+                  "Content-Type": "application/json",
+                  Accept: "application/json"
+              },
+              body: JSON.stringify(
+                [
+                  {
+                    "eventId": selectedShow.id,
+                    "sectionId": null,
+                    "price": ticketPrice,
+                    "startRow": 1,
+                    "endRow": 1
+                  }
+                ]
+              ),
+          }
+          );
+  
+          // const data = await res.json();
+          // console.log(data)
+          setTicketPrice(null);
+      } catch (error) {
+          console.error("Error occurred during creating blocks:", error);
+      }
+    }
   
     return (
         <div>
@@ -522,12 +558,16 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                             <p><strong>Show:</strong> {selectedShow.name}</p>
                                             <p><strong>Date:</strong> {selectedShow.date}</p>
                                             <p><strong>Time:</strong> {selectedShow.time}</p>
+                                            <p><strong>Id:</strong> {selectedShow.id}</p>
                                             <button onClick={handleUnselectShow}>unselectShow</button>
                                             <button onClick={activateShow}>activateShow</button>
                                             <button onClick={handleDeleteShow}>deleteShow</button>
                                         </div>
                                         <div style={{ position: 'absolute', right: 100, top:100 }}>
                                             <h3>Venue Layout</h3>
+                                            <input type="number" value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} placeholder="Enter ticket price"/><p></p>
+                                            <p>This ticket price will be assigned to all seats: ${ticketPrice}</p>
+                                            <button onClick={createBlock}>Submit ticket price</button>
                                             <div style={{ display: 'flex' }}>
                                             <Section title="Left" rows={getLayout(manager.id, 0)} cols={getLayout(manager.id, 1)} canSelect={true}/>
                                             <Section title="Center" rows={getLayout(manager.id, 2)} cols={getLayout(manager.id, 3)}  canSelect={true}/>
