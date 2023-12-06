@@ -253,6 +253,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
 
   const handleUnselectVenue = () => {
     setSelectedVenue(null);
+    setSelectedShow(null);
     setListOfShows([]);
     setHideList(true);
   };
