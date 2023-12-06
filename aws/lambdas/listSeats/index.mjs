@@ -27,31 +27,31 @@ export const handler = async (event) => {
     switch (user.roleId) {
       case Role.VENUE_MANAGER:
         [seats] = await connection.execute(
-          "SELECT * FROM seat JOIN event ON seat.event_id = event.id WHERE event.active OR event.venue_id = ? AND event.id = ?",
+          "SELECT seat.id, seat.section_id, seat.available, seat.section_row, seat.section_col FROM seat JOIN event ON seat.event_id = event.id WHERE event.active OR event.venue_id = ? AND event.id = ?",
           [user.venueId, eventId]
         );
         [blocks] = await connection.execute(
-          "SELECT * FROM block JOIN event ON block.event_id = event.id WHERE block.event_id = ? AND (event.active OR venue_id = ?)",
+          "SELECT block.id, block.section_id, block.price, block.start_row, block.end_row FROM block JOIN event ON block.event_id = event.id WHERE block.event_id = ? AND (event.active OR venue_id = ?)",
           [eventId, user.venueId]
         );
         break;
       case Role.ADMIN:
         [seats] = await connection.execute(
-          "SELECT * FROM seat WHERE event_id = ?",
+          "SELECT seat.id, seat.section_id, seat.available, seat.section_row, seat.section_col FROM seat WHERE event_id = ?",
           [eventId]
         );
         [blocks] = await connection.execute(
-          "SELECT * FROM block WHERE event_id = ?",
+          "SELECT block.id, block.section_id, block.price, block.start_row, block.end_row FROM block WHERE event_id = ?",
           [eventId]
         );
         break;
       default:
         [seats] = await connection.execute(
-          "SELECT * FROM seat JOIN event ON seat.event_id = event.id WHERE event.active AND event.id = ?",
+          "SELECT seat.id, seat.section_id, seat.available, seat.section_row, seat.section_col FROM seat JOIN event ON seat.event_id = event.id WHERE event.active AND event.id = ?",
           [eventId]
         );
         [blocks] = await connection.execute(
-          "SELECT * FROM block JOIN event ON block.event_id = event.id WHERE block.event_id = ? AND event.active",
+          "SELECT block.id, block.section_id, block.price, block.start_row, block.end_row FROM block JOIN event ON block.event_id = event.id WHERE block.event_id = ? AND event.active",
           [eventId]
         );
         break;
