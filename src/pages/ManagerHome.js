@@ -569,9 +569,9 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                             <p>This ticket price will be assigned to all seats: ${ticketPrice}</p>
                                             <button onClick={createBlock}>Submit ticket price</button>
                                             <div style={{ display: 'flex' }}>
-                                            <Section title="Left" rows={getLayout(manager.id, 0)} cols={getLayout(manager.id, 1)} canSelect={true}/>
-                                            <Section title="Center" rows={getLayout(manager.id, 2)} cols={getLayout(manager.id, 3)}  canSelect={true}/>
-                                            <Section title="Right" rows={getLayout(manager.id, 4)} cols={getLayout(manager.id, 5)}  canSelect={true}/>
+                                            <Section title="Left" rows={getLayout(manager.id, 0)} cols={getLayout(manager.id, 1)} canSelect={false}/>
+                                            <Section title="Center" rows={getLayout(manager.id, 2)} cols={getLayout(manager.id, 3)}  canSelect={false}/>
+                                            <Section title="Right" rows={getLayout(manager.id, 4)} cols={getLayout(manager.id, 5)}  canSelect={false}/>
                                             </div>
                                         </div>
                                     </div>

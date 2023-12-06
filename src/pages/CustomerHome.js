@@ -281,6 +281,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
         );
 
         const data = await res.json();
+        console.log(data);
 
         for (let index = 0; index < data.length; index++) {
           if (data[index].event_id === eventId) {
