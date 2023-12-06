@@ -150,6 +150,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const [centerRow, setCenterRow] = useState('');
     const [centerCol, setCenterCol] = useState('');
     const [showCreating, setShowCreating] = useState(false);
+    const [generatedToggle, setGeneratedToggle] = useState(false);
     const [showName, setShowName] = useState('');
     const [showDate, setShowDate] = useState('');
     const [showTime, setShowTime] = useState('');
@@ -300,6 +301,10 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       activateShowC(selectedShow);
       console.log(selectedShow);
     };
+
+    const generateShowReport = () => {
+      setGeneratedToggle(!generatedToggle);
+    }
   
     const createShow = () => {
         setSubmitLoading(true);
@@ -561,8 +566,17 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                             <p><strong>Id:</strong> {selectedShow.id}</p>
                                             <button onClick={handleUnselectShow}>unselectShow</button>
                                             <button onClick={activateShow}>activateShow</button>
+                                            <button onClick={generateShowReport}>generateShowReport</button>
                                             <button onClick={handleDeleteShow}>deleteShow</button>
                                         </div>
+                                        {generatedToggle && (
+                                          <div style={{ position: 'absolute', left: 100, top:300 }}>
+                                            <p><strong>Active:</strong> {selectedShow.name}</p>
+                                            <p><strong>Tickets Sold:</strong> {selectedShow.name}</p>
+                                            <p><strong>Tickets Remainig:</strong> {selectedShow.name}</p>
+                                            <p><strong>Revenue:</strong> {selectedShow.name}</p>
+                                          </div>
+                                        )}
                                         <div style={{ position: 'absolute', right: 100, top:100 }}>
                                             <h3>Venue Layout</h3>
                                             <input type="number" value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} placeholder="Enter ticket price"/><p></p>
