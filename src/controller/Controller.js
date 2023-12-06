@@ -71,7 +71,6 @@ export async function deleteShowC(manager, showToDelete) {
     } catch (error) {
         console.error("Error occurred during deleting show:", error);
     }
-
     manager.venue.deleteShow(showToDelete);
 }
 
@@ -150,6 +149,22 @@ export async function activateShowC(activateShow) {
     }
 }
 
+export async function activateShowAdminC(id) {
+    try {
+        console.log(id)
+        const res = await fetch(
+            "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/activateevent",
+            {
+                credentials: "include",
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ eventId: id}),
+            }
+        );
+    } catch (error) {
+        console.error("Error occurred while activating show:", error);
+    }
+}
 
 
 export async function purchaseSeatsC(venueId, showId, seatSelection) {

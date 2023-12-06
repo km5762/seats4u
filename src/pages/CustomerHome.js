@@ -280,6 +280,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
         );
 
         const data = await res.json();
+        console.log(data);
         let price = parseInt(data[0].price, 10);
         setTicketPrice(price);
         // console.log(data);
