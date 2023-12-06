@@ -174,10 +174,7 @@ export async function purchaseSeatsC(venueId, showId, seatSelection) {
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    "venueId": venueId, 
-                    "showId": showId,
-                    "seatsToPurchase": seatSelection}),
+                body: JSON.stringify({"seatIds": seatSelection}),
             }
         );
     } catch (error) {
