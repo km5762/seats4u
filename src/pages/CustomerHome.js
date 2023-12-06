@@ -525,18 +525,22 @@ const CustomerHome = ({ setLoggedInUser, loggedInUser, onLogout }) => {
         console.log(data.seats[index].available);
       }
 
-      for (let index = 0; index < data.blocks.length; index++) {
-        if (data.blocks[index].event_id === eventId) {
-          // Found the matching id, get the price and break the loop
-          let price = parseInt(data.blocks[index].price, 10);
-          setTicketPrice(price);
-          console.log(eventId);
-          console.log(price);
-          return;
-        }
-      }
-      setTicketPrice(null);
-      console.log("no ticket price found");
+      let price = parseInt(data.blocks[0].price, 10);
+      setTicketPrice(price);
+      console.log(price);
+
+      // for (let index = 0; index < data.blocks.length; index++) {
+      //   if (data.blocks[index].event_id === eventId) {
+      //     // Found the matching id, get the price and break the loop
+      //     let price = parseInt(data.blocks[index].price, 10);
+      //     setTicketPrice(price);
+      //     console.log(eventId);
+      //     console.log(price);
+      //     return;
+      //   }
+      // }
+      // setTicketPrice(null);
+      // console.log("no ticket price found");
       return;
 
       // let price = parseInt(data[0].price, 10);
@@ -668,7 +672,11 @@ const CustomerHome = ({ setLoggedInUser, loggedInUser, onLogout }) => {
                       getLayout(selectedShow.venue_id, 2) *
                         getLayout(selectedShow.venue_id, 3)
                   )}
-                  startId={startId}
+                  startId={
+                    startId +
+                    getLayout(selectedShow.venue_id, 0) *
+                      getLayout(selectedShow.venue_id)
+                  }
                 />
                 <Section
                   title="Right"
@@ -688,7 +696,13 @@ const CustomerHome = ({ setLoggedInUser, loggedInUser, onLogout }) => {
                       getLayout(selectedShow.venue_id, 4) *
                         getLayout(selectedShow.venue_id, 5)
                   )}
-                  startId={startId}
+                  startId={
+                    startId +
+                    getLayout(selectedShow.venue_id, 0) *
+                      getLayout(selectedShow.venue_id) +
+                    getLayout(selectedShow.venue_id, 2) *
+                      getLayout(selectedShow.venue_id, 3)
+                  }
                 />
               </div>
             </div>
@@ -756,7 +770,11 @@ const CustomerHome = ({ setLoggedInUser, loggedInUser, onLogout }) => {
                       getLayout(selectedShowList.venue_id, 2) *
                         getLayout(selectedShowList.venue_id, 3)
                   )}
-                  startId={startId}
+                  startId={
+                    startId +
+                    getLayout(selectedShowList.venue_id, 0) *
+                      getLayout(selectedShowList.venue_id, 1)
+                  }
                 />
                 <Section
                   title="Right"
@@ -776,7 +794,13 @@ const CustomerHome = ({ setLoggedInUser, loggedInUser, onLogout }) => {
                       getLayout(selectedShowList.venue_id, 4) *
                         getLayout(selectedShowList.venue_id, 5)
                   )}
-                  startId={startId}
+                  startId={
+                    startId +
+                    getLayout(selectedShowList.venue_id, 0) *
+                      getLayout(selectedShowList.venue_id, 1) +
+                    getLayout(selectedShowList.venue_id, 2) *
+                      getLayout(selectedShowList.venue_id, 3)
+                  }
                 />
               </div>
             </div>
