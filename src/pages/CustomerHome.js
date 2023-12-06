@@ -24,7 +24,7 @@ const Show = ({ name, date, time, venue, onClick, eventId }) => (
   </div>
 );
 
-const Seat = ({ row, col, onClick, selected, blocked }) => (
+const Seat = ({ row, col, onClick, selected, blocked, available }) => (
   <div
     style={{
       border: '1px solid black',
@@ -32,13 +32,14 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
       margin: '2px',
       cursor: 'pointer',
       backgroundColor:
-      selected && !blocked
-        ? 'lightblue' // Light blue when selected and not blocked
-        : blocked && !selected
-        ? 'blue' // Blue when blocked and not selected
-        : selected && blocked
-        ? 'blue' // Blue when both selected and blocked
-        : 'white', // White when neither selected nor blocked
+      // selected && !blocked
+      //   ? 'lightblue' // Light blue when selected and not blocked
+      //   : blocked && !selected
+      //   ? 'blue' // Blue when blocked and not selected
+      //   : selected && blocked
+      //   ? 'blue' // Blue when both selected and blocked
+      //   : 'white', // White when neither selected nor blocked
+        selected ? 'lightblue' : (available ? 'white' : 'gray')
     }}
     onClick={() => onClick(row, col)}
   >
@@ -47,13 +48,17 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
 );
 
   // Section component containing a grid of seats
-  const Section = ({ title, rows, cols, canSelect, selectedShowList, ticketPrice }) => {
+  const Section = ({ title, rows, cols, canSelect, selectedShowList, ticketPrice, availableList }) => {
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [blockedSeats, setBlockedSeats] = useState([]);
     const [blocks, setBlocks] = useState([]);
   
     const handleSeatClick = (row, col, cost) => {
-      if (canSelect) {
+      // console.log(availableList);
+      // console.log((row-1) * cols + col - 1);
+      // console.log(availableList[(row-1) * cols + col - 1] === 1)
+      if (canSelect && availableList[(row-1) * cols + col - 1] === 1) {
+        console.log("Select")
         // Check if the seat is already selected
         const isSeatSelected = selectedSeats.some(seat => seat.row === row && seat.col === col);
         const isSeatBlocked = blockedSeats.some(seat => seat.row === row && seat.col === col);
@@ -92,6 +97,7 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
                 onClick={() => handleSeatClick(rowIndex + 1, colIndex + 1, ticketPrice)}
                 selected={selectedSeats.some(seat => seat.row === rowIndex + 1 && seat.col === colIndex + 1)}
                 blocked={blockedSeats.some(seat => seat.row === rowIndex + 1 && seat.col === colIndex + 1)}
+                available={availableList[rowIndex * cols + colIndex] === 1}
               />
             ))
           ))}
@@ -261,9 +267,12 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
   }
 
   const [ticketPrice, setTicketPrice] = useState(null);
+  const [availableList, setAvailableList] = useState([]);
 
   async function listSeats(eventId){
     
+    setAvailableList([]);
+
     try {
         const res = await fetch(
         "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/listseats",
@@ -281,6 +290,13 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
         );
 
         const data = await res.json();
+
+        console.log(data.length);
+
+        for (let index = 0; index < data.length; index++) {
+          setAvailableList(prevList => [...prevList, data[index].available]);
+          console.log(data[index].available);
+        }
 
         for (let index = 0; index < data.length; index++) {
           if (data[index].event_id === eventId) {
@@ -306,7 +322,10 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
         console.error("Error occurred during creating venue:", error);
     }
   }
-   
+  // useEffect(() => {
+  //   console.log(availableList);
+  // }, [availableList]); 
+
   return (
     <div>
         <div className="center-container">
@@ -372,9 +391,12 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
               <div style={{ position: 'absolute', left: 600 , top: -200 }}>
                   <h3>Venue Layout</h3>
                   <div style={{ display: 'flex' }}>
-                  <Section title="Left" rows={getLayout(selectedShow.venue_id, 0)} cols={getLayout(selectedShow.venue_id, 1)} canSelect={true} ticketPrice={ticketPrice}/>
-                  <Section title="Center" rows={getLayout(selectedShow.venue_id, 2)} cols={getLayout(selectedShow.venue_id, 3)} canSelect={true} ticketPrice={ticketPrice}/>
-                  <Section title="Right" rows={getLayout(selectedShow.venue_id, 4)} cols={getLayout(selectedShow.venue_id, 5)} canSelect={true} ticketPrice={ticketPrice}/>
+                  <Section title="Left" rows={getLayout(selectedShow.venue_id, 0)} cols={getLayout(selectedShow.venue_id, 1)} canSelect={true} ticketPrice={ticketPrice} 
+                    availableList={availableList.slice(0,getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1))}/>
+                  <Section title="Center" rows={getLayout(selectedShow.venue_id, 2)} cols={getLayout(selectedShow.venue_id, 3)} canSelect={true} ticketPrice={ticketPrice} 
+                    availableList={availableList.slice(getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1),getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1)+getLayout(selectedShow.venue_id, 2)*getLayout(selectedShow.venue_id, 3))}/>
+                  <Section title="Right" rows={getLayout(selectedShow.venue_id, 4)} cols={getLayout(selectedShow.venue_id, 5)} canSelect={true} ticketPrice={ticketPrice} 
+                    availableList={availableList.slice(getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1)+getLayout(selectedShow.venue_id, 2)*getLayout(selectedShow.venue_id, 3),getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1)+getLayout(selectedShow.venue_id, 2)*getLayout(selectedShow.venue_id, 3)+getLayout(selectedShow.venue_id, 4)*getLayout(selectedShow.venue_id, 5))}/>
                   </div>
               </div>
             </div>
@@ -405,9 +427,12 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
               <div style={{ position: 'absolute', left: 600 , top: -200 }}>
                   <h3>Venue Layout</h3>
                   <div style={{ display: 'flex' }}>
-                  <Section title="Left" rows={getLayout(selectedShowList.venue_id, 0)} cols={getLayout(selectedShowList.venue_id, 1)} canSelect={true} ticketPrice={ticketPrice}/>
-                  <Section title="Center" rows={getLayout(selectedShowList.venue_id, 2)} cols={getLayout(selectedShowList.venue_id, 3)} canSelect={true} ticketPrice={ticketPrice}/>
-                  <Section title="Right" rows={getLayout(selectedShowList.venue_id, 4)} cols={getLayout(selectedShowList.venue_id, 5)} canSelect={true} ticketPrice={ticketPrice}/>
+                  <Section title="Left" rows={getLayout(selectedShowList.venue_id, 0)} cols={getLayout(selectedShowList.venue_id, 1)} canSelect={true} ticketPrice={ticketPrice}
+                    availableList={availableList.slice(0,getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1))}/>
+                  <Section title="Center" rows={getLayout(selectedShowList.venue_id, 2)} cols={getLayout(selectedShowList.venue_id, 3)} canSelect={true} ticketPrice={ticketPrice}
+                    availableList={availableList.slice(getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1),getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1)+getLayout(selectedShowList.venue_id, 2)*getLayout(selectedShowList.venue_id, 3))}/>
+                  <Section title="Right" rows={getLayout(selectedShowList.venue_id, 4)} cols={getLayout(selectedShowList.venue_id, 5)} canSelect={true} ticketPrice={ticketPrice}
+                    availableList={availableList.slice(getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1)+getLayout(selectedShowList.venue_id, 2)*getLayout(selectedShowList.venue_id, 3),getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1)+getLayout(selectedShowList.venue_id, 2)*getLayout(selectedShowList.venue_id, 3)+getLayout(selectedShowList.venue_id, 4)*getLayout(selectedShowList.venue_id, 5))}/>
                   </div>
               </div>
             </div>
