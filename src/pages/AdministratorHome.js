@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 // import SearchBar from "../component/SearchBar";
 //import SpecificSearchBar from "../component/SpecificSearchBar";
 import { Administrator } from "../model/Model";
-import { deleteShowAdminC, createVenueC, deleteVenueC, createShowC, deleteShowC, activateShowAdminC } from '../controller/Controller';
+import { deleteShowAdminC, createVenueC, deleteVenueC, createShowAdminC, deleteShowC, activateShowAdminC } from '../controller/Controller';
 
 // Seat component representing a clickable seat
 const Seat = ({ row, col, onClick, selected, blocked }) => (
@@ -163,6 +163,17 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
 
   const [hideList, setHideList] = useState(true);
   const [ticketPrice, setTicketPrice] = useState(null);
+  const [leftRow, setLeftRow] = useState('');
+  const [leftCol, setLeftCol] = useState('');
+  const [rightRow, setRightRow] = useState('');
+  const [rightCol, setRightCol] = useState('');
+  const [centerRow, setCenterRow] = useState('');
+  const [centerCol, setCenterCol] = useState('');
+  const [showCreating, setShowCreating] = useState(false);
+  const [showName, setShowName] = useState('');
+  const [showDate, setShowDate] = useState('');
+  const [showTime, setShowTime] = useState('');
+  const [submitLoading, setSubmitLoading] = useState(false);
   
 
   const hideListOfShows = () => {
@@ -344,7 +355,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
             body: JSON.stringify(
               [
                 {
-                  "eventId": selectedShow.event_id,
+                  "eventId": selectedShow.id,
                   "sectionId": null,
                   "price": ticketPrice,
                   "startRow": 1,
@@ -362,6 +373,77 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
         console.error("Error occurred during creating blocks:", error);
     }
   }
+  const creatingShow = () => {
+    setShowCreating(true);
+  }
+
+  const formatDateTime = (date, time) => {
+    const year = Math.floor(date / 10000);
+    const month = Math.floor((date % 10000) / 100);
+    const day = date % 100;
+
+    const hours = Math.floor(time / 100);
+    const minutes = time % 100;
+
+    return `${year.toString().padStart(2, '0')}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+};
+const handleDateTimeChange = (datetimeString) => {
+  const selectedDate = new Date(datetimeString); // Convert string to Date object
+  if (!isNaN(selectedDate)) {
+      // Check if the conversion was successful
+      const year = selectedDate.getFullYear(); // Extract YYYY
+      const month = selectedDate.getMonth() + 1; // GetMonth is zero-based
+      const day = selectedDate.getDate();
+
+      const hours = selectedDate.getHours();
+      const minutes = selectedDate.getMinutes();
+
+      // Convert date and time
+      setShowDate(year * 10000 + month * 100 + day);
+      setShowTime(hours * 100 + minutes);
+  }
+};
+
+const displayDate = (date) => {
+  const year = Math.floor(date / 10000);
+  const month = Math.floor((date % 10000) / 100);
+  const day = date % 100;
+  return `Date: Month ${month.toString().padStart(2, '0')} / Day ${day.toString().padStart(2, '0')} / Year ${year}`;
+};
+
+const displayTime = (time) => {
+  const hour = Math.floor(time / 100);
+  const minute = time % 100;
+  return `Time: ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+};
+
+const createShow = () => {
+  setSubmitLoading(true);
+  const year = Math.floor(showDate / 10000);
+  const month = Math.floor((showDate % 10000) / 100);
+  const day = showDate % 100;
+  const hours = Math.floor(showTime / 100);
+  const minutes = showTime % 100;
+  
+  // Call createShowC with await if it returns a Promise
+  createShowAdminC(selectedVenue.id , showName, showDate, showTime);
+      // Use setTimeout to introduce a delay
+      setTimeout(() => {
+      setShowName('');
+      setShowDate('');
+      setShowTime('');
+      setShowCreating(false);
+      setSubmitLoading(false);
+      }, 2000);
+
+};
+const handleBackCreateShow = () => {
+  setShowName('');
+  setShowDate('');
+  setShowTime('');
+  setShowCreating(false);
+  setSubmitLoading(false);
+}
 
   return (
     <div>
@@ -413,12 +495,13 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                     </div>
                   </div>
                   <div className="middle-container">
-                    {selectedVenue && (
+                    {selectedVenue && !showCreating && (
                       <div>
                         <p><strong>Selected Venue:</strong></p>
                         <p><strong>Name:</strong> {selectedVenue.name} <strong>Id:</strong> {selectedVenue.id}</p>
                         <button onClick={handleUnselectVenue}>unselectVenue</button>
                         <button>generate show report</button>
+                        <button onClick={creatingShow}>Create show</button>
                         {!selectedShow && hideList && (
                           <button onClick={listShows}>Get list of shows in this venue</button>
                           // <SpecificSearchBar onSearch={handleSearch} initialSearchQuery={selectedVenue.name} />
@@ -449,7 +532,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                               onClick={() => handleShowClick(index)}
                             />
                           ))} */}
-                          {selectedShow && (
+                          {selectedShow && !showCreating && (
                             <div>
                               <div>
                                 <Show
@@ -471,16 +554,18 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                               <p>This ticket price will be assigned to all seats: ${ticketPrice}</p>
                               <button onClick={createBlock}>Submit ticket price</button>
                               <div style={{ display: 'flex' }}>
-                              <Section title="Left" rows={getLayout(selectedVenue.id, 0)} cols={getLayout(selectedVenue.id, 1)} canSelect={true}/>
-                              <Section title="Center" rows={getLayout(selectedVenue.id, 2)} cols={getLayout(selectedVenue.id, 3)}  canSelect={true}/>
-                              <Section title="Right" rows={getLayout(selectedVenue.id, 4)} cols={getLayout(selectedVenue.id, 5)}  canSelect={true}/>
+                              <Section title="Left" rows={getLayout(selectedVenue.id, 0)} cols={getLayout(selectedVenue.id, 1)} canSelect={false}/>
+                              <Section title="Center" rows={getLayout(selectedVenue.id, 2)} cols={getLayout(selectedVenue.id, 3)}  canSelect={false}/>
+                              <Section title="Right" rows={getLayout(selectedVenue.id, 4)} cols={getLayout(selectedVenue.id, 5)}  canSelect={false}/>
                               </div>
                             </div>
                         </div>
                           )}
                         </div>
                       </div>
-                    )}
+                    )} 
+
+
                   </div>
                 </div>
               ) : (
@@ -498,6 +583,33 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
           </div>
         )}
       </div>
+      {selectedVenue && showCreating && (
+      <div>
+        <div style={{ position: 'absolute', left: 100, top: 50 }}>
+          {/* Form for creating a show */}
+          <input type="text" value={showName} onChange={(e) => setShowName(e.target.value)} placeholder="Show Name" /> <p></p>
+          <input type="datetime-local" value={formatDateTime(showDate, showTime)} onChange={(e) => handleDateTimeChange(e.target.value)} placeholder="Show Date and Time" />
+          <p>Confirm the information: </p>
+          <p>Show Name: {showName}</p>
+          <p>{displayDate(showDate)}</p>
+          <p>{displayTime(showTime)}</p>
+          <div>
+            <button onClick={handleBackCreateShow}>← </button>
+            <button onClick={createShow}>Submit</button>
+            {submitLoading && <p>Please wait, this might take some seconds...</p>}
+          </div>
+        </div>
+        <div style={{ position: 'absolute', right: 100, top: 100 }}>
+          <h3>Venue Layout</h3>
+          <div style={{ display: 'flex' }}>
+            {/* Venue layout sections */}
+            {/* <Section title="Left" rows={leftRow} cols={leftCol} canSelect={false} />
+            <Section title="Center" rows={centerRow} cols={centerCol} canSelect={false} />
+            <Section title="Right" rows={rightRow} cols={rightCol} canSelect={false} /> */}
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   );
 };
