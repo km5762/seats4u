@@ -68,13 +68,14 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
     };
   
     const purchaseSeats = () => {
-      if (selectedSeats.length > 0) {         //TODO CHANGE LOGIC TO PURCHASE SEAT 
-        purchaseSeatsC(selectedShowList.venue_id,selectedShowList.venue_id, selectedSeats);
-        console.log(title);
+      if (selectedSeats.length > 0) {       
         console.log(selectedSeats);
-        setBlockedSeats(prevSeats => [...prevSeats, ...selectedSeats]);   
-        setBlocks(prevBlocks => [...prevBlocks, selectedSeats]);
-        setSelectedSeats([]);
+        // purchaseSeatsC(selectedShowList.venue_id,selectedShowList.venue_id, selectedSeats);
+        // console.log(title);
+        // console.log(selectedSeats);
+        // setBlockedSeats(prevSeats => [...prevSeats, ...selectedSeats]);   
+        // setBlocks(prevBlocks => [...prevBlocks, selectedSeats]);
+        // setSelectedSeats([]);
       }
     };
   
@@ -146,9 +147,9 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
     //1: [10, 20],
   });
 
-  useEffect(() => {
-    console.log(layoutDict);
-  }, [layoutDict]); 
+  // useEffect(() => {
+  //   console.log(layoutDict);
+  // }, [layoutDict]); 
 
   // Function to add or update a value in the dictionary
   const updateDict = (key, list) => {
@@ -169,7 +170,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
   // Function to retrieve numbers from the dictionary
   const getLayout = (venueId, num) => {
     let layout = layoutDict[venueId]
-    console.log(layoutDict[venueId])
+    // console.log(layoutDict[venueId])
     let result = layout[num]
     return result;
   };
@@ -280,9 +281,23 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
         );
 
         const data = await res.json();
-        console.log(data);
-        let price = parseInt(data[0].price, 10);
-        setTicketPrice(price);
+
+        for (let index = 0; index < data.length; index++) {
+          if (data[index].event_id === eventId) {
+            // Found the matching id, get the price and break the loop
+            let price = parseInt(data[index].price, 10);
+            setTicketPrice(price);
+            console.log(eventId);
+            console.log(price);
+            return;
+          }
+        }
+        setTicketPrice(null);
+        console.log("no ticket price found");
+        return;
+
+        // let price = parseInt(data[0].price, 10);
+        // setTicketPrice(price);
         // console.log(data);
         // console.log(data[0]);
         // console.log(data[0].price);
