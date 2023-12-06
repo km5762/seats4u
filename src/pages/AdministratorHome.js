@@ -438,7 +438,11 @@ const createShow = () => {
 
 };
 const handleBackCreateShow = () => {
+  setShowName('');
+  setShowDate('');
+  setShowTime('');
   setShowCreating(false);
+  setSubmitLoading(false);
 }
 
   return (
@@ -590,7 +594,7 @@ const handleBackCreateShow = () => {
           <p>{displayDate(showDate)}</p>
           <p>{displayTime(showTime)}</p>
           <div>
-            <button onClick={handleBackCreateShow()}>← </button>
+            <button onClick={handleBackCreateShow}>← </button>
             <button onClick={createShow}>Submit</button>
             {submitLoading && <p>Please wait, this might take some seconds...</p>}
           </div>
