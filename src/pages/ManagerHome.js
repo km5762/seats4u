@@ -296,10 +296,10 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
 
 
     const activateShow = () => {
-        selectedShow.active = 1;
-      activateShowC(selectedShow)
-      console.log(selectedShow)
-    }
+      selectedShow.active = 1;
+      activateShowC(selectedShow);
+      console.log(selectedShow);
+    };
   
     const createShow = () => {
         setSubmitLoading(true);
