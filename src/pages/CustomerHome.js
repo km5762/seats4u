@@ -24,7 +24,7 @@ const Show = ({ name, date, time, venue, onClick, eventId }) => (
   </div>
 );
 
-const Seat = ({ row, col, onClick, selected, blocked, available }) => (
+const Seat = ({ row, col, onClick, selected, blocked, available}) => (
   <div
     style={{
       border: '1px solid black',
@@ -48,17 +48,19 @@ const Seat = ({ row, col, onClick, selected, blocked, available }) => (
 );
 
   // Section component containing a grid of seats
-  const Section = ({ title, rows, cols, canSelect, selectedShowList, ticketPrice, availableList }) => {
+  const Section = ({ title, rows, cols, canSelect, selectedShowList, ticketPrice, availableList, startId }) => {
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [blockedSeats, setBlockedSeats] = useState([]);
     const [blocks, setBlocks] = useState([]);
   
     const handleSeatClick = (row, col, cost) => {
+      let id = startId+(row-1) * cols + col - 1
+      console.log(id);
       // console.log(availableList);
       // console.log((row-1) * cols + col - 1);
       // console.log(availableList[(row-1) * cols + col - 1] === 1)
       if (canSelect && availableList[(row-1) * cols + col - 1] === 1) {
-        console.log("Select")
+        // console.log("Select")
         // Check if the seat is already selected
         const isSeatSelected = selectedSeats.some(seat => seat.row === row && seat.col === col);
         const isSeatBlocked = blockedSeats.some(seat => seat.row === row && seat.col === col);
@@ -75,7 +77,7 @@ const Seat = ({ row, col, onClick, selected, blocked, available }) => (
     const purchaseSeats = () => {
       if (selectedSeats.length > 0) {       
         console.log(selectedSeats);
-        // purchaseSeatsC(selectedShowList.venue_id,selectedShowList.venue_id, selectedSeats);
+        //purchaseSeatsC(selectedShowList.venue_id,selectedShowList.venue_id, selectedSeats);
         // console.log(title);
         // console.log(selectedSeats);
         // setBlockedSeats(prevSeats => [...prevSeats, ...selectedSeats]);   
@@ -98,6 +100,7 @@ const Seat = ({ row, col, onClick, selected, blocked, available }) => (
                 selected={selectedSeats.some(seat => seat.row === rowIndex + 1 && seat.col === colIndex + 1)}
                 blocked={blockedSeats.some(seat => seat.row === rowIndex + 1 && seat.col === colIndex + 1)}
                 available={availableList[rowIndex * cols + colIndex] === 1}
+                id = {startId}
               />
             ))
           ))}
@@ -268,6 +271,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
 
   const [ticketPrice, setTicketPrice] = useState(null);
   const [availableList, setAvailableList] = useState([]);
+  const [startId, setStartId] = useState(null);
 
   async function listSeats(eventId){
     
@@ -291,17 +295,19 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
 
         const data = await res.json();
 
-        console.log(data.length);
+        //console.log(data.length);
 
-        for (let index = 0; index < data.length; index++) {
-          setAvailableList(prevList => [...prevList, data[index].available]);
-          console.log(data[index].available);
+        setStartId(data.seats[0].id);
+
+        for (let index = 0; index < data.seats.length; index++) {
+          setAvailableList(prevList => [...prevList, data.seats[index].available]);
+          console.log(data.seats[index].available);
         }
 
-        for (let index = 0; index < data.length; index++) {
-          if (data[index].event_id === eventId) {
+        for (let index = 0; index < data.blocks.length; index++) {
+          if (data.blocks[index].event_id === eventId) {
             // Found the matching id, get the price and break the loop
-            let price = parseInt(data[index].price, 10);
+            let price = parseInt(data.blocks[index].price, 10);
             setTicketPrice(price);
             console.log(eventId);
             console.log(price);
@@ -323,8 +329,8 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
     }
   }
   // useEffect(() => {
-  //   console.log(availableList);
-  // }, [availableList]); 
+  //   console.log(startId);
+  // }, [startId]); 
 
   return (
     <div>
@@ -392,11 +398,14 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                   <h3>Venue Layout</h3>
                   <div style={{ display: 'flex' }}>
                   <Section title="Left" rows={getLayout(selectedShow.venue_id, 0)} cols={getLayout(selectedShow.venue_id, 1)} canSelect={true} ticketPrice={ticketPrice} 
-                    availableList={availableList.slice(0,getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1))}/>
+                    availableList={availableList.slice(0,getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1))}
+                    startId={startId}/>
                   <Section title="Center" rows={getLayout(selectedShow.venue_id, 2)} cols={getLayout(selectedShow.venue_id, 3)} canSelect={true} ticketPrice={ticketPrice} 
-                    availableList={availableList.slice(getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1),getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1)+getLayout(selectedShow.venue_id, 2)*getLayout(selectedShow.venue_id, 3))}/>
+                    availableList={availableList.slice(getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1),getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1)+getLayout(selectedShow.venue_id, 2)*getLayout(selectedShow.venue_id, 3))}
+                    startId={startId}/>
                   <Section title="Right" rows={getLayout(selectedShow.venue_id, 4)} cols={getLayout(selectedShow.venue_id, 5)} canSelect={true} ticketPrice={ticketPrice} 
-                    availableList={availableList.slice(getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1)+getLayout(selectedShow.venue_id, 2)*getLayout(selectedShow.venue_id, 3),getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1)+getLayout(selectedShow.venue_id, 2)*getLayout(selectedShow.venue_id, 3)+getLayout(selectedShow.venue_id, 4)*getLayout(selectedShow.venue_id, 5))}/>
+                    availableList={availableList.slice(getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1)+getLayout(selectedShow.venue_id, 2)*getLayout(selectedShow.venue_id, 3),getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1)+getLayout(selectedShow.venue_id, 2)*getLayout(selectedShow.venue_id, 3)+getLayout(selectedShow.venue_id, 4)*getLayout(selectedShow.venue_id, 5))}
+                    startId={startId}/>
                   </div>
               </div>
             </div>
@@ -428,11 +437,14 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                   <h3>Venue Layout</h3>
                   <div style={{ display: 'flex' }}>
                   <Section title="Left" rows={getLayout(selectedShowList.venue_id, 0)} cols={getLayout(selectedShowList.venue_id, 1)} canSelect={true} ticketPrice={ticketPrice}
-                    availableList={availableList.slice(0,getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1))}/>
+                    availableList={availableList.slice(0,getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1))}
+                    startId={startId}/>
                   <Section title="Center" rows={getLayout(selectedShowList.venue_id, 2)} cols={getLayout(selectedShowList.venue_id, 3)} canSelect={true} ticketPrice={ticketPrice}
-                    availableList={availableList.slice(getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1),getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1)+getLayout(selectedShowList.venue_id, 2)*getLayout(selectedShowList.venue_id, 3))}/>
+                    availableList={availableList.slice(getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1),getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1)+getLayout(selectedShowList.venue_id, 2)*getLayout(selectedShowList.venue_id, 3))}
+                    startId={startId}/>
                   <Section title="Right" rows={getLayout(selectedShowList.venue_id, 4)} cols={getLayout(selectedShowList.venue_id, 5)} canSelect={true} ticketPrice={ticketPrice}
-                    availableList={availableList.slice(getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1)+getLayout(selectedShowList.venue_id, 2)*getLayout(selectedShowList.venue_id, 3),getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1)+getLayout(selectedShowList.venue_id, 2)*getLayout(selectedShowList.venue_id, 3)+getLayout(selectedShowList.venue_id, 4)*getLayout(selectedShowList.venue_id, 5))}/>
+                    availableList={availableList.slice(getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1)+getLayout(selectedShowList.venue_id, 2)*getLayout(selectedShowList.venue_id, 3),getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1)+getLayout(selectedShowList.venue_id, 2)*getLayout(selectedShowList.venue_id, 3)+getLayout(selectedShowList.venue_id, 4)*getLayout(selectedShowList.venue_id, 5))}
+                    startId={startId}/>
                   </div>
               </div>
             </div>
@@ -464,75 +476,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
 
 export default CustomerHome;
 
-// import React, { useState, useEffect } from "react";
-// import { Link } from "react-router-dom";
-// import SearchBar from "../component/SearchBar";
-// import { purchaseSeatsC } from "../controller/Controller";
-// import BlockCanvas from "../boundary/Boundary";
 
-// // Show component representing a rectangular block
-// const Show = ({ name, date, time, venue, onClick, eventId }) => (
-//   <div
-//     style={{
-//       border: "1px solid black",
-//       padding: "10px",
-//       marginBottom: "10px",
-//       cursor: "pointer",
-//       width: "200px", // Set a fixed width for each block
-//       boxSizing: "border-box", // Include padding and border in the width calculation
-//     }}
-//     onClick={onClick}
-//   >
-//     <p>
-//       <strong>Show:</strong> {name}
-//     </p>
-//     <p>
-//       <strong>Date:</strong> {date}
-//     </p>
-//     <p>
-//       <strong>Time:</strong> {time}
-//     </p>
-//     <p>
-//       <strong>Venue:</strong> {venue}
-//     </p>
-//     <p>
-//       <strong>Event ID:</strong> {eventId}
-//     </p>
-//     {/* <p><strong>Date:</strong> {date.split("T")[0]}</p>
-//     <p><strong>Time:</strong> {date.split("T")[1].split("Z")[0]}</p> */}
-//   </div>
-// );
-
-// const Seat = ({ row, col, onClick, selected, blocked, available }) => (
-//   <div
-//     style={{
-//       border: "1px solid black",
-//       padding: "4px",
-//       margin: "2px",
-//       cursor: "pointer",
-//       backgroundColor:
-//       // selected && !blocked
-//       //   ? 'lightblue' // Light blue when selected and not blocked
-//       //   : blocked && !selected
-//       //   ? 'blue' // Blue when blocked and not selected
-//       //   : selected && blocked
-//       //   ? 'blue' // Blue when both selected and blocked
-//       //   : 'white', // White when neither selected nor blocked
-//         selected ? 'lightblue' : (available ? 'white' : 'gray')
-// //         selected && !blocked
-// //           ? "lightblue" // Light blue when selected and not blocked
-// //           : blocked && !selected
-// //           ? "blue" // Blue when blocked and not selected
-// //           : selected && blocked
-// //           ? "blue" // Blue when both selected and blocked
-// //           : "white", // White when neither selected nor blocked
-
-//     }}
-//     onClick={() => onClick(row, col)}
-//   >
-//     {`${String.fromCharCode(64 + row).toUpperCase()}-${col}`}
-//   </div>
-// );
 
 //   // Section component containing a grid of seats
 //   const Section = ({ title, rows, cols, canSelect, selectedShowList, ticketPrice, availableList }) => {
