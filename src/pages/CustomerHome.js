@@ -95,13 +95,14 @@ const Section = ({
 
   const purchaseSeats = () => {
     if (selectedSeats.length > 0) {
-      console.log(selectedSeats);
-      // purchaseSeatsC(selectedShowList.venue_id,selectedShowList.venue_id, selectedSeats);
+      // console.log(selectedSeats);
+      console.log(selectedShowList)
+      purchaseSeatsC(selectedShowList.venue_id,selectedShowList.venue_id, selectedSeats);
       // console.log(title);
       // console.log(selectedSeats);
-      // setBlockedSeats(prevSeats => [...prevSeats, ...selectedSeats]);
-      // setBlocks(prevBlocks => [...prevBlocks, selectedSeats]);
-      // setSelectedSeats([]);
+      setBlockedSeats(prevSeats => [...prevSeats, ...selectedSeats]);
+      setBlocks(prevBlocks => [...prevBlocks, selectedSeats]);
+      setSelectedSeats([]);
     }
   };
 
@@ -213,8 +214,12 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
 
   // Function to retrieve numbers from the dictionary
   const getLayout = (venueId, num) => {
+    // console.log(venueId)
+    // console.log(layoutDict)
     let layout = layoutDict[venueId];
     // console.log(layoutDict[venueId])
+    // console.log(num)
+    // console.log(layout)
     let result = layout[num];
     return result;
   };
@@ -265,10 +270,10 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
           );
           setSearchResults(filteredEvents);
 
-          // data.sections.map(section => {
-          //   // Call addShow for each event
-          //   updateDict(section.venue_id, [section.row_count, section.col_count]);
-          // });
+          data.sections.map(section => {
+            // Call addShow for each event
+            updateDict(section.venue_id, [section.row_count, section.col_count]);
+          });
         } catch (error) {
           console.error("Error occurred while searching show:", error);
         }
@@ -299,10 +304,10 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
     setListOfShows(filteredEvents);
     setLoadingList(false);
 
-    // data.sections.map(section => {
-    //   // Call addShow for each event
-    //   updateDict(section.venue_id, [section.row_count, section.col_count]);
-    // });
+    data.sections.map(section => {
+      // Call addShow for each event
+      updateDict(section.venue_id, [section.row_count, section.col_count]);
+    });
   }
 
   const [ticketPrice, setTicketPrice] = useState(null);
@@ -444,6 +449,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                   rows={getLayout(selectedShow.venue_id, 0)}
                   cols={getLayout(selectedShow.venue_id, 1)}
                   canSelect={true}
+                  selectedShowList={selectedShowList}
                   ticketPrice={ticketPrice}
                 />
                 <Section
@@ -451,6 +457,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                   rows={getLayout(selectedShow.venue_id, 2)}
                   cols={getLayout(selectedShow.venue_id, 3)}
                   canSelect={true}
+                  selectedShowList={selectedShowList}
                   ticketPrice={ticketPrice}
                 />
                 <Section
@@ -504,6 +511,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                   rows={getLayout(selectedShowList.venue_id, 0)}
                   cols={getLayout(selectedShowList.venue_id, 1)}
                   canSelect={true}
+                  selectedShowList={selectedShowList}
                   ticketPrice={ticketPrice}
                 />
                 <Section
@@ -511,6 +519,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                   rows={getLayout(selectedShowList.venue_id, 2)}
                   cols={getLayout(selectedShowList.venue_id, 3)}
                   canSelect={true}
+                  selectedShowList={selectedShowList}
                   ticketPrice={ticketPrice}
                 />
                 <Section
@@ -518,6 +527,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
                   rows={getLayout(selectedShowList.venue_id, 4)}
                   cols={getLayout(selectedShowList.venue_id, 5)}
                   canSelect={true}
+                  selectedShowList={selectedShowList}
                   ticketPrice={ticketPrice}
                 />
               </div>
