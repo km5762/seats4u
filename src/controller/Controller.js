@@ -132,6 +132,44 @@ export async function createShowC(manager, name, date, time) {
     }
 }
 
+export async function createShowAdminC(id ,name, date, time) {
+    
+
+    const year = Math.floor(date / 10000);
+    const month = Math.floor((date % 10000) / 100);
+    const day = date % 100;
+
+    const hours = Math.floor(time / 100);
+    const minutes = time % 100;
+
+    const isoDateString = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
+
+    const isoDate = new Date(isoDateString);
+
+    try {
+        const res = await fetch(
+            "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/createevent",
+            {
+                credentials: "include",
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: name,
+                    venueId: id,
+                    date: isoDate.toISOString(), //sends the date UTC
+                }),
+            }
+        );
+
+        const data = await res.json();
+        console.log(data.eventId);
+
+    } catch (error) {
+        console.error("Error occurred during creating a show:", error);
+        return null;
+    }
+}
+
 export async function activateShowC(activateShow) {
     try {
         console.log(activateShow.id)
@@ -174,10 +212,7 @@ export async function purchaseSeatsC(venueId, showId, seatSelection) {
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    "venueId": venueId, 
-                    "showId": showId,
-                    "seatsToPurchase": seatSelection}),
+                body: JSON.stringify({"seatIds": seatSelection}),
             }
         );
     } catch (error) {

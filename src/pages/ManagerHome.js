@@ -150,6 +150,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const [centerRow, setCenterRow] = useState('');
     const [centerCol, setCenterCol] = useState('');
     const [showCreating, setShowCreating] = useState(false);
+    const [generatedToggle, setGeneratedToggle] = useState(false);
     const [showName, setShowName] = useState('');
     const [showDate, setShowDate] = useState('');
     const [showTime, setShowTime] = useState('');
@@ -279,6 +280,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     };
   
     const handleUnselectShow = () => {
+      setGeneratedToggle(false)
       setSelectedShow(null);
     };
   
@@ -300,6 +302,10 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       activateShowC(selectedShow);
       console.log(selectedShow);
     };
+
+    const generateShowReport = () => {
+      setGeneratedToggle(!generatedToggle);
+    }
   
     const createShow = () => {
         setSubmitLoading(true);
@@ -480,6 +486,13 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
           console.error("Error occurred during creating blocks:", error);
       }
     }
+    const handleBackCreateShow = () => {
+      setShowName('');
+      setShowDate('');
+      setShowTime('');
+      setShowCreating(false);
+      setSubmitLoading(false);
+}
   
     return (
         <div>
@@ -561,17 +574,26 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                             <p><strong>Id:</strong> {selectedShow.id}</p>
                                             <button onClick={handleUnselectShow}>unselectShow</button>
                                             <button onClick={activateShow}>activateShow</button>
+                                            <button onClick={generateShowReport}>generateShowReport</button>
                                             <button onClick={handleDeleteShow}>deleteShow</button>
                                         </div>
+                                        {generatedToggle && (
+                                          <div style={{ position: 'absolute', left: 100, top:300 }}>
+                                            <p><strong>Active:</strong> {selectedShow.name}</p>
+                                            <p><strong>Tickets Sold:</strong> {selectedShow.name}</p>
+                                            <p><strong>Tickets Remainig:</strong> {selectedShow.name}</p>
+                                            <p><strong>Revenue:</strong> {selectedShow.name}</p>
+                                          </div>
+                                        )}
                                         <div style={{ position: 'absolute', right: 100, top:100 }}>
                                             <h3>Venue Layout</h3>
                                             <input type="number" value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} placeholder="Enter ticket price"/><p></p>
                                             <p>This ticket price will be assigned to all seats: ${ticketPrice}</p>
                                             <button onClick={createBlock}>Submit ticket price</button>
                                             <div style={{ display: 'flex' }}>
-                                            <Section title="Left" rows={getLayout(manager.id, 0)} cols={getLayout(manager.id, 1)} canSelect={true}/>
-                                            <Section title="Center" rows={getLayout(manager.id, 2)} cols={getLayout(manager.id, 3)}  canSelect={true}/>
-                                            <Section title="Right" rows={getLayout(manager.id, 4)} cols={getLayout(manager.id, 5)}  canSelect={true}/>
+                                            <Section title="Left" rows={getLayout(manager.id, 0)} cols={getLayout(manager.id, 1)} canSelect={false}/>
+                                            <Section title="Center" rows={getLayout(manager.id, 2)} cols={getLayout(manager.id, 3)}  canSelect={false}/>
+                                            <Section title="Right" rows={getLayout(manager.id, 4)} cols={getLayout(manager.id, 5)}  canSelect={false}/>
                                             </div>
                                         </div>
                                     </div>
@@ -588,6 +610,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                 <p>{displayDate(showDate)}</p>
                                 <p>{displayTime(showTime)}</p>
                                 <div>
+                                  <button onClick={handleBackCreateShow}>← </button>
                                   <button onClick={createShow}>Submit</button>
                                   {submitLoading && <p>Please wait, this might take some seconds...</p>}
                                 </div>

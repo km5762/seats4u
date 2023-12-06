@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const Role = Object.freeze({ ADMIN: 1, VENUE_MANAGER: 2 });
+
 let connection;
 try {
   connection = mysql.createPool({
@@ -16,25 +18,27 @@ try {
 }
 
 export const handler = async (event) => {
-  const { seatIds } = JSON.parse(event.body);
+  const user = event.requestContext.authorizer.lambda;
+  const { blockIds } = JSON.parse(event.body);
 
-  console.log(seatIds);
   try {
-    const purchasedSeatIds = [];
-    for (const seatId of seatIds) {
-      const [res] = await connection.execute(
-        "UPDATE seat JOIN event ON seat.event_id = event.id SET seat.available = FALSE WHERE seat.id = (?) AND event.active = TRUE AND seat.available = TRUE",
-        [seatId]
-      );
+    let query =
+      "DELETE block FROM block JOIN event ON block.event_id = event.id JOIN venue ON venue.id = event.venue_id WHERE block.id = ?";
 
-      if (res.affectedRows > 0) {
-        purchasedSeatIds.push(seatId);
+    if (user.roleId === Role.VENUE_MANAGER) {
+      query += "  AND venue_id = ?";
+    }
+
+    for (const blockId of blockIds) {
+      if (user.roleId === Role.VENUE_MANAGER) {
+        await connection.execute(query, [blockId, user.venueId]);
+      } else {
+        await connection.execute(query, [blockId]);
       }
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ purchasedSeatIds: purchasedSeatIds }),
     };
   } catch (error) {
     console.error("Database error: ", error);
