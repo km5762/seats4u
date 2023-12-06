@@ -280,6 +280,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     };
   
     const handleUnselectShow = () => {
+      setGeneratedToggle(false)
       setSelectedShow(null);
     };
   
