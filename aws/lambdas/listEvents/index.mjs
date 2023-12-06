@@ -19,14 +19,30 @@ try {
 
 export const handler = async (event) => {
   const user = event.requestContext.authorizer.lambda;
+  const { venueId } = event.body;
 
   try {
-    const query =
-      user.roleId === Role.ADMIN || user.roleId === Role.VENUE_MANAGER
-        ? "SELECT * FROM event"
-        : "SELECT * FROM event WHERE active";
+    let query;
+    let queryParams = [];
+    switch (user.roleId) {
+      case Role.ADMIN:
+        query = "SELECT * FROM event";
+        break;
+      case Role.VENUE_MANAGER:
+        query = "SELECT * FROM event WHERE active OR venue_id = ?";
+        queryParams = [user.venueId];
+        break;
+      default:
+        query = "SELECT * FROM event WHERE active";
+        break;
+    }
 
-    const [events] = await connection.execute(query);
+    if (venueId) {
+      query += " AND venue_id = ?";
+      queryParams.push(venueId);
+    }
+
+    const [events] = await connection.execute(query, queryParams);
 
     return {
       statusCode: 200,
