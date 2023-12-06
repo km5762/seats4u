@@ -295,6 +295,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
 
   const handleUnselectShow = () => {
     setSelectedShow(null);
+    listShows();
   };
 
   const handleDeleteShow = () => {
@@ -302,9 +303,12 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
     deleteShowAdminC(selectedShow.id);
     setListOfShows(prevShows => prevShows.filter(show => show !== selectedShow));
     setSelectedShow(null);
+    listShows();
   };
 
   const activateShow = () => {
+    const updatedShow = { ...selectedShow, active: 1 };
+    setSelectedShow(updatedShow);
     console.log(selectedShow.id);
     selectedShow.active = 1;
     activateShowAdminC(selectedShow.id);
@@ -438,11 +442,11 @@ const createShow = () => {
 
 };
 const handleBackCreateShow = () => {
-  setShowName('');
-  setShowDate('');
-  setShowTime('');
-  setShowCreating(false);
-  setSubmitLoading(false);
+      setShowName('');
+      setShowDate('');
+      setShowTime('');
+      setShowCreating(false);
+      setSubmitLoading(false);
 }
 
   return (
@@ -494,6 +498,7 @@ const handleBackCreateShow = () => {
                         ))}
                     </div>
                   </div>
+
                   <div className="middle-container">
                     {selectedVenue && !showCreating && (
                       <div>
@@ -545,6 +550,7 @@ const handleBackCreateShow = () => {
                                 />
                                 <button onClick={handleUnselectShow}>unselectShow</button>
                                 <button onClick={activateShow}>activateShow</button>
+                                
                                 <button onClick={handleDeleteShow}>deleteShow</button>
                               </div>
 

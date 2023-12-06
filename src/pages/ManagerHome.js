@@ -280,6 +280,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     };
   
     const handleUnselectShow = () => {
+      setGeneratedToggle(false)
       setSelectedShow(null);
     };
   
@@ -470,8 +471,8 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                     "eventId": selectedShow.id,
                     "sectionId": null,
                     "price": ticketPrice,
-                    "startRow": 1,
-                    "endRow": 1
+                    "startRow": null,
+                    "endRow": null
                   }
                 ]
               ),
@@ -485,6 +486,13 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
           console.error("Error occurred during creating blocks:", error);
       }
     }
+    const handleBackCreateShow = () => {
+      setShowName('');
+      setShowDate('');
+      setShowTime('');
+      setShowCreating(false);
+      setSubmitLoading(false);
+}
   
     return (
         <div>
@@ -602,6 +610,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                 <p>{displayDate(showDate)}</p>
                                 <p>{displayTime(showTime)}</p>
                                 <div>
+                                  <button onClick={handleBackCreateShow}>← </button>
                                   <button onClick={createShow}>Submit</button>
                                   {submitLoading && <p>Please wait, this might take some seconds...</p>}
                                 </div>
