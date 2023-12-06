@@ -22,31 +22,44 @@ export const handler = async (event) => {
   const user = event.requestContext.authorizer.lambda;
 
   try {
-    let query;
-    let queryParams = [];
+    let seats;
+    let blocks;
     switch (user.roleId) {
       case Role.VENUE_MANAGER:
-        query =
-          "SELECT seat.id, seat.event_id, seat.section_id, seat.available, seat.section_row, seat.section_col, block.price FROM seat JOIN block ON (seat.event_id = block.event_id AND (seat.section_id = block.section_id OR block.section_id IS NULL AND ((seat.section_row BETWEEN block.start_row AND block.end_row) OR block.section_id IS NULL))) JOIN event ON seat.event_id = event.id WHERE seat.event_id = ? AND (event.active OR event.venue_id = ?)";
-        queryParams = [eventId, user.venueId];
+        [seats] = await connection.execute(
+          "SELECT * FROM seat JOIN event ON seat.event_id = event.id WHERE event.active OR event.venue_id = ? AND event.id = ?",
+          [user.venueId, eventId]
+        );
+        [blocks] = await connection.execute(
+          "SELECT * FROM block JOIN event ON block.event_id = event.id WHERE block.event_id = ? AND (event.active OR venue_id = ?)",
+          [eventId, user.venueId]
+        );
         break;
       case Role.ADMIN:
-        query =
-          "SELECT seat.id, seat.event_id, seat.section_id, seat.available, seat.section_row, seat.section_col, block.price FROM seat JOIN block ON (seat.event_id = block.event_id AND (seat.section_id = block.section_id OR block.section_id IS NULL AND ((seat.section_row BETWEEN block.start_row AND block.end_row) OR block.section_id IS NULL))) JOIN event ON seat.event_id = event.id WHERE seat.event_id = ?";
-        queryParams = [eventId];
+        [seats] = await connection.execute(
+          "SELECT * FROM seat WHERE event_id = ?",
+          [eventId]
+        );
+        [blocks] = await connection.execute(
+          "SELECT * FROM block WHERE event_id = ?",
+          [eventId]
+        );
         break;
       default:
-        query =
-          "SELECT seat.id, seat.event_id, seat.section_id, seat.available, seat.section_row, seat.section_col, block.price FROM seat JOIN block ON (seat.event_id = block.event_id AND (seat.section_id = block.section_id OR block.section_id IS NULL AND ((seat.section_row BETWEEN block.start_row AND block.end_row) OR block.section_id IS NULL))) JOIN event ON seat.event_id = event.id WHERE event.active AND seat.event_id = ?";
-        queryParams = [eventId];
+        [seats] = await connection.execute(
+          "SELECT * FROM seat JOIN event ON seat.event_id = event.id WHERE event.active AND event.id = ?",
+          [eventId]
+        );
+        [blocks] = await connection.execute(
+          "SELECT * FROM block JOIN event ON block.event_id = event.id WHERE block.event_id = ? AND event.active",
+          [eventId]
+        );
         break;
     }
 
-    const [seats] = await connection.execute(query, queryParams);
-
     return {
       statusCode: 200,
-      body: JSON.stringify(seats),
+      body: JSON.stringify({ seats: seats, blocks: blocks }),
     };
   } catch (error) {
     console.error("Database error: ", error);
