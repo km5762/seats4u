@@ -16,17 +16,25 @@ try {
 }
 
 export const handler = async (event) => {
-  const seatIds = JSON.parse(event.body);
+  const { seatIds } = JSON.parse(event.body);
 
   console.log(seatIds);
   try {
-    await connection.execute(
-      "UPDATE seat JOIN event ON seat.event_id = event.id SET seat.available = FALSE WHERE seat.id IN (?) AND event.active = TRUE AND seat.available = TRUE",
-      [seatIds.join(", ")]
-    );
+    const purchasedSeatIds = [];
+    for (const seatId of seatIds) {
+      const [res] = await connection.execute(
+        "UPDATE seat JOIN event ON seat.event_id = event.id SET seat.available = FALSE WHERE seat.id = (?) AND event.active = TRUE AND seat.available = TRUE",
+        [seatId]
+      );
+
+      if (res.affectedRows > 0) {
+        purchasedSeatIds.push(seatId);
+      }
+    }
 
     return {
       statusCode: 200,
+      body: JSON.stringify({ purchasedSeatIds: purchasedSeatIds }),
     };
   } catch (error) {
     console.error("Database error: ", error);
