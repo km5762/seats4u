@@ -37,7 +37,7 @@ const Show = ({ name, date, time, venue, onClick, eventId }) => (
   </div>
 );
 
-const Seat = ({ row, col, onClick, selected, blocked }) => (
+const Seat = ({ row, col, onClick, selected, blocked, available }) => (
   <div
     style={{
       border: "1px solid black",
@@ -45,13 +45,22 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
       margin: "2px",
       cursor: "pointer",
       backgroundColor:
-        selected && !blocked
-          ? "lightblue" // Light blue when selected and not blocked
-          : blocked && !selected
-          ? "blue" // Blue when blocked and not selected
-          : selected && blocked
-          ? "blue" // Blue when both selected and blocked
-          : "white", // White when neither selected nor blocked
+      // selected && !blocked
+      //   ? 'lightblue' // Light blue when selected and not blocked
+      //   : blocked && !selected
+      //   ? 'blue' // Blue when blocked and not selected
+      //   : selected && blocked
+      //   ? 'blue' // Blue when both selected and blocked
+      //   : 'white', // White when neither selected nor blocked
+        selected ? 'lightblue' : (available ? 'white' : 'gray')
+//         selected && !blocked
+//           ? "lightblue" // Light blue when selected and not blocked
+//           : blocked && !selected
+//           ? "blue" // Blue when blocked and not selected
+//           : selected && blocked
+//           ? "blue" // Blue when both selected and blocked
+//           : "white", // White when neither selected nor blocked
+
     }}
     onClick={() => onClick(row, col)}
   >
@@ -59,87 +68,141 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
   </div>
 );
 
-// Section component containing a grid of seats
-const Section = ({
-  title,
-  rows,
-  cols,
-  canSelect,
-  selectedShowList,
-  ticketPrice,
-}) => {
-  const [selectedSeats, setSelectedSeats] = useState([]);
-  const [blockedSeats, setBlockedSeats] = useState([]);
-  const [blocks, setBlocks] = useState([]);
-
-  const handleSeatClick = (row, col, cost) => {
-    if (canSelect) {
-      // Check if the seat is already selected
-      const isSeatSelected = selectedSeats.some(
-        (seat) => seat.row === row && seat.col === col
-      );
-      const isSeatBlocked = blockedSeats.some(
-        (seat) => seat.row === row && seat.col === col
-      );
-      if (!isSeatSelected && !isSeatBlocked) {
-        // Add the selected seat to the list
-        setSelectedSeats((prevSeats) => [...prevSeats, { row, col, cost }]);
-      } else {
-        // Remove the selected seat from the list if it's already selected
-        setSelectedSeats((prevSeats) =>
-          prevSeats.filter((seat) => !(seat.row === row && seat.col === col))
-        );
+  // Section component containing a grid of seats
+  const Section = ({ title, rows, cols, canSelect, selectedShowList, ticketPrice, availableList }) => {
+    const [selectedSeats, setSelectedSeats] = useState([]);
+    const [blockedSeats, setBlockedSeats] = useState([]);
+    const [blocks, setBlocks] = useState([]);
+  
+    const handleSeatClick = (row, col, cost) => {
+      // console.log(availableList);
+      // console.log((row-1) * cols + col - 1);
+      // console.log(availableList[(row-1) * cols + col - 1] === 1)
+      if (canSelect && availableList[(row-1) * cols + col - 1] === 1) {
+        console.log("Select")
+        // Check if the seat is already selected
+        const isSeatSelected = selectedSeats.some(seat => seat.row === row && seat.col === col);
+        const isSeatBlocked = blockedSeats.some(seat => seat.row === row && seat.col === col);
+        if (!isSeatSelected && !isSeatBlocked) {
+          // Add the selected seat to the list
+          setSelectedSeats(prevSeats => [...prevSeats, { row, col, cost }]);
+        } else {
+          // Remove the selected seat from the list if it's already selected
+          setSelectedSeats(prevSeats => prevSeats.filter(seat => !(seat.row === row && seat.col === col)));
+        }
       }
-    }
-  };
+    };
+  
+    const purchaseSeats = () => {
+      if (selectedSeats.length > 0) {       
+        console.log(selectedSeats);
+        // purchaseSeatsC(selectedShowList.venue_id,selectedShowList.venue_id, selectedSeats);
+        // console.log(title);
+        // console.log(selectedSeats);
+        // setBlockedSeats(prevSeats => [...prevSeats, ...selectedSeats]);   
+        // setBlocks(prevBlocks => [...prevBlocks, selectedSeats]);
+        // setSelectedSeats([]);
+      }
+    };
+  
+    return (
+      <div style={{ padding: '4px' }}>
+        <h4>{title}</h4>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+          {Array.from({ length: rows }, (_, rowIndex) => (
+            Array.from({ length: cols }, (_, colIndex) => (
+              <Seat
+                key={`${rowIndex}-${colIndex}`}
+                row={rowIndex + 1}
+                col={colIndex + 1}
+                onClick={() => handleSeatClick(rowIndex + 1, colIndex + 1, ticketPrice)}
+                selected={selectedSeats.some(seat => seat.row === rowIndex + 1 && seat.col === colIndex + 1)}
+                blocked={blockedSeats.some(seat => seat.row === rowIndex + 1 && seat.col === colIndex + 1)}
+                available={availableList[rowIndex * cols + colIndex] === 1}
+              />
+            ))
 
-  const purchaseSeats = () => {
-    if (selectedSeats.length > 0) {
-      // console.log(selectedSeats);
-      console.log(selectedShowList)
-      purchaseSeatsC(selectedShowList.venue_id,selectedShowList.venue_id, selectedSeats);
-      // console.log(title);
-      // console.log(selectedSeats);
-      setBlockedSeats(prevSeats => [...prevSeats, ...selectedSeats]);
-      setBlocks(prevBlocks => [...prevBlocks, selectedSeats]);
-      setSelectedSeats([]);
-    }
-  };
+// Section component containing a grid of seats
+//const Section = ({
+//  title,
+//  rows,
+//  cols,
+//  canSelect,
+//  selectedShowList,
+//   ticketPrice,
+// }) => {
+//   const [selectedSeats, setSelectedSeats] = useState([]);
+//   const [blockedSeats, setBlockedSeats] = useState([]);
+//   const [blocks, setBlocks] = useState([]);
 
-  return (
-    <div style={{ padding: "4px" }}>
-      <h4>{title}</h4>
-      <div
-        style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)` }}
-      >
-        {Array.from({ length: rows }, (_, rowIndex) =>
-          Array.from({ length: cols }, (_, colIndex) => (
-            <Seat
-              key={`${rowIndex}-${colIndex}`}
-              row={rowIndex + 1}
-              col={colIndex + 1}
-              onClick={() =>
-                handleSeatClick(rowIndex + 1, colIndex + 1, ticketPrice)
-              }
-              selected={selectedSeats.some(
-                (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
-              )}
-              blocked={blockedSeats.some(
-                (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
-              )}
-            />
-          ))
-        )}
-      </div>
+//   const handleSeatClick = (row, col, cost) => {
+//     if (canSelect) {
+//       // Check if the seat is already selected
+//       const isSeatSelected = selectedSeats.some(
+//         (seat) => seat.row === row && seat.col === col
+//       );
+//       const isSeatBlocked = blockedSeats.some(
+//         (seat) => seat.row === row && seat.col === col
+//       );
+//       if (!isSeatSelected && !isSeatBlocked) {
+//         // Add the selected seat to the list
+//         setSelectedSeats((prevSeats) => [...prevSeats, { row, col, cost }]);
+//       } else {
+//         // Remove the selected seat from the list if it's already selected
+//         setSelectedSeats((prevSeats) =>
+//           prevSeats.filter((seat) => !(seat.row === row && seat.col === col))
+//         );
+//       }
+//     }
+//   };
 
-      {selectedSeats.length > 0 && (
-        <div>
-          <h3>Selected Seats</h3>
-          {selectedSeats.map((seat, index) => (
-            <p key={index}>{`Row: ${String.fromCharCode(
-              64 + seat.row
-            ).toUpperCase()}, Column: ${seat.col}`}</p>
-          ))}
+//   const purchaseSeats = () => {
+//     if (selectedSeats.length > 0) {
+//       // console.log(selectedSeats);
+//       console.log(selectedShowList)
+//       purchaseSeatsC(selectedShowList.venue_id,selectedShowList.venue_id, selectedSeats);
+//       // console.log(title);
+//       // console.log(selectedSeats);
+//       setBlockedSeats(prevSeats => [...prevSeats, ...selectedSeats]);
+//       setBlocks(prevBlocks => [...prevBlocks, selectedSeats]);
+//       setSelectedSeats([]);
+//     }
+//   };
+
+//   return (
+//     <div style={{ padding: "4px" }}>
+//       <h4>{title}</h4>
+//       <div
+//         style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)` }}
+//       >
+//         {Array.from({ length: rows }, (_, rowIndex) =>
+//           Array.from({ length: cols }, (_, colIndex) => (
+//             <Seat
+//               key={`${rowIndex}-${colIndex}`}
+//               row={rowIndex + 1}
+//               col={colIndex + 1}
+//               onClick={() =>
+//                 handleSeatClick(rowIndex + 1, colIndex + 1, ticketPrice)
+//               }
+//               selected={selectedSeats.some(
+//                 (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
+//               )}
+//               blocked={blockedSeats.some(
+//                 (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
+//               )}
+//             />
+//           ))
+//         )}
+//       </div>
+
+//       {selectedSeats.length > 0 && (
+//         <div>
+//           <h3>Selected Seats</h3>
+//           {selectedSeats.map((seat, index) => (
+//             <p key={index}>{`Row: ${String.fromCharCode(
+//               64 + seat.row
+//             ).toUpperCase()}, Column: ${seat.col}`}</p>
+//           ))}
           <p>
             Total Cost = $
             {selectedSeats.reduce(
@@ -311,8 +374,12 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
   }
 
   const [ticketPrice, setTicketPrice] = useState(null);
+  const [availableList, setAvailableList] = useState([]);
 
-  async function listSeats(eventId) {
+
+  async function listSeats(eventId){
+    
+    setAvailableList([]);
     try {
       const res = await fetch(
         "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/listseats",
@@ -331,15 +398,22 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
 
         const data = await res.json();
         console.log(data);
+        console.log(data.length);
 
-      for (let index = 0; index < data.length; index++) {
-        if (data[index].event_id === eventId) {
-          // Found the matching id, get the price and break the loop
-          let price = parseInt(data[index].price, 10);
-          setTicketPrice(price);
-          console.log(eventId);
-          console.log(price);
-          return;
+        for (let index = 0; index < data.length; index++) {
+          setAvailableList(prevList => [...prevList, data[index].available]);
+          console.log(data[index].available);
+        }
+
+        for (let index = 0; index < data.length; index++) {
+          if (data[index].event_id === eventId) {
+            // Found the matching id, get the price and break the loop
+            let price = parseInt(data[index].price, 10);
+            setTicketPrice(price);
+            console.log(eventId);
+            console.log(price);
+            return;
+          }
         }
       }
       setTicketPrice(null);
@@ -427,47 +501,69 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
               onClick={() => handleShowClick(index)}
             />
           ))}
-        {selectedShow && (
-          <div>
-            <Show
-              name={selectedShow.event_name}
-              date={new Date(selectedShow.event_date).toLocaleDateString()}
-              time={new Date(selectedShow.event_date).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-              })}
-              venue={selectedShow.venue_name}
-              eventId={selectedShow.event_id}
-            />
-            {/* <button onClick={() => listSeats(selectedShow.event_id)}>List Seats</button> */}
-            <button onClick={handleUnselectShow}>unselectShow</button>
-            <div style={{ position: "absolute", left: 600, top: -200 }}>
-              <h3>Venue Layout</h3>
-              <div style={{ display: "flex" }}>
-                <Section
-                  title="Left"
-                  rows={getLayout(selectedShow.venue_id, 0)}
-                  cols={getLayout(selectedShow.venue_id, 1)}
-                  canSelect={true}
-                  selectedShowList={selectedShowList}
-                  ticketPrice={ticketPrice}
-                />
-                <Section
-                  title="Center"
-                  rows={getLayout(selectedShow.venue_id, 2)}
-                  cols={getLayout(selectedShow.venue_id, 3)}
-                  canSelect={true}
-                  selectedShowList={selectedShowList}
-                  ticketPrice={ticketPrice}
-                />
-                <Section
-                  title="Right"
-                  rows={getLayout(selectedShow.venue_id, 4)}
-                  cols={getLayout(selectedShow.venue_id, 5)}
-                  canSelect={true}
-                  ticketPrice={ticketPrice}
-                />
+
+          {selectedShow && (
+            <div>
+              <Show
+                name={selectedShow.event_name}
+                date={new Date(selectedShow.event_date).toLocaleDateString()}
+                time={new Date(selectedShow.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                venue={selectedShow.venue_name}
+                eventId={selectedShow.event_id}
+              /> 
+              {/* <button onClick={() => listSeats(selectedShow.event_id)}>List Seats</button> */}
+              <button onClick={handleUnselectShow}>unselectShow</button>
+              <div style={{ position: 'absolute', left: 600 , top: -200 }}>
+                  <h3>Venue Layout</h3>
+                  <div style={{ display: 'flex' }}>
+                  <Section title="Left" rows={getLayout(selectedShow.venue_id, 0)} cols={getLayout(selectedShow.venue_id, 1)} canSelect={true} ticketPrice={ticketPrice} 
+                    availableList={availableList.slice(0,getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1))}/>
+                  <Section title="Center" rows={getLayout(selectedShow.venue_id, 2)} cols={getLayout(selectedShow.venue_id, 3)} canSelect={true} ticketPrice={ticketPrice} 
+                    availableList={availableList.slice(getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1),getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1)+getLayout(selectedShow.venue_id, 2)*getLayout(selectedShow.venue_id, 3))}/>
+                  <Section title="Right" rows={getLayout(selectedShow.venue_id, 4)} cols={getLayout(selectedShow.venue_id, 5)} canSelect={true} ticketPrice={ticketPrice} 
+                    availableList={availableList.slice(getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1)+getLayout(selectedShow.venue_id, 2)*getLayout(selectedShow.venue_id, 3),getLayout(selectedShow.venue_id, 0)*getLayout(selectedShow.venue_id, 1)+getLayout(selectedShow.venue_id, 2)*getLayout(selectedShow.venue_id, 3)+getLayout(selectedShow.venue_id, 4)*getLayout(selectedShow.venue_id, 5))}/>
+                  </div>
+//         {selectedShow && (
+//           <div>
+//             <Show
+//               name={selectedShow.event_name}
+//               date={new Date(selectedShow.event_date).toLocaleDateString()}
+//               time={new Date(selectedShow.event_date).toLocaleTimeString([], {
+//                 hour: "2-digit",
+//                 minute: "2-digit",
+//                 hour12: false,
+//               })}
+//               venue={selectedShow.venue_name}
+//               eventId={selectedShow.event_id}
+//             />
+//             {/* <button onClick={() => listSeats(selectedShow.event_id)}>List Seats</button> */}
+//             <button onClick={handleUnselectShow}>unselectShow</button>
+//             <div style={{ position: "absolute", left: 600, top: -200 }}>
+//               <h3>Venue Layout</h3>
+//               <div style={{ display: "flex" }}>
+//                 <Section
+//                   title="Left"
+//                   rows={getLayout(selectedShow.venue_id, 0)}
+//                   cols={getLayout(selectedShow.venue_id, 1)}
+//                   canSelect={true}
+//                   selectedShowList={selectedShowList}
+//                   ticketPrice={ticketPrice}
+//                 />
+//                 <Section
+//                   title="Center"
+//                   rows={getLayout(selectedShow.venue_id, 2)}
+//                   cols={getLayout(selectedShow.venue_id, 3)}
+//                   canSelect={true}
+//                   selectedShowList={selectedShowList}
+//                   ticketPrice={ticketPrice}
+//                 />
+//                 <Section
+//                   title="Right"
+//                   rows={getLayout(selectedShow.venue_id, 4)}
+//                   cols={getLayout(selectedShow.venue_id, 5)}
+//                   canSelect={true}
+//                   ticketPrice={ticketPrice}
+//                 />
               </div>
             </div>
           </div>
@@ -489,48 +585,69 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
               onClick={() => handleShowClickList(index)}
             />
           ))}
-        {selectedShowList && (
-          <div>
-            <Show
-              name={selectedShowList.name}
-              date={new Date(selectedShowList.date).toLocaleDateString()}
-              time={new Date(selectedShowList.date).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-              })}
-              venue={selectedShowList.venue_id}
-              eventId={selectedShowList.id}
-            />
-            {/* <button onClick={() => listSeats(selectedShowList.id)}>List Seats</button> */}
-            <button onClick={handleUnselectShowList}>unselectShow</button>
-            <div style={{ position: "absolute", left: 600, top: -200 }}>
-              <h3>Venue Layout</h3>
-              <div style={{ display: "flex" }}>
-                <Section
-                  title="Left"
-                  rows={getLayout(selectedShowList.venue_id, 0)}
-                  cols={getLayout(selectedShowList.venue_id, 1)}
-                  canSelect={true}
-                  selectedShowList={selectedShowList}
-                  ticketPrice={ticketPrice}
-                />
-                <Section
-                  title="Center"
-                  rows={getLayout(selectedShowList.venue_id, 2)}
-                  cols={getLayout(selectedShowList.venue_id, 3)}
-                  canSelect={true}
-                  selectedShowList={selectedShowList}
-                  ticketPrice={ticketPrice}
-                />
-                <Section
-                  title="Right"
-                  rows={getLayout(selectedShowList.venue_id, 4)}
-                  cols={getLayout(selectedShowList.venue_id, 5)}
-                  canSelect={true}
-                  selectedShowList={selectedShowList}
-                  ticketPrice={ticketPrice}
-                />
+          {selectedShowList && (
+            <div>
+              <Show
+                name={selectedShowList.name}
+                date={new Date(selectedShowList.date).toLocaleDateString()}
+                time={new Date(selectedShowList.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+                venue={selectedShowList.venue_id}
+                eventId={selectedShowList.id}
+              />
+              {/* <button onClick={() => listSeats(selectedShowList.id)}>List Seats</button> */}
+              <button onClick={handleUnselectShowList}>unselectShow</button>
+              <div style={{ position: 'absolute', left: 600 , top: -200 }}>
+                  <h3>Venue Layout</h3>
+                  <div style={{ display: 'flex' }}>
+                  <Section title="Left" rows={getLayout(selectedShowList.venue_id, 0)} cols={getLayout(selectedShowList.venue_id, 1)} canSelect={true} ticketPrice={ticketPrice}
+                    availableList={availableList.slice(0,getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1))}/>
+                  <Section title="Center" rows={getLayout(selectedShowList.venue_id, 2)} cols={getLayout(selectedShowList.venue_id, 3)} canSelect={true} ticketPrice={ticketPrice}
+                    availableList={availableList.slice(getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1),getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1)+getLayout(selectedShowList.venue_id, 2)*getLayout(selectedShowList.venue_id, 3))}/>
+                  <Section title="Right" rows={getLayout(selectedShowList.venue_id, 4)} cols={getLayout(selectedShowList.venue_id, 5)} canSelect={true} ticketPrice={ticketPrice}
+                    availableList={availableList.slice(getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1)+getLayout(selectedShowList.venue_id, 2)*getLayout(selectedShowList.venue_id, 3),getLayout(selectedShowList.venue_id, 0)*getLayout(selectedShowList.venue_id, 1)+getLayout(selectedShowList.venue_id, 2)*getLayout(selectedShowList.venue_id, 3)+getLayout(selectedShowList.venue_id, 4)*getLayout(selectedShowList.venue_id, 5))}/>
+                  </div>
+//         {selectedShowList && (
+//           <div>
+//             <Show
+//               name={selectedShowList.name}
+//               date={new Date(selectedShowList.date).toLocaleDateString()}
+//               time={new Date(selectedShowList.date).toLocaleTimeString([], {
+//                 hour: "2-digit",
+//                 minute: "2-digit",
+//                 hour12: false,
+//               })}
+//               venue={selectedShowList.venue_id}
+//               eventId={selectedShowList.id}
+//             />
+//             {/* <button onClick={() => listSeats(selectedShowList.id)}>List Seats</button> */}
+//             <button onClick={handleUnselectShowList}>unselectShow</button>
+//             <div style={{ position: "absolute", left: 600, top: -200 }}>
+//               <h3>Venue Layout</h3>
+//               <div style={{ display: "flex" }}>
+//                 <Section
+//                   title="Left"
+//                   rows={getLayout(selectedShowList.venue_id, 0)}
+//                   cols={getLayout(selectedShowList.venue_id, 1)}
+//                   canSelect={true}
+//                   selectedShowList={selectedShowList}
+//                   ticketPrice={ticketPrice}
+//                 />
+//                 <Section
+//                   title="Center"
+//                   rows={getLayout(selectedShowList.venue_id, 2)}
+//                   cols={getLayout(selectedShowList.venue_id, 3)}
+//                   canSelect={true}
+//                   selectedShowList={selectedShowList}
+//                   ticketPrice={ticketPrice}
+//                 />
+//                 <Section
+//                   title="Right"
+//                   rows={getLayout(selectedShowList.venue_id, 4)}
+//                   cols={getLayout(selectedShowList.venue_id, 5)}
+//                   canSelect={true}
+//                   selectedShowList={selectedShowList}
+//                   ticketPrice={ticketPrice}
+//                 />
               </div>
             </div>
           </div>

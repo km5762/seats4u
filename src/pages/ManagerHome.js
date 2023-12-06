@@ -471,8 +471,8 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                     "eventId": selectedShow.id,
                     "sectionId": null,
                     "price": ticketPrice,
-                    "startRow": 1,
-                    "endRow": 1
+                    "startRow": null,
+                    "endRow": null
                   }
                 ]
               ),
