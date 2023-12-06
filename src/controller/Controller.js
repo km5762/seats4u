@@ -205,7 +205,7 @@ export async function activateShowAdminC(id) {
 }
 
 
-export async function purchaseSeatsC(venueId, showId, seatSelection) {
+export async function purchaseSeatsC(seatSelection) {
     try {
         const res = await fetch(
             "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/purchaseseats",
