@@ -39,6 +39,7 @@ const Login = ({ setLoggedInUser }) => {
               setLoginError("");
               setLoadingMessage("");
               navigate("/manager", { state: { userData: data } });
+              localStorage.setItem("login", JSON.stringify(true));
               console.log(res);
               console.log(data);
             }
@@ -47,6 +48,7 @@ const Login = ({ setLoggedInUser }) => {
             setLoginError("");
             setLoadingMessage("");
             navigate("/manager", { state: { userData: data } });
+            localStorage.setItem("login", JSON.stringify(true));
             console.log(res);
             console.log(data);
           }
@@ -59,6 +61,7 @@ const Login = ({ setLoggedInUser }) => {
           setLoadingMessage("");
           navigate("/admin", { state: { userData: data } });
           setLoggedInUser(data.user);
+          localStorage.setItem("login", JSON.stringify(true));
         } else {
           console.log("User doesn't have the required role for this action");
         }

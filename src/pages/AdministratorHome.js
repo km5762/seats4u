@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 // import SearchBar from "../component/SearchBar";
 //import SpecificSearchBar from "../component/SpecificSearchBar";
 import { Administrator } from "../model/Model";
@@ -189,7 +189,7 @@ const Venue = ({ name, onClick }) => (
   </div>
 );
 
-const AdminHome = ({ loggedInUser, onLogout }) => {
+const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   const [administrator, setAdministrator] = React.useState(new Administrator());
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -223,10 +223,93 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
   const [generatedToggle, setGeneratedToggle] = useState(true);
   const [reports, setReports] = useState([]);
 
+  const navigate = useNavigate();
+
   const hideListOfShows = () => {
     setHideList(true);
     setListOfShows([]);
   };
+
+  useEffect(() => {
+    const handleLogin = async () => {
+      // Simulate login logic (you would typically perform an API call here)
+      try {
+        const res = await fetch(
+          "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/signinuserbytoken",
+          {
+            credentials: "include",
+            method: "GET",
+          }
+        );
+
+        const data = await res.json();
+
+        if (data && data.user) {
+          if (data.user.role_id === 2) {
+            if (data.venue && data.venue.length > 0) {
+              if (data.venue.length === 1) {
+                const singleVenue = data.venue[0];
+                console.log("Only one venue found:", singleVenue);
+                // Venue manager with a single venue
+                navigate("/manager", { state: { userData: data } });
+                localStorage.setItem("login", JSON.stringify(true));
+                console.log(res);
+                console.log(data);
+              }
+            } else {
+              console.log("No venues found in the response");
+              navigate("/manager", { state: { userData: data } });
+              localStorage.setItem("login", JSON.stringify(true));
+              console.log(res);
+              console.log(data);
+            }
+
+            // Set the logged-in user
+            setLoggedInUser(data.user);
+          } else if (data.user.role_id === 1) {
+            // Redirect to '/admin'
+            navigate("/admin", { state: { userData: data } });
+            setLoggedInUser(data.user);
+            localStorage.setItem("login", JSON.stringify(true));
+          } else {
+            console.log("User doesn't have the required role for this action");
+          }
+        } else {
+          console.log("Invalid user data or role information");
+        }
+      } catch (error) {
+        console.error("Error occurred during login:", error);
+      }
+      // For simplicity, just set the logged-in user to the entered username
+      // setLoggedInUser({ username, role });
+    };
+
+    const checkLogin = (event) => {
+      console.log("Checking login");
+      if (event && event.key === "login") {
+        const login = localStorage.getItem("login");
+        if (JSON.parse(login) === true) {
+          handleLogin();
+        } else {
+          onLogout();
+          navigate("/");
+        }
+      }
+    };
+
+    const login = localStorage.getItem("login");
+    if (JSON.parse(login)) {
+      handleLogin();
+    } else {
+      onLogout();
+    }
+
+    window.addEventListener("storage", checkLogin);
+
+    return () => {
+      window.removeEventListener("storage", checkLogin);
+    };
+  }, [navigate, setLoggedInUser, onLogout]);
 
   async function handleSearch(query) {
     setSearchQuery((prevQuery) => {
