@@ -579,6 +579,15 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       setShowCreating(false);
       setSubmitLoading(false);
     }, 2000);
+
+
+    addShow({
+      name: showName,
+      date: `${year}-${month}-${day}`,
+      time: `${hours}:${minutes}`,
+      id: selectedVenue.id,
+      active: 0,
+  });
   };
   const handleBackCreateShow = () => {
     setShowName("");
