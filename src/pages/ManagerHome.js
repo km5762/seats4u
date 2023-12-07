@@ -974,10 +974,16 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                             <button onClick={handleUnselectShow}>
                               unselectShow
                             </button>
-                            <button onClick={activateShow}>activateShow</button>
-                            <button onClick={handleDeleteShow}>
-                              deleteShow
-                            </button>
+                            {selectedShow.active === 0 && (
+                              <button onClick={activateShow}>
+                                activateShow
+                              </button>
+                            )}
+                            {selectedShow.active === 0 && (
+                              <button onClick={handleDeleteShow}>
+                                deleteShow
+                              </button>
+                            )}
                           </div>
                           <div
                             style={{
