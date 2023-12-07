@@ -279,22 +279,22 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
     const data = await res.json();
 
     setListOfShows(data.events);
-    setListOfShows([]);
-    data.events.map((event) => {
-      // Call addShow for each event
-      event.venue_id === selectedVenue.id &&
-        addShow({
-          name: event.name,
-          date: new Date(event.date).toLocaleDateString(),
-          time: new Date(event.date).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          }),
-          id: event.id,
-          active: event.active,
-        });
-    });
+    // setListOfShows([]);
+    // data.events.map((event) => {
+    //   // Call addShow for each event
+    //   event.venue_id === selectedVenue.id &&
+    //     addShow({
+    //       name: event.name,
+    //       date: new Date(event.date).toLocaleDateString(),
+    //       time: new Date(event.date).toLocaleTimeString([], {
+    //         hour: "2-digit",
+    //         minute: "2-digit",
+    //         hour12: false,
+    //       }),
+    //       id: event.id,
+    //       active: event.active,
+    //     });
+    // });
 
     data.sections.map((section) => {
       // Call addShow for each event
