@@ -1,11 +1,9 @@
-import React, { useState } from "react";
-import { useNavigate} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../App.css"; // Import the CSS file
-import {VenueManager, Administrator} from '../model/Model';
+import { VenueManager, Administrator } from "../model/Model";
 
-
-
-const Login = ({ setLoggedInUser}) => {
+const Login = ({ setLoggedInUser }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState(null); // Track the selected circle
@@ -13,7 +11,6 @@ const Login = ({ setLoggedInUser}) => {
   const [loadingMessage, setLoadingMessage] = useState(""); // Track loading message
   const [loginError, setLoginError] = useState("");
 
-  
   const handleLogin = async () => {
     // Simulate login logic (you would typically perform an API call here)
 
@@ -41,15 +38,15 @@ const Login = ({ setLoggedInUser}) => {
               // Venue manager with a single venue
               setLoginError("");
               setLoadingMessage("");
-              navigate('/manager', { state: { userData: data } });
+              navigate("/manager", { state: { userData: data } });
               console.log(res);
               console.log(data);
-            } 
+            }
           } else {
             console.log("No venues found in the response");
             setLoginError("");
             setLoadingMessage("");
-            navigate('/manager', { state: { userData: data } });
+            navigate("/manager", { state: { userData: data } });
             console.log(res);
             console.log(data);
           }
@@ -60,14 +57,16 @@ const Login = ({ setLoggedInUser}) => {
           // Redirect to '/admin'
           setLoginError("");
           setLoadingMessage("");
-          navigate('/admin', { state: { userData: data } });
+          navigate("/admin", { state: { userData: data } });
           setLoggedInUser(data.user);
         } else {
           console.log("User doesn't have the required role for this action");
         }
       } else {
         setLoadingMessage("");
-        setLoginError("Credential doesn't exist or the password/user might be incorrect");
+        setLoginError(
+          "Credential doesn't exist or the password/user might be incorrect"
+        );
         console.log("Invalid user data or role information");
       }
     } catch (error) {
@@ -76,14 +75,13 @@ const Login = ({ setLoggedInUser}) => {
     // For simplicity, just set the logged-in user to the entered username
     // setLoggedInUser({ username, role });
   };
-  
+
   const handleCircleClick = (roleNumber, e) => {
     e.preventDefault();
     setRole(roleNumber);
   };
 
   return (
-    
     <div>
       <div className="center-container">
         <img src="/pictures/logo.png" alt="Logo" width="250" height="100" />
@@ -115,10 +113,12 @@ const Login = ({ setLoggedInUser}) => {
               <span className="circle-text">{circleRoleMap[roleNumber]}</span>
             </div>
           ))}
-        </div> */}        
-        <button onClick={handleLogin} >Login</button>
-        {loadingMessage && <div className="loading-message">{loadingMessage}</div>}
-        {loginError && <div className="error-message">{loginError}</div>} 
+        </div> */}
+        <button onClick={handleLogin}>Login</button>
+        {loadingMessage && (
+          <div className="loading-message">{loadingMessage}</div>
+        )}
+        {loginError && <div className="error-message">{loginError}</div>}
       </div>
     </div>
   );

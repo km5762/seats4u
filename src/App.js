@@ -48,10 +48,6 @@ const App = () => {
     fetchData();
   };
 
-  useEffect(() => {
-    handleLogout();
-  }, []);
-
   return (
     <Router>
       <div>
