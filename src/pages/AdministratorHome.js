@@ -438,7 +438,7 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       prevShows.filter((show) => show !== selectedShow)
     );
     setSelectedShow(null);
-    listShows();
+    //listShows();
   };
 
   const activateShow = () => {
@@ -495,8 +495,8 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
               eventId: selectedShow.id,
               sectionId: null,
               price: ticketPrice,
-              startRow: 1,
-              endRow: 1,
+              startRow: null,
+              endRow: null,
             },
           ]),
         }
