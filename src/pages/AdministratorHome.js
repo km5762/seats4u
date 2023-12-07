@@ -355,7 +355,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
       prevShows.filter((show) => show !== selectedShow)
     );
     setSelectedShow(null);
-    listShows();
+    //listShows();
   };
 
   const activateShow = () => {
