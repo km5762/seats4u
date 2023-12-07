@@ -35,8 +35,8 @@ export const handler = async (event) => {
         : `SELECT venue.id AS venue_id, venue.name AS venue_name, event.id AS event_id, event.name AS event_name, event.date as event_date, event.active as event_active FROM venue, event WHERE venue.id = event.venue_id AND event.active AND (event.name LIKE ? OR venue.name LIKE ?)`;
 
     const [events] = await connection.execute(query, [
-      `${searchQuery.toLowerCase()}%`,
-      `${searchQuery.toLowerCase()}%`,
+      `%${searchQuery.toLowerCase()}%`,
+      `%${searchQuery.toLowerCase()}%`,
     ]);
 
     return {
