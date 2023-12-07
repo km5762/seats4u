@@ -174,7 +174,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
   const [showDate, setShowDate] = useState('');
   const [showTime, setShowTime] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [generatedToggle, setGeneratedToggle] = useState(false);
+  const [generatedToggle, setGeneratedToggle] = useState(true);
   const [reports, setReports] = useState([]);
   
 
@@ -629,10 +629,10 @@ const Report = ({ id, name, seatsAvailable, seatsUnavailable, totalRevenue }) =>
                         </div>
                           )}
                         </div>
-                        <div style={{ position: 'relative' }}>
+                        <div style={{ position: 'relative'}}>
                                     {!generatedToggle && (
                                           <div style={{ marginTop: '20px' }}>
-                                            <h2>Your shows reports</h2>
+                                            <h2>Your shows reports:</h2>
                                             {reports.length > 0 && reports}
                                           </div>
                                         )}

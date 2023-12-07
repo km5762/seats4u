@@ -150,7 +150,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const [centerRow, setCenterRow] = useState('');
     const [centerCol, setCenterCol] = useState('');
     const [showCreating, setShowCreating] = useState(false);
-    const [generatedToggle, setGeneratedToggle] = useState(false);
+    const [generatedToggle, setGeneratedToggle] = useState(true);
     const [showName, setShowName] = useState('');
     const [showDate, setShowDate] = useState('');
     const [showTime, setShowTime] = useState('');
@@ -282,6 +282,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const handleShowClick = (index) => {
       setSelectedShow(shows[index]);
       setGeneratedToggle(true);
+      // listSeats(selectedShow.id);
   
     };
   
@@ -721,7 +722,7 @@ const handleCurrentPrice = () => {
                                       <div style={{ position: 'relative' }}>
                                         {!generatedToggle && (
                                           <div style={{ marginTop: '20px' }}>
-                                            <h2>Your shows reports</h2>
+                                            <h2>Your shows reports:</h2>
                                             {reports.length > 0 && reports}
                                           </div>
                                         )}
