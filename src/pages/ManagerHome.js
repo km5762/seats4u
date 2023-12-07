@@ -282,6 +282,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const handleShowClick = (index) => {
       setSelectedShow(shows[index]);
       setGeneratedToggle(true);
+      setPriceSubmitted(false);
       // listSeats(selectedShow.id);
   
     };
@@ -308,6 +309,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       selectedShow.active = 1;
       activateShowC(selectedShow);
       console.log(selectedShow);
+      setSelectedShow(null);
     };
     
     const Report = ({ id, name, seatsAvailable, seatsUnavailable, totalRevenue }) => (
@@ -631,6 +633,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
           // const data = await res.json();
           // console.log(data)
           setTicketPrice(null);
+          setPriceSubmitted(true);
       } catch (error) {
           console.error("Error occurred during creating blocks:", error);
       }
@@ -643,6 +646,8 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       setShowCreating(false);
       setSubmitLoading(false);
 }
+
+const [priceSubmitted, setPriceSubmitted] = useState(false);
 
 const handleCurrentPrice = () => {
   listSeats(selectedShow.id);
@@ -743,11 +748,13 @@ const handleCurrentPrice = () => {
                                         </div>
                                         <div style={{ position: 'absolute', right: 100, top:100 }}>
                                             <h3>Venue Layout</h3>
-                                            <input type="number" value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} placeholder="Enter ticket price"/><p></p>
-                                            <p>This ticket price will be assigned to all seats: ${ticketPrice}</p>
-                                            {/* <p>The current price assigned for the seats is: ${currentTicketPrice}</p> */}
-                                            <button onClick={createBlock}>Submit ticket price</button>
-                                            {/* <button onClick={handleCurrentPrice}>Get current price</button> */}
+                                            {!priceSubmitted && (
+                                            <div>
+                                              <input type="number" value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} placeholder="Enter ticket price"/><p></p>
+                                              <p>This ticket price will be assigned to all seats: ${ticketPrice}</p>
+                                              <button onClick={createBlock}>Submit ticket price</button>
+                                            </div>
+                                            )}
                                             <div style={{ display: 'flex' }}>
                                             <Section title="Left" rows={getLayout(manager.id, 0)} cols={getLayout(manager.id, 1)} canSelect={false}/>
                                             <Section title="Center" rows={getLayout(manager.id, 2)} cols={getLayout(manager.id, 3)}  canSelect={false}/>
