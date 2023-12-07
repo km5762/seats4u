@@ -780,14 +780,14 @@ const handleCurrentPrice = () => {
                                   {submitLoading && <p>Please wait, this might take some seconds...</p>}
                                 </div>
                             </div>
-                            <div style={{ position: 'absolute', right: 100, top:100 }}>
+                            {/* <div style={{ position: 'absolute', right: 100, top:100 }}>
                                 <h3>Venue Layout</h3>
                                 <div style={{ display: 'flex' }}>
                                 <Section title="Left" rows={leftRow} cols={leftCol} canSelect={false}/>
                                 <Section title="Center" rows={centerRow} cols={centerCol} canSelect={false}/>
                                 <Section title="Right" rows={rightRow} cols={rightCol} canSelect={false}/>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     )}
                     </div> 
