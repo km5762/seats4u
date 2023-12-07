@@ -157,6 +157,10 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     const [showNum, setShowNum] = useState(0);
     const [initialShowCount, setInitialShowCount] = useState(0);
     const [submitLoading, setSubmitLoading] = useState(false);
+    const [ticketPrice, setTicketPrice] = useState(null);
+    const [currentTicketPrice, setCurrentTicketPrice] = useState(null);
+    const [blockId, setBlockId] = useState(null);
+    const [reports, setReports] = useState([]);
 
     React.useEffect(() => {
         if (receivedData && Array.isArray(receivedData.venue) && receivedData.venue.length > 0) {
@@ -277,10 +281,12 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
     
     const handleShowClick = (index) => {
       setSelectedShow(shows[index]);
+      setGeneratedToggle(true);
+  
     };
   
     const handleUnselectShow = () => {
-      setGeneratedToggle(false)
+      // setCurrentTicketPrice(null);
       setSelectedShow(null);
     };
   
@@ -302,9 +308,60 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       activateShowC(selectedShow);
       console.log(selectedShow);
     };
+    
+    const Report = ({ id, name, seatsAvailable, seatsUnavailable, totalRevenue }) => (
+      <div style={{ 
+        marginBottom: '10px',
+        borderBottom: '1px solid black',
+        paddingBottom: '10px',
+      }}>
+        <p><strong>Show Name:</strong> {name}</p>
+        <p><strong>Seats Available:</strong> {seatsAvailable}</p>
+        <p><strong>Seats Unavailable:</strong> {seatsUnavailable}</p>
+        <p><strong>Total Revenue:</strong> {totalRevenue}</p>
+        <p><strong>ID:</strong> {id}</p>
+      </div>
+    );
 
-    const generateShowReport = () => {
+    const generateShowReport = async () => {
+      try {
+        const res = await fetch(
+          "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/generateshowsreport",
+          {
+            credentials: "include",
+            method: "GET",
+          }
+        );
+  
+        const data = await res.json();
+        console.log(data);
+  
+        // Convert the data into Report components
+        const reportComponents = data.map(report => (
+          <Report
+            key={report.event_id}
+            id={report.event_id}
+            name={report.event_name}
+            seatsAvailable={report.available_seats}
+            seatsUnavailable={report.unavailable_seats}
+            totalRevenue={report.total_revenue}
+          />
+        ));
+  
+        setReports(reportComponents); // Update state with the generated Report components
+  
+      } catch (error) {
+        console.error("Error occurred during generate show report:", error);
+        setReports([]); // Set empty array if there's an error
+        setGeneratedToggle(false);
+      }
+    };
+
+    const handleGenerateShowsReport = () => {
       setGeneratedToggle(!generatedToggle);
+      if (generatedToggle){
+        generateShowReport(); 
+      }
     }
   
     const createShow = () => {
@@ -451,9 +508,99 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       
     }
 
-    const [ticketPrice, setTicketPrice] = useState(null);
+    async function listSeats(eventId) {
+    try {
+      const res = await fetch(
+        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/listseats",
+        {
+          credentials: "include",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            eventId: eventId,
+          }),
+        }
+      );
+
+        const data = await res.json();
+        console.log(data);
+    if (data.blocks.length !== 0){
+        setBlockId(data.blocks[0].id);
+      
+      if (data.blocks[0].event_id === eventId) {
+        // Found the matching id, get the price and break the loop
+        let price = parseInt(data.blocks[0].price, 10);
+        if (price !== null){
+          setCurrentTicketPrice(price);
+          console.log(eventId);
+          console.log(price);
+          return;
+        }else{
+          setCurrentTicketPrice(0);
+          return;
+        }
+        
+      }
+    }else{
+      setCurrentTicketPrice(0);
+    }
+      setTicketPrice(null);
+      console.log("no ticket price found");
+      return;
+
+      // let price = parseInt(data[0].price, 10);
+      // setTicketPrice(price);
+      // console.log(data);
+      // console.log(data[0]);
+      // console.log(data[0].price);
+    } catch (error) {
+      console.error("Error occurred during listing seats:", error);
+    }
+  }
+    
+  async function deleteBlock(blockId){
+    listSeats(selectedShow.id);
+    if (blockId !== null){
+      //deleteCurrentBlock
+    }
+  
+    try {
+        const res = await fetch(
+        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/deleteblocks",
+        {
+            credentials: "include",
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                Accept: "application/json"
+            },
+            body: JSON.stringify(
+              [
+                {
+                  "bloackIds": blockId,
+                }
+              ]
+            ),
+        }
+        );
+
+        // const data = await res.json();
+        // console.log(data)
+        setTicketPrice(null);
+    } catch (error) {
+        console.error("Error occurred during creating blocks:", error);
+    }
+    setCurrentTicketPrice(null);
+  }
 
     async function createBlock(){
+      // listSeats(selectedShow.id);
+      // if (blockId !== null){
+      //   //deleteCurrentBlock
+      // }
     
       try {
           const res = await fetch(
@@ -485,6 +632,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       } catch (error) {
           console.error("Error occurred during creating blocks:", error);
       }
+      // setCurrentTicketPrice(null);
     }
     const handleBackCreateShow = () => {
       setShowName('');
@@ -492,6 +640,10 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
       setShowTime('');
       setShowCreating(false);
       setSubmitLoading(false);
+}
+
+const handleCurrentPrice = () => {
+  listSeats(selectedShow.id);
 }
   
     return (
@@ -556,14 +708,25 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                     <p>You have {shows.length} shows</p>
                                     <button onClick={creatingShow}>Create show</button>
                                     <button onClick={deleteVenue}>Delete Venue</button>
+                                    <button onClick={handleGenerateShowsReport}>generateShowReport</button>
                                     <button onClick={listShows}>Refresh</button>
                                     </div>)
                                 }
-                                <div style={{ position: 'absolute', left: 100, top:250, display: 'flex', flexWrap: 'wrap' }}>
-                                    {!selectedShow && shows.map((show, index) => (
-                                    <Show key={index} {...show} onClick={() => handleShowClick(index)} />
-                                    ))}
-                                </div>
+                                    <div style={{ position: 'absolute', left: 100, top: 250 }}>
+                                      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                                        {!selectedShow && shows.map((show, index) => (
+                                          <Show key={index} {...show} onClick={() => handleShowClick(index)} />
+                                        ))}
+                                      </div>
+                                      <div style={{ position: 'relative' }}>
+                                        {!generatedToggle && (
+                                          <div style={{ marginTop: '20px' }}>
+                                            <h2>Your shows reports</h2>
+                                            {reports.length > 0 && reports}
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
                                 {selectedShow && (
                                     <div>
                                         <div style={{ position: 'absolute', left: 100, top:50 }}>
@@ -574,22 +737,15 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
                                             <p><strong>Id:</strong> {selectedShow.id}</p>
                                             <button onClick={handleUnselectShow}>unselectShow</button>
                                             <button onClick={activateShow}>activateShow</button>
-                                            <button onClick={generateShowReport}>generateShowReport</button>
                                             <button onClick={handleDeleteShow}>deleteShow</button>
                                         </div>
-                                        {generatedToggle && (
-                                          <div style={{ position: 'absolute', left: 100, top:300 }}>
-                                            <p><strong>Active:</strong> {selectedShow.name}</p>
-                                            <p><strong>Tickets Sold:</strong> {selectedShow.name}</p>
-                                            <p><strong>Tickets Remainig:</strong> {selectedShow.name}</p>
-                                            <p><strong>Revenue:</strong> {selectedShow.name}</p>
-                                          </div>
-                                        )}
                                         <div style={{ position: 'absolute', right: 100, top:100 }}>
                                             <h3>Venue Layout</h3>
                                             <input type="number" value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} placeholder="Enter ticket price"/><p></p>
                                             <p>This ticket price will be assigned to all seats: ${ticketPrice}</p>
+                                            {/* <p>The current price assigned for the seats is: ${currentTicketPrice}</p> */}
                                             <button onClick={createBlock}>Submit ticket price</button>
+                                            {/* <button onClick={handleCurrentPrice}>Get current price</button> */}
                                             <div style={{ display: 'flex' }}>
                                             <Section title="Left" rows={getLayout(manager.id, 0)} cols={getLayout(manager.id, 1)} canSelect={false}/>
                                             <Section title="Center" rows={getLayout(manager.id, 2)} cols={getLayout(manager.id, 3)}  canSelect={false}/>

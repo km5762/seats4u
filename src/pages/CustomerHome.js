@@ -352,7 +352,7 @@ const CustomerHome = ({ loggedInUser, onLogout }) => {
       // console.log(data[0]);
       // console.log(data[0].price);
     } catch (error) {
-      console.error("Error occurred during creating venue:", error);
+      console.error("Error occurred during listing seats:", error);
     }
   }
 

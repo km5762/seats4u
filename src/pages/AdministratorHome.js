@@ -174,6 +174,8 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
   const [showDate, setShowDate] = useState('');
   const [showTime, setShowTime] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [generatedToggle, setGeneratedToggle] = useState(false);
+  const [reports, setReports] = useState([]);
   
 
   const hideListOfShows = () => {
@@ -266,6 +268,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
     setSelectedVenue(null);
     setSelectedShow(null);
     setListOfShows([]);
+    setGeneratedToggle(true);
     setHideList(true);
   };
 
@@ -291,6 +294,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
 
   const handleShowClick = (index) => {
     setSelectedShow(listOfShows[index]);
+    setGeneratedToggle(true);
   };
 
   const handleUnselectShow = () => {
@@ -448,6 +452,60 @@ const handleBackCreateShow = () => {
       setShowCreating(false);
       setSubmitLoading(false);
 }
+const generateShowReport = async () => {
+  try {
+    const res = await fetch(
+      "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/generateshowsreport",
+      {
+        credentials: "include",
+        method: "GET",
+      }
+    );
+
+    const data = await res.json();
+    console.log(data);
+
+    // Convert the data into Report components
+    const reportComponents = data.map(report => (
+      <Report
+        key={report.event_id}
+        id={report.event_id}
+        name={report.event_name}
+        seatsAvailable={report.available_seats}
+        seatsUnavailable={report.unavailable_seats}
+        totalRevenue={report.total_revenue}
+      />
+    ));
+
+    setReports(reportComponents); // Update state with the generated Report components
+
+  } catch (error) {
+    console.error("Error occurred during generate show report:", error);
+    setReports([]); // Set empty array if there's an error
+    setGeneratedToggle(false);
+  }
+};
+
+const handleGenerateShowsReport = () => {
+  setGeneratedToggle(!generatedToggle);
+  if (generatedToggle){
+    generateShowReport(); 
+  }
+}
+
+const Report = ({ id, name, seatsAvailable, seatsUnavailable, totalRevenue }) => (
+  <div style={{ 
+    marginBottom: '10px',
+    borderBottom: '1px solid black',
+    paddingBottom: '10px',
+  }}>
+    <p><strong>Show Name:</strong> {name}</p>
+    <p><strong>Seats Available:</strong> {seatsAvailable}</p>
+    <p><strong>Seats Unavailable:</strong> {seatsUnavailable}</p>
+    <p><strong>Total Revenue:</strong> {totalRevenue}</p>
+    <p><strong>ID:</strong> {id}</p>
+  </div>
+);
 
   return (
     <div>
@@ -505,7 +563,7 @@ const handleBackCreateShow = () => {
                         <p><strong>Selected Venue:</strong></p>
                         <p><strong>Name:</strong> {selectedVenue.name} <strong>Id:</strong> {selectedVenue.id}</p>
                         <button onClick={handleUnselectVenue}>unselectVenue</button>
-                        <button>generate show report</button>
+                        <button onClick={handleGenerateShowsReport}>generate show report</button>
                         <button onClick={creatingShow}>Create show</button>
                         {!selectedShow && hideList && (
                           <button onClick={listShows}>Get list of shows in this venue</button>
@@ -514,6 +572,9 @@ const handleBackCreateShow = () => {
                         {!hideList && (
                           <button onClick={hideListOfShows}>Hide list</button>
                         )}
+
+                          <div>
+
                         <div style={{display: 'flex', flexWrap: 'wrap'}}>
                         {!selectedShow && listOfShows.map((show, index) => (
                                     <Show key={index}
@@ -568,6 +629,17 @@ const handleBackCreateShow = () => {
                         </div>
                           )}
                         </div>
+                        <div style={{ position: 'relative' }}>
+                                    {!generatedToggle && (
+                                          <div style={{ marginTop: '20px' }}>
+                                            <h2>Your shows reports</h2>
+                                            {reports.length > 0 && reports}
+                                          </div>
+                                        )}
+                                        </div>
+                            </div>
+
+
                       </div>
                     )} 
 
