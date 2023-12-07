@@ -716,9 +716,8 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                                   <button onClick={handleUnselectShow}>
                                     unselectShow
                                   </button>
-                                  <button onClick={activateShow}>
-                                    activateShow
-                                  </button>
+                                  {selectedShow.active === 0 && 
+                                  <button onClick={activateShow}>activateShow</button>}
 
                                   <button onClick={handleDeleteShow}>
                                     deleteShow

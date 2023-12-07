@@ -743,8 +743,8 @@ const handleCurrentPrice = () => {
                                             <p><strong>Time:</strong> {selectedShow.time}</p>
                                             <p><strong>Id:</strong> {selectedShow.id}</p>
                                             <button onClick={handleUnselectShow}>unselectShow</button>
-                                            <button onClick={activateShow}>activateShow</button>
-                                            <button onClick={handleDeleteShow}>deleteShow</button>
+                                            {selectedShow.active === 0 && <button onClick={activateShow}>activateShow</button>}
+                                            {selectedShow.active === 0 && <button onClick={handleDeleteShow}>deleteShow</button>}
                                         </div>
                                         <div style={{ position: 'absolute', right: 100, top:100 }}>
                                             <h3>Venue Layout</h3>
