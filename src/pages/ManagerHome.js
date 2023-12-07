@@ -397,6 +397,7 @@ const ManagerHome = ({ loggedInUser, onLogout }) => {
             setShowNum((prevNum) => prevNum + 1);
             setShowCreating(false);
             setSubmitLoading(false);
+            listShows();
             console.log(manager.showId);
             }, 2000);
 
