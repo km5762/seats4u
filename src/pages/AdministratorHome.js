@@ -220,6 +220,8 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
   const [showDate, setShowDate] = useState("");
   const [showTime, setShowTime] = useState("");
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [generatedToggle, setGeneratedToggle] = useState(true);
+  const [reports, setReports] = useState([]);
 
   const hideListOfShows = () => {
     setHideList(true);
@@ -312,6 +314,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
     setSelectedVenue(null);
     setSelectedShow(null);
     setListOfShows([]);
+    setGeneratedToggle(true);
     setHideList(true);
   };
 
@@ -337,6 +340,7 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
 
   const handleShowClick = (index) => {
     setSelectedShow(listOfShows[index]);
+    setGeneratedToggle(true);
   };
 
   const handleUnselectShow = () => {
@@ -500,6 +504,77 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
     setShowCreating(false);
     setSubmitLoading(false);
   };
+  const generateShowReport = async () => {
+    try {
+      const res = await fetch(
+        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/generateshowsreport",
+        {
+          credentials: "include",
+          method: "GET",
+        }
+      );
+
+      const data = await res.json();
+      console.log(data);
+
+      // Convert the data into Report components
+      const reportComponents = data.map((report) => (
+        <Report
+          key={report.event_id}
+          id={report.event_id}
+          name={report.event_name}
+          seatsAvailable={report.available_seats}
+          seatsUnavailable={report.unavailable_seats}
+          totalRevenue={report.total_revenue}
+        />
+      ));
+
+      setReports(reportComponents); // Update state with the generated Report components
+    } catch (error) {
+      console.error("Error occurred during generate show report:", error);
+      setReports([]); // Set empty array if there's an error
+      setGeneratedToggle(false);
+    }
+  };
+
+  const handleGenerateShowsReport = () => {
+    setGeneratedToggle(!generatedToggle);
+    if (generatedToggle) {
+      generateShowReport();
+    }
+  };
+
+  const Report = ({
+    id,
+    name,
+    seatsAvailable,
+    seatsUnavailable,
+    totalRevenue,
+  }) => (
+    <div
+      style={{
+        marginBottom: "10px",
+        borderBottom: "1px solid black",
+        paddingBottom: "10px",
+      }}
+    >
+      <p>
+        <strong>Show Name:</strong> {name}
+      </p>
+      <p>
+        <strong>Seats Available:</strong> {seatsAvailable}
+      </p>
+      <p>
+        <strong>Seats Unavailable:</strong> {seatsUnavailable}
+      </p>
+      <p>
+        <strong>Total Revenue:</strong> {totalRevenue}
+      </p>
+      <p>
+        <strong>ID:</strong> {id}
+      </p>
+    </div>
+  );
 
   return (
     <div>
@@ -569,7 +644,9 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                         <button onClick={handleUnselectVenue}>
                           unselectVenue
                         </button>
-                        <button>generate show report</button>
+                        <button onClick={handleGenerateShowsReport}>
+                          generate show report
+                        </button>
                         <button onClick={creatingShow}>Create show</button>
                         {!selectedShow && hideList && (
                           <button onClick={listShows}>
@@ -580,28 +657,32 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                         {!hideList && (
                           <button onClick={hideListOfShows}>Hide list</button>
                         )}
-                        <div style={{ display: "flex", flexWrap: "wrap" }}>
-                          {!selectedShow &&
-                            listOfShows.map((show, index) => (
-                              <Show
-                                key={index}
-                                name={show.name}
-                                date={new Date(show.date).toLocaleDateString()}
-                                time={new Date(show.date).toLocaleTimeString(
-                                  [],
-                                  {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    hour12: false,
-                                  }
-                                )}
-                                venue={selectedVenue.name}
-                                id={show.id}
-                                active={show.active}
-                                onClick={() => handleShowClick(index)}
-                              />
-                            ))}
-                          {/* {!selectedShow && listOfShows.map((event, index) => (
+
+                        <div>
+                          <div style={{ display: "flex", flexWrap: "wrap" }}>
+                            {!selectedShow &&
+                              listOfShows.map((show, index) => (
+                                <Show
+                                  key={index}
+                                  name={show.name}
+                                  date={new Date(
+                                    show.date
+                                  ).toLocaleDateString()}
+                                  time={new Date(show.date).toLocaleTimeString(
+                                    [],
+                                    {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                      hour12: false,
+                                    }
+                                  )}
+                                  venue={selectedVenue.name}
+                                  id={show.id}
+                                  active={show.active}
+                                  onClick={() => handleShowClick(index)}
+                                />
+                              ))}
+                            {/* {!selectedShow && listOfShows.map((event, index) => (
                             <Show
                               key={index}
                               name={event.event_name}
@@ -613,84 +694,93 @@ const AdminHome = ({ loggedInUser, onLogout }) => {
                               onClick={() => handleShowClick(index)}
                             />
                           ))} */}
-                          {selectedShow && !showCreating && (
-                            <div>
+                            {selectedShow && !showCreating && (
                               <div>
-                                <Show
-                                  name={selectedShow.name}
-                                  date={new Date(
-                                    selectedShow.date
-                                  ).toLocaleDateString()}
-                                  time={new Date(
-                                    selectedShow.date
-                                  ).toLocaleTimeString([], {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    hour12: false,
-                                  })}
-                                  venue={selectedVenue.name}
-                                  active={selectedShow.active}
-                                  id={selectedShow.id}
-                                />
-                                <button onClick={handleUnselectShow}>
-                                  unselectShow
-                                </button>
-                                <button onClick={activateShow}>
-                                  activateShow
-                                </button>
+                                <div>
+                                  <Show
+                                    name={selectedShow.name}
+                                    date={new Date(
+                                      selectedShow.date
+                                    ).toLocaleDateString()}
+                                    time={new Date(
+                                      selectedShow.date
+                                    ).toLocaleTimeString([], {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                      hour12: false,
+                                    })}
+                                    venue={selectedVenue.name}
+                                    active={selectedShow.active}
+                                    id={selectedShow.id}
+                                  />
+                                  <button onClick={handleUnselectShow}>
+                                    unselectShow
+                                  </button>
+                                  <button onClick={activateShow}>
+                                    activateShow
+                                  </button>
 
-                                <button onClick={handleDeleteShow}>
-                                  deleteShow
-                                </button>
-                              </div>
+                                  <button onClick={handleDeleteShow}>
+                                    deleteShow
+                                  </button>
+                                </div>
 
-                              <div
-                                style={{
-                                  position: "absolute",
-                                  right: 100,
-                                  top: 100,
-                                }}
-                              >
-                                <h3>Venue Layout</h3>
-                                <input
-                                  type="number"
-                                  value={ticketPrice}
-                                  onChange={(e) =>
-                                    setTicketPrice(e.target.value)
-                                  }
-                                  placeholder="Enter ticket price"
-                                />
-                                <p></p>
-                                <p>
-                                  This ticket price will be assigned to all
-                                  seats: ${ticketPrice}
-                                </p>
-                                <button onClick={createBlock}>
-                                  Submit ticket price
-                                </button>
-                                <div style={{ display: "flex" }}>
-                                  <Section
-                                    title="Left"
-                                    rows={getLayout(selectedVenue.id, 0)}
-                                    cols={getLayout(selectedVenue.id, 1)}
-                                    canSelect={false}
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    right: 100,
+                                    top: 100,
+                                  }}
+                                >
+                                  <h3>Venue Layout</h3>
+                                  <input
+                                    type="number"
+                                    value={ticketPrice}
+                                    onChange={(e) =>
+                                      setTicketPrice(e.target.value)
+                                    }
+                                    placeholder="Enter ticket price"
                                   />
-                                  <Section
-                                    title="Center"
-                                    rows={getLayout(selectedVenue.id, 2)}
-                                    cols={getLayout(selectedVenue.id, 3)}
-                                    canSelect={false}
-                                  />
-                                  <Section
-                                    title="Right"
-                                    rows={getLayout(selectedVenue.id, 4)}
-                                    cols={getLayout(selectedVenue.id, 5)}
-                                    canSelect={false}
-                                  />
+                                  <p></p>
+                                  <p>
+                                    This ticket price will be assigned to all
+                                    seats: ${ticketPrice}
+                                  </p>
+                                  <button onClick={createBlock}>
+                                    Submit ticket price
+                                  </button>
+                                  <div style={{ display: "flex" }}>
+                                    <Section
+                                      title="Left"
+                                      rows={getLayout(selectedVenue.id, 0)}
+                                      cols={getLayout(selectedVenue.id, 1)}
+                                      canSelect={false}
+                                    />
+                                    <Section
+                                      title="Center"
+                                      rows={getLayout(selectedVenue.id, 2)}
+                                      cols={getLayout(selectedVenue.id, 3)}
+                                      canSelect={false}
+                                    />
+                                    <Section
+                                      title="Right"
+                                      rows={getLayout(selectedVenue.id, 4)}
+                                      cols={getLayout(selectedVenue.id, 5)}
+                                      canSelect={false}
+                                    />
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          )}
+                            )}
+                          </div>
+                          <div style={{ position: "relative" }}>
+                            {!generatedToggle && (
+                              <div style={{ marginTop: "20px" }}>
+                                <h2>Your shows reports:</h2>
+                                {reports.length > 0 && reports}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     )}
