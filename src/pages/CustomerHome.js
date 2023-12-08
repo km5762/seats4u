@@ -77,7 +77,10 @@ const Section = ({
 
   const handleSeatClick = (row, col, cost) => {
     let id = startId + (row - 1) * cols + col - 1;
-    // console.log(id);
+    console.log("Start Id");
+    console.log(startId);
+    console.log("ID: ");
+    console.log(id);
     // console.log(availableList);
     // console.log((row-1) * cols + col - 1);
     // console.log(availableList[(row-1) * cols + col - 1] === 1)
@@ -594,7 +597,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   startId={
                     startId +
                     getLayout(selectedShow.venue_id, 0) *
-                      getLayout(selectedShow.venue_id)
+                      getLayout(selectedShow.venue_id, 1)
                   }
                 />
                 <Section
@@ -618,7 +621,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   startId={
                     startId +
                     getLayout(selectedShow.venue_id, 0) *
-                      getLayout(selectedShow.venue_id) +
+                      getLayout(selectedShow.venue_id, 1) +
                     getLayout(selectedShow.venue_id, 2) *
                       getLayout(selectedShow.venue_id, 3)
                   }
