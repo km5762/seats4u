@@ -291,16 +291,16 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     return result;
   };
 
-  const handleShowClick = (index) => {
+  const handleShowClick = async (index) => {
     setSelectedShow(searchResults[index]);
     let result = searchResults[index];
-    listSeats(result.event_id);
+    await listSeats(result.event_id);
   };
 
-  const handleShowClickList = (index) => {
+  const handleShowClickList = async(index) => {
     setSelectedShowList(listOfShows[index]);
     let result = listOfShows[index];
-    listSeats(result.id);
+    await listSeats(result.id);
   };
 
   const handleUnselectShow = () => {
@@ -516,7 +516,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
               })}
               venue={event.venue_name}
               eventId={event.event_id}
-              onClick={() => handleShowClick(index)}
+              onClick={async() => {await handleShowClick(index)}}
             />
           ))}
         {selectedShow && (
@@ -614,7 +614,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
               })}
               venue={event.venue_id}
               eventId={event.id}
-              onClick={() => handleShowClickList(index)}
+              onClick={async () => {await handleShowClickList(index)}}
             />
           ))}
         {selectedShowList && (
