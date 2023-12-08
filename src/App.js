@@ -44,6 +44,7 @@ const App = () => {
       console.log("Logout API call completed");
     };
 
+    localStorage.setItem("login", JSON.stringify(false));
     // Call the async function immediately
     fetchData();
   };
@@ -70,6 +71,7 @@ const App = () => {
             path="/manager"
             element={
               <ManagerHome
+                setLoggedInUser={setLoggedInUser}
                 loggedInUser={loggedInUser}
                 onLogout={handleLogout}
               />
@@ -78,7 +80,11 @@ const App = () => {
           <Route
             path="/admin"
             element={
-              <AdminHome loggedInUser={loggedInUser} onLogout={handleLogout} />
+              <AdminHome
+                setLoggedInUser={setLoggedInUser}
+                loggedInUser={loggedInUser}
+                onLogout={handleLogout}
+              />
             }
           />
         </Routes>

@@ -235,12 +235,14 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                 console.log("Only one venue found:", singleVenue);
                 // Venue manager with a single venue
                 navigate("/manager", { state: { userData: data } });
+                localStorage.setItem("login", JSON.stringify(true));
                 console.log(res);
                 console.log(data);
               }
             } else {
               console.log("No venues found in the response");
               navigate("/manager", { state: { userData: data } });
+              localStorage.setItem("login", JSON.stringify(true));
               console.log(res);
               console.log(data);
             }
@@ -251,6 +253,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
             // Redirect to '/admin'
             navigate("/admin", { state: { userData: data } });
             setLoggedInUser(data.user);
+            localStorage.setItem("login", JSON.stringify(true));
           } else {
             console.log("User doesn't have the required role for this action");
           }
@@ -264,8 +267,32 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       // setLoggedInUser({ username, role });
     };
 
-    handleLogin();
-  }, [navigate, setLoggedInUser]);
+    const checkLogin = (event) => {
+      console.log("Checking login");
+      if (event && event.key === "login") {
+        const login = localStorage.getItem("login");
+        if (JSON.parse(login) === true) {
+          handleLogin();
+        } else {
+          onLogout();
+          navigate("/");
+        }
+      }
+    };
+
+    const login = localStorage.getItem("login");
+    if (JSON.parse(login)) {
+      handleLogin();
+    } else {
+      onLogout();
+    }
+
+    window.addEventListener("storage", checkLogin);
+
+    return () => {
+      window.removeEventListener("storage", checkLogin);
+    };
+  }, [navigate, setLoggedInUser, onLogout]);
 
   // Function to add or update a value in the dictionary
   const updateDict = (key, list) => {
