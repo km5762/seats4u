@@ -29,7 +29,7 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
     }}
     onClick={() => onClick(row, col)}
   >
-    {`${String.fromCharCode(64 + row).toUpperCase()}-${col}`}
+    {`${col}`}
   </div>
 );
 
@@ -84,25 +84,26 @@ const Section = ({ title, rows, cols, canSelect }) => {
   return (
     <div style={{ padding: "4px" }}>
       <h4>{title}</h4>
-      <div
-        style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)` }}
-      >
-        {Array.from({ length: rows }, (_, rowIndex) =>
-          Array.from({ length: cols }, (_, colIndex) => (
-            <Seat
-              key={`${rowIndex}-${colIndex}`}
-              row={rowIndex + 1}
-              col={colIndex + 1}
-              onClick={() => handleSeatClick(rowIndex + 1, colIndex + 1, cols)}
-              selected={selectedSeats.some(
-                (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
-              )}
-              blocked={blockedSeats.some(
-                (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
-              )}
-            />
-          ))
-        )}
+      <div style={{ display: "grid", gridTemplateColumns: `auto repeat(${cols}, 1fr)` }}>
+        {Array.from({ length: rows }, (_, rowIndex) => (
+          <>
+            <div style={{ gridRow: rowIndex + 1, alignSelf: "center" }}>{String.fromCharCode(65 + rowIndex)}</div>
+            {Array.from({ length: cols }, (_, colIndex) => (
+              <Seat
+                key={`${rowIndex}-${colIndex}`}
+                row={rowIndex + 1}
+                col={colIndex + 1}
+                onClick={() => handleSeatClick(rowIndex + 1, colIndex + 1, cols)}
+                selected={selectedSeats.some(
+                  (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
+                )}
+                blocked={blockedSeats.some(
+                  (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
+                )}
+              />
+            ))}
+          </>
+        ))}
       </div>
 
       {selectedSeats.length > 0 && (

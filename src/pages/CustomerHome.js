@@ -56,7 +56,7 @@ const Seat = ({ row, col, onClick, selected, blocked, available }) => (
     }}
     onClick={() => onClick(row, col)}
   >
-    {`${String.fromCharCode(64 + row).toUpperCase()}-${col}`}
+    {`${col}`}
   </div>
 );
 
@@ -74,6 +74,7 @@ const Section = ({
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [blockedSeats, setBlockedSeats] = useState([]);
   const [blocks, setBlocks] = useState([]);
+  const showRowIdentifiers = title === "Left";
 
   const handleSeatClick = (row, col, cost) => {
     let id = startId + (row - 1) * cols + col - 1;
@@ -121,35 +122,23 @@ const Section = ({
       setSelectedSeats([]);
     }
   };
-
   return (
     <div style={{ padding: "4px" }}>
       <h4>{title}</h4>
-      <div
-        style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)` }}
-      >
-        {Array.from({ length: rows }, (_, rowIndex) =>
-          Array.from({ length: cols }, (_, colIndex) => (
-            <Seat
-              key={`${rowIndex}-${colIndex}`}
-              row={rowIndex + 1}
-              col={colIndex + 1}
-              onClick={() =>
-                handleSeatClick(rowIndex + 1, colIndex + 1, ticketPrice)
-              }
-              selected={selectedSeats.some(
-                (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
-              )}
-              blocked={blockedSeats.some(
-                (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
-              )}
-              available={availableList[rowIndex * cols + colIndex] === 1}
-              id={startId}
-            />
-          ))
-        )}
+      <div style={{ display: "grid", gridTemplateColumns: `auto repeat(${cols}, 1fr)` }}>
+        {Array.from({ length: rows }, (_, rowIndex) => (
+          <>
+            <div style={{ gridRow: rowIndex + 1, alignSelf: "center" }}>{String.fromCharCode(65 + rowIndex)}</div>
+            {Array.from({ length: cols }, (_, colIndex) => (
+              <Seat
+                key={`${rowIndex}-${colIndex}`}
+                row={rowIndex + 1}
+                col={colIndex + 1}
+              />
+            ))}
+          </>
+        ))}
       </div>
-
       {selectedSeats.length > 0 && (
         <div>
           <h3>Selected Seats</h3>
