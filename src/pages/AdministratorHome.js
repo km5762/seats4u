@@ -5,10 +5,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Administrator } from "../model/Model";
 import {
   deleteShowAdminC,
-  createVenueC,
-  deleteVenueC,
+  // createVenueC,
+  // deleteVenueC,
   createShowAdminC,
-  deleteShowC,
+  // deleteShowC,
   activateShowAdminC,
 } from "../controller/Controller";
 
@@ -24,8 +24,8 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
         selected && !blocked
           ? "lightblue" // Light blue when selected and not blocked
           : blocked && !selected
-          ? "blue" // Blue when blocked and not selected
-          : "white", // White when neither selected nor blocked
+            ? "blue" // Blue when blocked and not selected
+            : "white", // White when neither selected nor blocked
     }}
     onClick={() => onClick(row, col)}
   >
@@ -210,12 +210,12 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
   const [hideList, setHideList] = useState(true);
   const [ticketPrice, setTicketPrice] = useState(null);
-  const [leftRow, setLeftRow] = useState("");
-  const [leftCol, setLeftCol] = useState("");
-  const [rightRow, setRightRow] = useState("");
-  const [rightCol, setRightCol] = useState("");
-  const [centerRow, setCenterRow] = useState("");
-  const [centerCol, setCenterCol] = useState("");
+  // const [leftRow, setLeftRow] = useState("");
+  // const [leftCol, setLeftCol] = useState("");
+  // const [rightRow, setRightRow] = useState("");
+  // const [rightCol, setRightCol] = useState("");
+  // const [centerRow, setCenterRow] = useState("");
+  // const [centerCol, setCenterCol] = useState("");
   const [showCreating, setShowCreating] = useState(false);
   const [showName, setShowName] = useState("");
   const [showDate, setShowDate] = useState("");
@@ -224,7 +224,7 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   const [generatedToggle, setGeneratedToggle] = useState(true);
   const [reports, setReports] = useState([]);
 
-  const navigate = useNavigate();
+  useNavigate();
 
   const hideListOfShows = () => {
     setHideList(true);
@@ -312,39 +312,39 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   //   };
   // }, [navigate, setLoggedInUser, onLogout]);
 
-  async function handleSearch(query) {
-    setSearchQuery((prevQuery) => {
-      // Define an async function to perform the API call
-      const fetchData = async () => {
-        try {
-          console.log(`Search query: ${query}`);
-          const res = await fetch(
-            "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/searchevents",
-            {
-              credentials: "include",
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ searchQuery: query }),
-            }
-          );
-          const data = await res.json();
-          setListOfShows(data.events);
-          setHideList(false);
-        } catch (error) {
-          console.error("Error occurred while searching show:", error);
-        }
+  // async function handleSearch(query) {
+  //   setSearchQuery((prevQuery) => {
+  //     // Define an async function to perform the API call
+  //     const fetchData = async () => {
+  //       try {
+  //         console.log(`Search query: ${query}`);
+  //         const res = await fetch(
+  //           "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/searchevents",
+  //           {
+  //             credentials: "include",
+  //             method: "POST",
+  //             headers: { "Content-Type": "application/json" },
+  //             body: JSON.stringify({ searchQuery: query }),
+  //           }
+  //         );
+  //         const data = await res.json();
+  //         setListOfShows(data.events);
+  //         setHideList(false);
+  //       } catch (error) {
+  //         console.error("Error occurred while searching show:", error);
+  //       }
 
-        // Continue with any other logic after the API call
-        console.log("API call completed");
-      };
+  //       // Continue with any other logic after the API call
+  //       console.log("API call completed");
+  //     };
 
-      // Call the async function immediately
-      fetchData();
+  //     // Call the async function immediately
+  //     fetchData();
 
-      // Return the new state value to update the state
-      return query;
-    });
-  }
+  //     // Return the new state value to update the state
+  //     return query;
+  //   });
+  // }
   const addShow = (newShow) => {
     setListOfShows((prevShows) => [...prevShows, newShow]);
   };
@@ -380,10 +380,10 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     //     });
     // });
 
-    data.sections.map((section) => {
-      // Call addShow for each event
-      section.venue_id === selectedVenue.id &&
+    data.sections.forEach((section) => {
+      if (section.venue_id === selectedVenue.id) {
         updateDict(section.venue_id, [section.row_count, section.col_count]);
+      }
     });
   }
 
@@ -482,7 +482,7 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
   async function createBlock() {
     try {
-      const res = await fetch(
+      await fetch(
         "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/createblocks",
         {
           credentials: "include",
@@ -525,8 +525,8 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     return `${year.toString().padStart(2, "0")}-${month
       .toString()
       .padStart(2, "0")}-${day.toString().padStart(2, "0")}T${hours
-      .toString()
-      .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+        .toString()
+        .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
   };
   const handleDateTimeChange = (datetimeString) => {
     const selectedDate = new Date(datetimeString); // Convert string to Date object
@@ -588,7 +588,7 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       time: `${hours}:${minutes}`,
       id: selectedVenue.id,
       active: 0,
-  });
+    });
   };
   const handleBackCreateShow = () => {
     setShowName("");

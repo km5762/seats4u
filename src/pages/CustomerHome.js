@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SearchBar from "../component/SearchBar";
 import { purchaseSeatsC } from "../controller/Controller";
-import BlockCanvas from "../boundary/Boundary";
+// import BlockCanvas from "../boundary/Boundary";
 
 // Show component representing a rectangular block
 const Show = ({ name, date, time, venue, onClick, eventId }) => (
@@ -74,7 +74,6 @@ const Section = ({
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [blockedSeats, setBlockedSeats] = useState([]);
   const [blocks, setBlocks] = useState([]);
-  const showRowIdentifiers = title === "Left";
 
   const handleSeatClick = (row, col, cost) => {
     let id = startId + (row - 1) * cols + col - 1;
@@ -122,6 +121,7 @@ const Section = ({
       setSelectedSeats([]);
     }
   };
+
   return (
     <div style={{ padding: "4px" }}>
       <h4>{title}</h4>
@@ -134,6 +134,17 @@ const Section = ({
                 key={`${rowIndex}-${colIndex}`}
                 row={rowIndex + 1}
                 col={colIndex + 1}
+                onClick={() =>
+                  handleSeatClick(rowIndex + 1, colIndex + 1, ticketPrice)
+                }
+                selected={selectedSeats.some(
+                  (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
+                )}
+                blocked={blockedSeats.some(
+                  (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
+                )}
+                available={availableList[rowIndex * cols + colIndex] === 1}
+                id={startId}
               />
             ))}
           </>
@@ -188,12 +199,12 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
   const [selectedShow, setSelectedShow] = useState(null);
   const [selectedShowList, setSelectedShowList] = useState(null);
-  const [leftRow, setLeftRow] = useState("");
-  const [leftCol, setLeftCol] = useState("");
-  const [rightRow, setRightRow] = useState("");
-  const [rightCol, setRightCol] = useState("");
-  const [centerRow, setCenterRow] = useState("");
-  const [centerCol, setCenterCol] = useState("");
+  // const [leftRow, setLeftRow] = useState("");
+  // const [leftCol, setLeftCol] = useState("");
+  // const [rightRow, setRightRow] = useState("");
+  // const [rightCol, setRightCol] = useState("");
+  // const [centerRow, setCenterRow] = useState("");
+  // const [centerCol, setCenterCol] = useState("");
 
   const [layoutDict, setLayoutDict] = useState({
     //1: [10, 20],
@@ -316,7 +327,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     await listSeats(result.event_id);
   };
 
-  const handleShowClickList = async(index) => {
+  const handleShowClickList = async (index) => {
     setSelectedShowList(listOfShows[index]);
     let result = listOfShows[index];
     await listSeats(result.id);
@@ -356,7 +367,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
           );
           setSearchResults(filteredEvents);
 
-          data.sections.map((section) => {
+          data.sections.forEach((section) => {
             // Call addShow for each event
             updateDict(section.venue_id, [
               section.row_count,
@@ -393,7 +404,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     setListOfShows(filteredEvents);
     setLoadingList(false);
 
-    data.sections.map((section) => {
+    data.sections.forEach((section) => {
       // Call addShow for each event
       updateDict(section.venue_id, [section.row_count, section.col_count]);
     });
@@ -535,7 +546,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
               })}
               venue={event.venue_name}
               eventId={event.event_id}
-              onClick={async() => {await handleShowClick(index)}}
+              onClick={async () => { await handleShowClick(index) }}
             />
           ))}
         {selectedShow && (
@@ -565,7 +576,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   availableList={availableList.slice(
                     0,
                     getLayout(selectedShow.venue_id, 0) *
-                      getLayout(selectedShow.venue_id, 1)
+                    getLayout(selectedShow.venue_id, 1)
                   )}
                   startId={startId}
                 />
@@ -577,16 +588,16 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   ticketPrice={ticketPrice}
                   availableList={availableList.slice(
                     getLayout(selectedShow.venue_id, 0) *
-                      getLayout(selectedShow.venue_id, 1),
+                    getLayout(selectedShow.venue_id, 1),
                     getLayout(selectedShow.venue_id, 0) *
-                      getLayout(selectedShow.venue_id, 1) +
-                      getLayout(selectedShow.venue_id, 2) *
-                        getLayout(selectedShow.venue_id, 3)
+                    getLayout(selectedShow.venue_id, 1) +
+                    getLayout(selectedShow.venue_id, 2) *
+                    getLayout(selectedShow.venue_id, 3)
                   )}
                   startId={
                     startId +
                     getLayout(selectedShow.venue_id, 0) *
-                      getLayout(selectedShow.venue_id, 1)
+                    getLayout(selectedShow.venue_id, 1)
                   }
                 />
                 <Section
@@ -597,22 +608,22 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   ticketPrice={ticketPrice}
                   availableList={availableList.slice(
                     getLayout(selectedShow.venue_id, 0) *
-                      getLayout(selectedShow.venue_id, 1) +
-                      getLayout(selectedShow.venue_id, 2) *
-                        getLayout(selectedShow.venue_id, 3),
+                    getLayout(selectedShow.venue_id, 1) +
+                    getLayout(selectedShow.venue_id, 2) *
+                    getLayout(selectedShow.venue_id, 3),
                     getLayout(selectedShow.venue_id, 0) *
-                      getLayout(selectedShow.venue_id, 1) +
-                      getLayout(selectedShow.venue_id, 2) *
-                        getLayout(selectedShow.venue_id, 3) +
-                      getLayout(selectedShow.venue_id, 4) *
-                        getLayout(selectedShow.venue_id, 5)
+                    getLayout(selectedShow.venue_id, 1) +
+                    getLayout(selectedShow.venue_id, 2) *
+                    getLayout(selectedShow.venue_id, 3) +
+                    getLayout(selectedShow.venue_id, 4) *
+                    getLayout(selectedShow.venue_id, 5)
                   )}
                   startId={
                     startId +
                     getLayout(selectedShow.venue_id, 0) *
-                      getLayout(selectedShow.venue_id, 1) +
+                    getLayout(selectedShow.venue_id, 1) +
                     getLayout(selectedShow.venue_id, 2) *
-                      getLayout(selectedShow.venue_id, 3)
+                    getLayout(selectedShow.venue_id, 3)
                   }
                 />
               </div>
@@ -633,7 +644,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
               })}
               venue={event.venue_id}
               eventId={event.id}
-              onClick={async () => {await handleShowClickList(index)}}
+              onClick={async () => { await handleShowClickList(index) }}
             />
           ))}
         {selectedShowList && (
@@ -663,7 +674,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   availableList={availableList.slice(
                     0,
                     getLayout(selectedShowList.venue_id, 0) *
-                      getLayout(selectedShowList.venue_id, 1)
+                    getLayout(selectedShowList.venue_id, 1)
                   )}
                   startId={startId}
                 />
@@ -675,16 +686,16 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   ticketPrice={ticketPrice}
                   availableList={availableList.slice(
                     getLayout(selectedShowList.venue_id, 0) *
-                      getLayout(selectedShowList.venue_id, 1),
+                    getLayout(selectedShowList.venue_id, 1),
                     getLayout(selectedShowList.venue_id, 0) *
-                      getLayout(selectedShowList.venue_id, 1) +
-                      getLayout(selectedShowList.venue_id, 2) *
-                        getLayout(selectedShowList.venue_id, 3)
+                    getLayout(selectedShowList.venue_id, 1) +
+                    getLayout(selectedShowList.venue_id, 2) *
+                    getLayout(selectedShowList.venue_id, 3)
                   )}
                   startId={
                     startId +
                     getLayout(selectedShowList.venue_id, 0) *
-                      getLayout(selectedShowList.venue_id, 1)
+                    getLayout(selectedShowList.venue_id, 1)
                   }
                 />
                 <Section
@@ -695,22 +706,22 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   ticketPrice={ticketPrice}
                   availableList={availableList.slice(
                     getLayout(selectedShowList.venue_id, 0) *
-                      getLayout(selectedShowList.venue_id, 1) +
-                      getLayout(selectedShowList.venue_id, 2) *
-                        getLayout(selectedShowList.venue_id, 3),
+                    getLayout(selectedShowList.venue_id, 1) +
+                    getLayout(selectedShowList.venue_id, 2) *
+                    getLayout(selectedShowList.venue_id, 3),
                     getLayout(selectedShowList.venue_id, 0) *
-                      getLayout(selectedShowList.venue_id, 1) +
-                      getLayout(selectedShowList.venue_id, 2) *
-                        getLayout(selectedShowList.venue_id, 3) +
-                      getLayout(selectedShowList.venue_id, 4) *
-                        getLayout(selectedShowList.venue_id, 5)
+                    getLayout(selectedShowList.venue_id, 1) +
+                    getLayout(selectedShowList.venue_id, 2) *
+                    getLayout(selectedShowList.venue_id, 3) +
+                    getLayout(selectedShowList.venue_id, 4) *
+                    getLayout(selectedShowList.venue_id, 5)
                   )}
                   startId={
                     startId +
                     getLayout(selectedShowList.venue_id, 0) *
-                      getLayout(selectedShowList.venue_id, 1) +
+                    getLayout(selectedShowList.venue_id, 1) +
                     getLayout(selectedShowList.venue_id, 2) *
-                      getLayout(selectedShowList.venue_id, 3)
+                    getLayout(selectedShowList.venue_id, 3)
                   }
                 />
               </div>

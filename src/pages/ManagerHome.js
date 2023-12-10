@@ -7,7 +7,7 @@ import {
   deleteShowC,
   activateShowC,
 } from "../controller/Controller";
-import BlockCanvas from "../boundary/Boundary";
+// import BlockCanvas from "../boundary/Boundary";
 import { VenueManager } from "../model/Model";
 
 // Seat component representing a clickable seat
@@ -22,8 +22,8 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
         selected && !blocked
           ? "lightblue" // Light blue when selected and not blocked
           : blocked && !selected
-          ? "blue" // Blue when blocked and not selected
-          : "white", // White when neither selected nor blocked
+            ? "blue" // Blue when blocked and not selected
+            : "white", // White when neither selected nor blocked
     }}
     onClick={() => onClick(row, col)}
   >
@@ -171,9 +171,9 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
   const location = useLocation();
   const receivedData = location.state.userData;
-  const navigate = useNavigate();
+  useNavigate();
 
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
   // venues
   const [venueCreated, setVenueCreated] = useState(false);
@@ -190,7 +190,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   const [showDate, setShowDate] = useState("");
   const [showTime, setShowTime] = useState("");
   const [showNum, setShowNum] = useState(0);
-  const [initialShowCount, setInitialShowCount] = useState(0);
+  // const [initialShowCount, setInitialShowCount] = useState(0);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [ticketPrice, setTicketPrice] = useState(null);
   const [currentTicketPrice, setCurrentTicketPrice] = useState(null);
@@ -555,8 +555,8 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     return `${year.toString().padStart(2, "0")}-${month
       .toString()
       .padStart(2, "0")}-${day.toString().padStart(2, "0")}T${hours
-      .toString()
-      .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+        .toString()
+        .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
   };
 
   const handleDateTimeChange = (datetimeString) => {
