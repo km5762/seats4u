@@ -622,6 +622,7 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
         />
       ));
 
+      reportComponents.sort((a, b) => a.key - b.key);
       setReports(reportComponents); // Update state with the generated Report components
     } catch (error) {
       console.error("Error occurred during generate show report:", error);
