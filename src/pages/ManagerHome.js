@@ -802,7 +802,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   return (
     <div>
       <div className="center-container">
-        <img src="/pictures/logo.png" alt="Logo" width="250" height="100" />
+        <img src="/pictures/logo.png" alt="Logo" width="250" height="100" onClick={onLogout} style={{ cursor: 'pointer' }}/>
       </div>
 
       <div className="upper-right-text">
