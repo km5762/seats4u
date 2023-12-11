@@ -193,10 +193,15 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId, blockDict }) =
     if (!initBlocks) {
       console.log("getting initial blocks");
       let row = 1;
+      let newBlocks = [];
       for (let col = 1; col <  3; col++) {
         setBlockedSeats((prevSeats) => [...prevSeats, { col, row }]);
+        const seat = {col, row};
+        newBlocks.push(seat);
       }
       setInitBlocks(true);
+      console.log(newBlocks);
+      setBlocks((prevBlocks) => [...prevBlocks, newBlocks]);
     }
   }
 
