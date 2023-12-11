@@ -11,7 +11,7 @@ import {
 import { VenueManager } from "../model/Model";
 
 // Seat component representing a clickable seat
-const Seat = ({ row, col, onClick, selected, blocked }) => (
+const Seat = ({ row, col, onClick, selected, blocked, selectedAndBlocked }) => (
   <div
     style={{
       border: "1px solid black",
@@ -19,11 +19,13 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
       margin: "2px",
       cursor: "pointer",
       backgroundColor:
-        selected && !blocked
-          ? "lightblue" // Light blue when selected and not blocked
-          : blocked && !selected
-            ? "blue" // Blue when blocked and not selected
-            : "white", // White when neither selected nor blocked
+        selectedAndBlocked ?
+          "lightblue"
+          : selected && !blocked
+            ? "yellow" // Light blue when selected and not blocked
+            : blocked && !selected
+              ? "green" // Blue when blocked and not selected
+              : "white", // White when neither selected nor blocked
     }}
     onClick={() => onClick(row, col)}
   >
@@ -36,6 +38,9 @@ const Section = ({ title, rows, cols, canSelect }) => {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [blockedSeats, setBlockedSeats] = useState([]);
   const [blocks, setBlocks] = useState([]);
+  const [selectedBlock, setSelectedBlock] = useState([]);
+
+  const [listBlocks, setListBlocks] = useState(false);
 
   const handleSeatClick = (row, col, maxCols) => {
     if (canSelect) {
@@ -44,18 +49,28 @@ const Section = ({ title, rows, cols, canSelect }) => {
         (seat) => seat.row === row && seat.col === col
       );
 
-      if (!isSeatSelected) {
+      const isSeatBlocked = blockedSeats.some(
+        (seat) => seat.row === row && seat.col === col
+      )
+
+      const isBlockSelected = selectedBlock.some(
+        (seat) => seat.row === row && seat.col === col
+      )
+
+      if (!isSeatSelected && !isSeatBlocked) {
         // Add the selected seat to the list
         // setSelectedSeats(prevSeats => [...prevSeats, { row, col }]);
         // console.log(row);
         // console.log(col);
         for (let col = 1; col < maxCols + 1; col++) {
           setSelectedSeats((prevSeats) => [...prevSeats, { row, col }]);
-          console.log(row);
-          console.log(col);
-          console.log(selectedSeats);
+          // console.log(row);
+          // console.log(col);
+          // console.log(selectedSeats);
         }
-      } else {
+        setSelectedBlock([]);
+      } 
+      else if (isSeatSelected && !isSeatBlocked) {
         // Remove the selected seat from the list if it's already selected
         for (let col = 1; col < maxCols + 1; col++) {
           setSelectedSeats((prevSeats) =>
@@ -63,12 +78,31 @@ const Section = ({ title, rows, cols, canSelect }) => {
           );
         }
       }
+      else if (isSeatBlocked && !isBlockSelected) {
+        for (let i = 0; i < blocks.length; i++){
+          if (blocks[i].some((seat) => seat.row === row && seat.col === col)) {
+            setSelectedBlock(blocks[i]);
+          }
+        }
+        setSelectedSeats([]);
+      }
+      else{
+        setSelectedBlock([]);
+      }
     }
   };
 
   // useEffect(() => {
-  //   console.log(selectedSeats);
-  // }, [selectedSeats]);
+  //   console.log(selectedBlock);
+  // }, [selectedBlock]);
+
+  // useEffect(() => {
+  //   console.log(blocks);
+  // }, [blocks]);
+
+  // useEffect(() => {
+  //   console.log(blockedSeats);
+  // }, [blockedSeats]);
 
   const addBlock = () => {
     if (selectedSeats.length > 0) {
@@ -78,6 +112,25 @@ const Section = ({ title, rows, cols, canSelect }) => {
       setSelectedSeats([]);
     }
   };
+
+  const deleteBlock = () => {
+    if (selectedBlock.length > 0) {
+      console.log(selectedBlock);
+      setBlocks((prevBlocks) =>
+        prevBlocks.filter((block) => block !== selectedBlock)
+      );
+      setBlockedSeats((prevSeats) =>
+        prevSeats.filter(
+          (seat) =>
+            !selectedBlock.some(
+              (selectedSeat) => selectedSeat.row === seat.row && selectedSeat.col === seat.col
+            )
+        )
+      );
+      setSelectedBlock([]);
+    }
+  };
+
 
   return (
     <div style={{ padding: "4px" }}>
@@ -98,13 +151,15 @@ const Section = ({ title, rows, cols, canSelect }) => {
                 blocked={blockedSeats.some(
                   (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
                 )}
+                selectedAndBlocked={selectedBlock.some(
+                  (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
+                )}
               />
             ))}
           </>
         ))}
       </div>
-
-      {selectedSeats.length > 0 && (
+      {selectedSeats.length > 0 && selectedBlock.length === 0 && (
         <div>
           <h3>Selected Seats</h3>
           {selectedSeats.map((seat, index) => (
@@ -115,8 +170,25 @@ const Section = ({ title, rows, cols, canSelect }) => {
           <button onClick={addBlock}>Add block</button>
         </div>
       )}
-      {blocks.length > 0 &&
-        blocks.map((block, index) => (
+      {selectedBlock.length > 0 && selectedSeats.length === 0 &&(
+        <div>
+          <h3>Selected Block</h3>
+          {selectedBlock.map((seat, index) => (
+            <p key={index}>{`Row: ${String.fromCharCode(
+              64 + seat.row
+            ).toUpperCase()}, Column: ${seat.col}`}</p>
+          ))}
+          <button onClick={deleteBlock}>Delete block</button>
+        </div>
+      )}
+      {listBlocks ? (
+        <button onClick={() => setListBlocks(false)}>Hide Blocks</button>
+      ):(
+        <button onClick={() => setListBlocks(true)}>List Blocks</button>
+      )
+      }
+      {listBlocks  &&
+        blocks.length > 0 && blocks.map((block, index) => (
           <div>
             <p>Block</p>
             <span key={index}>
@@ -128,7 +200,8 @@ const Section = ({ title, rows, cols, canSelect }) => {
                 ))}
             </span>
           </div>
-        ))}
+        ))
+      }
     </div>
   );
 };
@@ -408,7 +481,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   const handleShowClick = (index) => {
     setSelectedShow(shows[index]);
     setGeneratedToggle(true);
-    setPriceSubmitted(false);
+    // setPriceSubmitted(false);
     // listSeats(selectedShow.id);
   };
 
@@ -781,7 +854,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       // const data = await res.json();
       // console.log(data)
       setTicketPrice(null);
-      setPriceSubmitted(true);
+      // setPriceSubmitted(true);
     } catch (error) {
       console.error("Error occurred during creating blocks:", error);
     }
@@ -795,7 +868,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     setSubmitLoading(false);
   };
 
-  const [priceSubmitted, setPriceSubmitted] = useState(false);
+  // const [priceSubmitted, setPriceSubmitted] = useState(false);
 
   const handleCurrentPrice = () => {
     listSeats(selectedShow.id);
@@ -996,7 +1069,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                             }}
                           >
                             <h3>Venue Layout</h3>
-                            {!priceSubmitted && (
+                            {/* {!priceSubmitted && (
                               <div>
                                 <input
                                   type="number"
@@ -1015,25 +1088,25 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                   Submit ticket price
                                 </button>
                               </div>
-                            )}
+                            )} */}
                             <div style={{ display: "flex" }}>
                               <Section
                                 title="Left"
                                 rows={getLayout(manager.id, 0)}
                                 cols={getLayout(manager.id, 1)}
-                                canSelect={false}
+                                canSelect={true}
                               />
                               <Section
                                 title="Center"
                                 rows={getLayout(manager.id, 2)}
                                 cols={getLayout(manager.id, 3)}
-                                canSelect={false}
+                                canSelect={true}
                               />
                               <Section
                                 title="Right"
                                 rows={getLayout(manager.id, 4)}
                                 cols={getLayout(manager.id, 5)}
-                                canSelect={false}
+                                canSelect={true}
                               />
                             </div>
                           </div>
