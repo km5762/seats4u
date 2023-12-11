@@ -34,13 +34,65 @@ const Seat = ({ row, col, onClick, selected, blocked, selectedAndBlocked }) => (
 );
 
 // Section component containing a grid of seats
-const Section = ({ title, rows, cols, canSelect }) => {
+const Section = ({ title, rows, cols, canSelect, show, sectionId }) => {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [blockedSeats, setBlockedSeats] = useState([]);
   const [blocks, setBlocks] = useState([]);
   const [selectedBlock, setSelectedBlock] = useState([]);
 
   const [listBlocks, setListBlocks] = useState(false);
+
+  const [ticketPrice, setTicketPrice] = useState(null);
+
+  async function createBlock() {
+    // listSeats(selectedShow.id);
+    // if (blockId !== null){
+    //   //deleteCurrentBlock
+    // }
+    console.log("Create Block")
+    console.log(show);
+    console.log(sectionId);
+    console.log(parseInt(ticketPrice, 10));
+
+    console.log(selectedSeats);
+
+    let startRow = selectedSeats[0].row - 1;
+    let endRow = selectedSeats[selectedSeats.length-1].row - 1;
+
+    console.log(startRow);
+    console.log(endRow);
+
+    try {
+      const res = await fetch(
+        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/createblocks",
+        {
+          credentials: "include",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify([
+            {
+              eventId: show,
+              sectionId: sectionId,
+              price: parseInt(ticketPrice, 10),
+              startRow: startRow,
+              endRow: endRow,
+            },
+          ]),
+        }
+      );
+
+      // const data = await res.json();
+      // console.log(data)
+      setTicketPrice(null);
+      setSelectedSeats([]);
+      // setPriceSubmitted(true);
+    } catch (error) {
+      console.error("Error occurred during creating blocks:", error);
+    }
+  }
 
   const handleSeatClick = (row, col, maxCols) => {
     if (canSelect) {
@@ -109,7 +161,7 @@ const Section = ({ title, rows, cols, canSelect }) => {
       console.log(selectedSeats);
       setBlockedSeats((prevSeats) => [...prevSeats, ...selectedSeats]);
       setBlocks((prevBlocks) => [...prevBlocks, selectedSeats]);
-      setSelectedSeats([]);
+      createBlock();
     }
   };
 
@@ -167,6 +219,19 @@ const Section = ({ title, rows, cols, canSelect }) => {
               64 + seat.row
             ).toUpperCase()}, Column: ${seat.col}`}</p>
           ))}
+          <input
+            type="number"
+            value={ticketPrice}
+            onChange={(e) =>
+              setTicketPrice(e.target.value)
+            }
+            placeholder="Enter ticket price"
+          />
+          <p></p>
+          <p>
+            This ticket price will be assigned to all
+            seats in this block: ${ticketPrice}
+          </p>
           <button onClick={addBlock}>Add block</button>
         </div>
       )}
@@ -478,11 +543,12 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     setShows((prevShows) => [...prevShows, newShow]);
   };
 
+  const [sectionID, setSectionID] = useState(null);
   const handleShowClick = (index) => {
     setSelectedShow(shows[index]);
     setGeneratedToggle(true);
     // setPriceSubmitted(false);
-    // listSeats(selectedShow.id);
+    listSeats(shows[index].id);
   };
 
   const handleUnselectShow = () => {
@@ -695,7 +761,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   // Function to retrieve numbers from the dictionary
   const getLayout = (venueId, num) => {
     let layout = layoutDict[venueId];
-    console.log(layoutDict[venueId]);
+    //console.log(layoutDict[venueId]);
     let result = layout[num];
     return result;
   };
@@ -757,27 +823,29 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
       const data = await res.json();
       console.log(data);
-      if (data.blocks.length !== 0) {
-        setBlockId(data.blocks[0].id);
+      setSectionID(data.seats[0].section_id);
+      console.log(data.seats[0].section_id);
+      // if (data.blocks.length !== 0) {
+      //   setBlockId(data.blocks[0].id);
 
-        if (data.blocks[0].event_id === eventId) {
-          // Found the matching id, get the price and break the loop
-          let price = parseInt(data.blocks[0].price, 10);
-          if (price !== null) {
-            setCurrentTicketPrice(price);
-            console.log(eventId);
-            console.log(price);
-            return;
-          } else {
-            setCurrentTicketPrice(0);
-            return;
-          }
-        }
-      } else {
-        setCurrentTicketPrice(0);
-      }
-      setTicketPrice(null);
-      console.log("no ticket price found");
+      //   if (data.blocks[0].event_id === eventId) {
+      //     // Found the matching id, get the price and break the loop
+      //     let price = parseInt(data.blocks[0].price, 10);
+      //     if (price !== null) {
+      //       setCurrentTicketPrice(price);
+      //       console.log(eventId);
+      //       console.log(price);
+      //       return;
+      //     } else {
+      //       setCurrentTicketPrice(0);
+      //       return;
+      //     }
+      //   }
+      // } else {
+      //   setCurrentTicketPrice(0);
+      // }
+      // setTicketPrice(null);
+      // console.log("no ticket price found");
       return;
 
       // let price = parseInt(data[0].price, 10);
@@ -823,43 +891,43 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     setCurrentTicketPrice(null);
   }
 
-  async function createBlock() {
-    // listSeats(selectedShow.id);
-    // if (blockId !== null){
-    //   //deleteCurrentBlock
-    // }
+  // async function createBlock() {
+  //   // listSeats(selectedShow.id);
+  //   // if (blockId !== null){
+  //   //   //deleteCurrentBlock
+  //   // }
 
-    try {
-      const res = await fetch(
-        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/createblocks",
-        {
-          credentials: "include",
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify([
-            {
-              eventId: selectedShow.id,
-              sectionId: null,
-              price: ticketPrice,
-              startRow: null,
-              endRow: null,
-            },
-          ]),
-        }
-      );
+  //   try {
+  //     const res = await fetch(
+  //       "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/createblocks",
+  //       {
+  //         credentials: "include",
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Accept: "application/json",
+  //         },
+  //         body: JSON.stringify([
+  //           {
+  //             eventId: selectedShow.id,
+  //             sectionId: null,
+  //             price: ticketPrice,
+  //             startRow: null,
+  //             endRow: null,
+  //           },
+  //         ]),
+  //       }
+  //     );
 
-      // const data = await res.json();
-      // console.log(data)
-      setTicketPrice(null);
-      // setPriceSubmitted(true);
-    } catch (error) {
-      console.error("Error occurred during creating blocks:", error);
-    }
-    // setCurrentTicketPrice(null);
-  }
+  //     // const data = await res.json();
+  //     // console.log(data)
+  //     setTicketPrice(null);
+  //     // setPriceSubmitted(true);
+  //   } catch (error) {
+  //     console.error("Error occurred during creating blocks:", error);
+  //   }
+  //   // setCurrentTicketPrice(null);
+  // }
   const handleBackCreateShow = () => {
     setShowName("");
     setShowDate("");
@@ -1094,18 +1162,25 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                 title="Left"
                                 rows={getLayout(manager.id, 0)}
                                 cols={getLayout(manager.id, 1)}
+                                show={selectedShow.id}
+                                sectionId={sectionID}
                                 canSelect={true}
+
                               />
                               <Section
                                 title="Center"
                                 rows={getLayout(manager.id, 2)}
                                 cols={getLayout(manager.id, 3)}
+                                show={selectedShow.id}
+                                sectionId={sectionID+1}
                                 canSelect={true}
                               />
                               <Section
                                 title="Right"
                                 rows={getLayout(manager.id, 4)}
                                 cols={getLayout(manager.id, 5)}
+                                show={selectedShow.id}
+                                sectionId={sectionID+2}
                                 canSelect={true}
                               />
                             </div>
