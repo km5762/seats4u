@@ -50,20 +50,25 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId }) => {
     //   //deleteCurrentBlock
     // }
     console.log("Create Block")
+    console.log("Show ID");
     console.log(show);
+    console.log("Section ID");
     console.log(sectionId);
+    console.log("Ticket Price");
     console.log(parseInt(ticketPrice, 10));
-
+    console.log("Selected Seats");
     console.log(selectedSeats);
 
     let startRow = selectedSeats[0].row - 1;
     let endRow = selectedSeats[selectedSeats.length-1].row - 1;
 
+    console.log("Start Row");
     console.log(startRow);
+    console.log("End Row");
     console.log(endRow);
 
     try {
-      const res = await fetch(
+      await fetch(
         "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/createblocks",
         {
           credentials: "include",
@@ -158,7 +163,7 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId }) => {
 
   const addBlock = () => {
     if (selectedSeats.length > 0) {
-      console.log(selectedSeats);
+      //console.log(selectedSeats);
       setBlockedSeats((prevSeats) => [...prevSeats, ...selectedSeats]);
       setBlocks((prevBlocks) => [...prevBlocks, selectedSeats]);
       createBlock();
@@ -804,6 +809,26 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     });
   }
 
+  const [blockDict, setBlockDict] = useState({});
+
+  // Function to add or update a value in the dictionary
+  const updateBlockDict = (key, list) => {
+    setBlockDict((prevDictionary) => {
+      return {
+        ...prevDictionary,
+        [key]: list,
+      };
+    });
+  };
+
+  // // Function to retrieve numbers from the dictionary
+  // const getLayout = (venueId, num) => {
+  //   let layout = layoutDict[venueId];
+  //   //console.log(layoutDict[venueId]);
+  //   let result = layout[num];
+  //   return result;
+  // };
+
   async function listSeats(eventId) {
     try {
       const res = await fetch(
@@ -825,27 +850,20 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       console.log(data);
       setSectionID(data.seats[0].section_id);
       console.log(data.seats[0].section_id);
-      // if (data.blocks.length !== 0) {
-      //   setBlockId(data.blocks[0].id);
 
-      //   if (data.blocks[0].event_id === eventId) {
-      //     // Found the matching id, get the price and break the loop
-      //     let price = parseInt(data.blocks[0].price, 10);
-      //     if (price !== null) {
-      //       setCurrentTicketPrice(price);
-      //       console.log(eventId);
-      //       console.log(price);
-      //       return;
-      //     } else {
-      //       setCurrentTicketPrice(0);
-      //       return;
-      //     }
-      //   }
-      // } else {
-      //   setCurrentTicketPrice(0);
-      // }
-      // setTicketPrice(null);
-      // console.log("no ticket price found");
+      data.blocks.map((block) => {
+        // Call addShow for each event
+        let sectionID = block.section_id;
+        let startROW = block.start_row;
+        let endROW = block.end_row;
+        let price = block.price;
+        let blockID = block.id;
+
+        let keyList = [eventId,sectionID,startROW,endROW];
+        let key = keyList.join(', ');
+        updateBlockDict(key, [blockID, price]);
+      });
+
       return;
 
       // let price = parseInt(data[0].price, 10);
@@ -857,6 +875,11 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       console.error("Error occurred during listing seats:", error);
     }
   }
+
+  useEffect(() => {
+    console.log(blockDict);
+  }, [blockDict]);
+
 
   async function deleteBlock(blockId) {
     listSeats(selectedShow.id);
@@ -1164,6 +1187,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                 cols={getLayout(manager.id, 1)}
                                 show={selectedShow.id}
                                 sectionId={sectionID}
+                                blocks={blockDict}
                                 canSelect={true}
 
                               />
@@ -1173,6 +1197,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                 cols={getLayout(manager.id, 3)}
                                 show={selectedShow.id}
                                 sectionId={sectionID+1}
+                                blocks={blockDict}
                                 canSelect={true}
                               />
                               <Section
@@ -1181,6 +1206,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                 cols={getLayout(manager.id, 5)}
                                 show={selectedShow.id}
                                 sectionId={sectionID+2}
+                                blocks={blockDict}
                                 canSelect={true}
                               />
                             </div>
