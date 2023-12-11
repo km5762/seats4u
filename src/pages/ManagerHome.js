@@ -34,7 +34,7 @@ const Seat = ({ row, col, onClick, selected, blocked, selectedAndBlocked }) => (
 );
 
 // Section component containing a grid of seats
-const Section = ({ title, rows, cols, canSelect, show, sectionId }) => {
+const Section = ({ title, rows, cols, canSelect, show, sectionId, blockDict }) => {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [blockedSeats, setBlockedSeats] = useState([]);
   const [blocks, setBlocks] = useState([]);
@@ -172,6 +172,7 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId }) => {
 
   const deleteBlock = () => {
     if (selectedBlock.length > 0) {
+      deleteBlockC();
       console.log(selectedBlock);
       setBlocks((prevBlocks) =>
         prevBlocks.filter((block) => block !== selectedBlock)
@@ -187,6 +188,16 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId }) => {
       setSelectedBlock([]);
     }
   };
+
+  const deleteBlockC = () => {
+    let startRow = selectedBlock[0].row - 1;
+    let endRow = selectedBlock[selectedBlock.length-1].row - 1;
+    let keyList = [show, sectionId, startRow, endRow];
+    let key = keyList.join(', ');
+    let info = blockDict[key];
+    console.log(key);
+    console.log(info);
+  }
 
 
   return (
@@ -1187,7 +1198,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                 cols={getLayout(manager.id, 1)}
                                 show={selectedShow.id}
                                 sectionId={sectionID}
-                                blocks={blockDict}
+                                blockDict={blockDict}
                                 canSelect={true}
 
                               />
@@ -1197,7 +1208,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                 cols={getLayout(manager.id, 3)}
                                 show={selectedShow.id}
                                 sectionId={sectionID+1}
-                                blocks={blockDict}
+                                blockDict={blockDict}
                                 canSelect={true}
                               />
                               <Section
@@ -1206,7 +1217,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                 cols={getLayout(manager.id, 5)}
                                 show={selectedShow.id}
                                 sectionId={sectionID+2}
-                                blocks={blockDict}
+                                blockDict={blockDict}
                                 canSelect={true}
                               />
                             </div>
