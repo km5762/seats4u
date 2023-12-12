@@ -45,10 +45,7 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
   const [ticketPrice, setTicketPrice] = useState(null);
 
   async function createBlock() {
-    // listSeats(selectedShow.id);
-    // if (blockId !== null){
-    //   //deleteCurrentBlock
-    // }
+
     console.log("Create Block")
     console.log("Show ID");
     console.log(show);
@@ -89,13 +86,10 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
         }
       );
 
-      // const data = await res.json();
-      // console.log(data)
       await listBlock(show);
 
       setTicketPrice(null);
       setSelectedSeats([]);
-      // setPriceSubmitted(true);
     } catch (error) {
       console.error("Error occurred during creating blocks:", error);
     }
@@ -117,20 +111,12 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
       )
 
       if (!isSeatSelected && !isSeatBlocked) {
-        // Add the selected seat to the list
-        // setSelectedSeats(prevSeats => [...prevSeats, { row, col }]);
-        // console.log(row);
-        // console.log(col);
         for (let col = 1; col < maxCols + 1; col++) {
           setSelectedSeats((prevSeats) => [...prevSeats, { row, col }]);
-          // console.log(row);
-          // console.log(col);
-          // console.log(selectedSeats);
         }
         setSelectedBlock([]);
       } 
       else if (isSeatSelected && !isSeatBlocked) {
-        // Remove the selected seat from the list if it's already selected
         for (let col = 1; col < maxCols + 1; col++) {
           setSelectedSeats((prevSeats) =>
             prevSeats.filter((seat) => !(seat.row === row && seat.col === col))
@@ -153,7 +139,6 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
 
   const addBlock = () => {
     if (selectedSeats.length > 0) {
-      //console.log(selectedSeats);
       setBlockedSeats((prevSeats) => [...prevSeats, ...selectedSeats]);
       setBlocks((prevBlocks) => [...prevBlocks, selectedSeats]);
       createBlock();
@@ -191,14 +176,6 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
     });
   };
 
-  // // Function to retrieve numbers from the dictionary
-  // const getLayout = (venueId, num) => {
-  //   let layout = layoutDict[venueId];
-  //   //console.log(layoutDict[venueId]);
-  //   let result = layout[num];
-  //   return result;
-  // };
-
   async function listBlock(eventId) {
     try {
       const res = await fetch(
@@ -219,7 +196,6 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
       const data = await res.json();
 
       data.blocks.map((block) => {
-        // Call addShow for each event
         let sectionID = block.section_id;
         let startROW = block.start_row;
         let endROW = block.end_row;
@@ -234,20 +210,19 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
         console.log("Listing block initially");
         data.blocks.map((block) => {
           if (block.section_id === sectionId){
-            //let blockedlist = [];
             console.log(sectionId);
             console.log(block);
+            let newBlocks = [];
             for (let rowIndex = block.start_row; rowIndex <= block.end_row; rowIndex++){
               for (let colIndex = 0; colIndex < cols; colIndex++){
                 let row = rowIndex + 1;
                 let col = colIndex + 1;
-                // console.log(rowUpdated, colUpdated);
                 console.log(row, col);
-                //blockedlist.push({row, col});
                 setBlockedSeats((prevSeats) => [...prevSeats, {row, col}]);
+                newBlocks.push({col, row});
               }
             }
-            //console.log(blockedlist);
+            setBlocks((prevBlocks) => [...prevBlocks, newBlocks]);
           }
         })
       };
@@ -257,12 +232,6 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
       console.error("Error occurred during listing seats:", error);
     }
   }
-
-  // useEffect(() => {
-  //   console.log(blockedSeats);
-  // }, [blockedSeats]);
-
-
 
   async function deleteBlockC() {
     let startRow = selectedBlock[0].row - 1;
@@ -297,16 +266,8 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
       );
 
       const blockDictCopy = { ...blockDict };
-
-      // Use the delete operator to remove the specified key
       delete blockDictCopy[key];
-  
-      // Update the state with the modified dictionary
       setBlockDict(blockDictCopy);
-
-      // const data = await res.json();
-      // console.log(data)
-      // setTicketPrice(null);
     } catch (error) {
       console.error("Error occurred during creating blocks:", error);
     }
@@ -317,35 +278,25 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
   async function getInitBlocks() {
     if (!initBlocks) {
       await listBlock(show);
-    //   console.log("getting initial blocks");
-    //   let row = 1;
-    //   let newBlocks = [];
-    //   for (let col = 1; col <  3; col++) {
-    //     setBlockedSeats((prevSeats) => [...prevSeats, { col, row }]);
-    //     const seat = {col, row};
-    //     newBlocks.push(seat);
-    //   }
-      console.log("Finished")
       setInitBlocks(true);
-      // console.log(blockDict);
-    //   console.log(newBlocks);
-    //   setBlocks((prevBlocks) => [...prevBlocks, newBlocks]);
     }
   }
 
-  // useEffect(() => {
-  //   console.log(blockDict);
-  // }, [blockDict]);
-
   const listBlocksC = () =>{
-    listBlock(show);
+    //listBlock(show);
     setListBlocks(true);
   }
+
+  // useEffect(() => {
+  //   console.log("USE EFFECT")
+  //   getInitBlocks();
+  // }, []);
+
+  if (canSelect){getInitBlocks();}
 
   return (
     <div style={{ padding: "4px" }}>
       <h4>{title}</h4>
-      {!initBlocks && (<button onClick={getInitBlocks}>Get Layout</button>)}
       {initBlocks && (
         <div style={{ display: "grid", gridTemplateColumns: `auto repeat(${cols}, 1fr)` }}>
           {Array.from({ length: rows }, (_, rowIndex) => (
@@ -593,36 +544,6 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
     listShows();
 
-    // if (receivedData && receivedData.events && receivedData.events.length > 0) {
-    //   const events = receivedData.events;
-
-    //   // Filter unique events by ID
-    //   const uniqueEvents = [...new Map(events.map(event => [event.id, event])).values()];
-
-    //   const showsFromEvents = uniqueEvents
-    //     .filter(event => event.date) // Filter out events without a date
-    //     .map((event) => {
-    //       const { id, name, date, active } = event;
-    //       const utcDate = new Date(date);
-
-    //       const localDate = utcDate.toLocaleDateString();
-    //       const localTime = utcDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-
-    //       return {
-    //         id,
-    //         name,
-    //         date: localDate,
-    //         time: localTime,
-    //         active,
-    //       };
-    //     });
-
-    //   setShows(showsFromEvents);
-    //   if (initialShowCount === 0) {
-    //     setInitialShowCount(uniqueEvents.length);
-    //     setShowNum(uniqueEvents.length);
-    // }
-    // }
   }, [receivedData]);
 
   const createVenue = () => {
@@ -966,25 +887,6 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     });
   }
 
-  // const [blockDict, setBlockDict] = useState({});
-
-  // // Function to add or update a value in the dictionary
-  // const updateBlockDict = (key, list) => {
-  //   setBlockDict((prevDictionary) => {
-  //     return {
-  //       ...prevDictionary,
-  //       [key]: list,
-  //     };
-  //   });
-  // };
-
-  // // Function to retrieve numbers from the dictionary
-  // const getLayout = (venueId, num) => {
-  //   let layout = layoutDict[venueId];
-  //   //console.log(layoutDict[venueId]);
-  //   let result = layout[num];
-  //   return result;
-  // };
 
   async function listSeats(eventId) {
     try {
@@ -1008,18 +910,6 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       setSectionID(data.seats[0].section_id);
       console.log(data.seats[0].section_id);
 
-      // data.blocks.map((block) => {
-      //   // Call addShow for each event
-      //   let sectionID = block.section_id;
-      //   let startROW = block.start_row;
-      //   let endROW = block.end_row;
-      //   let price = block.price;
-      //   let blockID = block.id;
-
-      //   let keyList = [eventId,sectionID,startROW,endROW];
-      //   let key = keyList.join(', ');
-      //   updateBlockDict(key, [blockID, price]);
-      // });
 
       return;
 
@@ -1033,81 +923,8 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     }
   }
 
-  // useEffect(() => {
-  //   console.log(blockDict);
-  // }, [blockDict]);
 
 
-  // async function deleteBlock(blockId) {
-  //   listSeats(selectedShow.id);
-  //   if (blockId !== null) {
-  //     //deleteCurrentBlock
-  //   }
-
-  //   try {
-  //     const res = await fetch(
-  //       "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/deleteblocks",
-  //       {
-  //         credentials: "include",
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Accept: "application/json",
-  //         },
-  //         body: JSON.stringify([
-  //           {
-  //             bloackIds: blockId,
-  //           },
-  //         ]),
-  //       }
-  //     );
-
-  //     // const data = await res.json();
-  //     // console.log(data)
-  //     setTicketPrice(null);
-  //   } catch (error) {
-  //     console.error("Error occurred during creating blocks:", error);
-  //   }
-  //   setCurrentTicketPrice(null);
-  // }
-
-  // async function createBlock() {
-  //   // listSeats(selectedShow.id);
-  //   // if (blockId !== null){
-  //   //   //deleteCurrentBlock
-  //   // }
-
-  //   try {
-  //     const res = await fetch(
-  //       "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/createblocks",
-  //       {
-  //         credentials: "include",
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Accept: "application/json",
-  //         },
-  //         body: JSON.stringify([
-  //           {
-  //             eventId: selectedShow.id,
-  //             sectionId: null,
-  //             price: ticketPrice,
-  //             startRow: null,
-  //             endRow: null,
-  //           },
-  //         ]),
-  //       }
-  //     );
-
-  //     // const data = await res.json();
-  //     // console.log(data)
-  //     setTicketPrice(null);
-  //     // setPriceSubmitted(true);
-  //   } catch (error) {
-  //     console.error("Error occurred during creating blocks:", error);
-  //   }
-  //   // setCurrentTicketPrice(null);
-  // }
   const handleBackCreateShow = () => {
     setShowName("");
     setShowDate("");
@@ -1115,8 +932,6 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     setShowCreating(false);
     setSubmitLoading(false);
   };
-
-  // const [priceSubmitted, setPriceSubmitted] = useState(false);
 
   const handleCurrentPrice = () => {
     listSeats(selectedShow.id);
@@ -1317,26 +1132,6 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                             }}
                           >
                             <h3>Venue Layout</h3>
-                            {/* {!priceSubmitted && (
-                              <div>
-                                <input
-                                  type="number"
-                                  value={ticketPrice}
-                                  onChange={(e) =>
-                                    setTicketPrice(e.target.value)
-                                  }
-                                  placeholder="Enter ticket price"
-                                />
-                                <p></p>
-                                <p>
-                                  This ticket price will be assigned to all
-                                  seats: ${ticketPrice}
-                                </p>
-                                <button onClick={createBlock}>
-                                  Submit ticket price
-                                </button>
-                              </div>
-                            )} */}
                             <div style={{ display: "flex" }}>
                               <Section
                                 title="Left"
