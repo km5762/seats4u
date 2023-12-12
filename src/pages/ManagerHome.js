@@ -229,13 +229,40 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
         let key = `${eventId}_${sectionID}_${startROW}_${endROW}`;
         updateBlockDict(key, [blockID, price]);
       });
-      console.log(blockDict);
+
+      if (!initBlocks){
+        console.log("Listing block initially");
+        data.blocks.map((block) => {
+          if (block.section_id === sectionId){
+            //let blockedlist = [];
+            console.log(sectionId);
+            console.log(block);
+            for (let rowIndex = block.start_row; rowIndex <= block.end_row; rowIndex++){
+              for (let colIndex = 0; colIndex < cols; colIndex++){
+                let row = rowIndex + 1;
+                let col = colIndex + 1;
+                // console.log(rowUpdated, colUpdated);
+                console.log(row, col);
+                //blockedlist.push({row, col});
+                setBlockedSeats((prevSeats) => [...prevSeats, {row, col}]);
+              }
+            }
+            //console.log(blockedlist);
+          }
+        })
+      };
 
       return;
     } catch (error) {
       console.error("Error occurred during listing seats:", error);
     }
   }
+
+  // useEffect(() => {
+  //   console.log(blockedSeats);
+  // }, [blockedSeats]);
+
+
 
   async function deleteBlockC() {
     let startRow = selectedBlock[0].row - 1;
@@ -287,8 +314,9 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
 
   const [initBlocks, setInitBlocks] = useState(false);
 
-  const getInitBlocks = () => {
+  async function getInitBlocks() {
     if (!initBlocks) {
+      await listBlock(show);
     //   console.log("getting initial blocks");
     //   let row = 1;
     //   let newBlocks = [];
@@ -297,25 +325,27 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
     //     const seat = {col, row};
     //     newBlocks.push(seat);
     //   }
+      console.log("Finished")
       setInitBlocks(true);
+      // console.log(blockDict);
     //   console.log(newBlocks);
     //   setBlocks((prevBlocks) => [...prevBlocks, newBlocks]);
     }
   }
+
+  // useEffect(() => {
+  //   console.log(blockDict);
+  // }, [blockDict]);
 
   const listBlocksC = () =>{
     listBlock(show);
     setListBlocks(true);
   }
 
-  // important, do not remove
-  useEffect(() => {
-    if (canSelect) {getInitBlocks();}
-  }, []);
-
   return (
     <div style={{ padding: "4px" }}>
       <h4>{title}</h4>
+      {!initBlocks && (<button onClick={getInitBlocks}>Get Layout</button>)}
       {initBlocks && (
         <div style={{ display: "grid", gridTemplateColumns: `auto repeat(${cols}, 1fr)` }}>
           {Array.from({ length: rows }, (_, rowIndex) => (
