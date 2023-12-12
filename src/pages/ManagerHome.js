@@ -225,6 +225,7 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
             setBlocks((prevBlocks) => [...prevBlocks, newBlocks]);
           }
         })
+        setInitBlocks(true);
       };
 
       return;
@@ -278,7 +279,6 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
   async function getInitBlocks() {
     if (!initBlocks) {
       await listBlock(show);
-      setInitBlocks(true);
     }
   }
 
@@ -292,11 +292,12 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
   //   getInitBlocks();
   // }, []);
 
-  if (canSelect){getInitBlocks();}
+  //if (canSelect){getInitBlocks();}
 
   return (
     <div style={{ padding: "4px" }}>
       <h4>{title}</h4>
+      {!initBlocks && (<button onClick={getInitBlocks}>Get Layout</button>)}
       {initBlocks && (
         <div style={{ display: "grid", gridTemplateColumns: `auto repeat(${cols}, 1fr)` }}>
           {Array.from({ length: rows }, (_, rowIndex) => (
@@ -359,27 +360,31 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
           <button onClick={deleteBlock}>Delete block</button>
         </div>
       )}
-      {listBlocks ? (
-        <button onClick={() => setListBlocks(false)}>Hide Blocks</button>
-      ):(
-        <button onClick={listBlocksC}>List Blocks</button>
-      )
-      }
-      {listBlocks &&
-        blocks.length > 0 && blocks.map((block, index) => (
-          <div>
-            <p>Block</p>
-            <span key={index}>
-              {block.length > 0 &&
-                block.map((seat, j) => (
-                  <p key={j}>{`${String.fromCharCode(
-                    64 + seat.row
-                  ).toUpperCase()}-${seat.col}`}</p>
-                ))}
-            </span>
-          </div>
-        ))
-      }
+      {initBlocks && (
+        <div>
+          {listBlocks ? (
+            <button onClick={() => setListBlocks(false)}>Hide Blocks</button>
+          ):(
+            <button onClick={listBlocksC}>List Blocks</button>
+          )
+          }
+          {listBlocks &&
+            blocks.length > 0 && blocks.map((block, index) => (
+              <div>
+                <p>Block</p>
+                <span key={index}>
+                  {block.length > 0 &&
+                    block.map((seat, j) => (
+                      <p key={j}>{`${String.fromCharCode(
+                        64 + seat.row
+                      ).toUpperCase()}-${seat.col}`}</p>
+                    ))}
+                </span>
+              </div>
+            ))
+          }
+        </div>
+      )}
     </div>
   );
 };
