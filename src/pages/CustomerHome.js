@@ -32,8 +32,6 @@ const Show = ({ name, date, time, venue, onClick, eventId }) => (
     <p>
       <strong>Event ID:</strong> {eventId}
     </p>
-    {/* <p><strong>Date:</strong> {date.split("T")[0]}</p>
-    <p><strong>Time:</strong> {date.split("T")[1].split("Z")[0]}</p> */}
   </div>
 );
 
@@ -45,13 +43,6 @@ const Seat = ({ row, col, onClick, selected, blocked, available }) => (
       margin: "2px",
       cursor: "pointer",
       backgroundColor:
-        // selected && !blocked
-        //   ? 'lightblue' // Light blue when selected and not blocked
-        //   : blocked && !selected
-        //   ? 'blue' // Blue when blocked and not selected
-        //   : selected && blocked
-        //   ? 'blue' // Blue when both selected and blocked
-        //   : 'white', // White when neither selected nor blocked
         selected ? "lightblue" : available && !blocked ? "white" : "gray",
     }}
     onClick={() => onClick(row, col)}
@@ -66,8 +57,7 @@ const Section = ({
   rows,
   cols,
   canSelect,
-  selectedShowList,
-  ticketPrice,
+  ticketPriceList,
   availableList,
   startId,
 }) => {
@@ -76,17 +66,9 @@ const Section = ({
   const [blocks, setBlocks] = useState([]);
 
   const handleSeatClick = (row, col, cost) => {
+    cost = parseInt(cost, 10);
     let id = startId + (row - 1) * cols + col - 1;
-    console.log("Start Id");
-    console.log(startId);
-    console.log("ID: ");
-    console.log(id);
-    // console.log(availableList);
-    // console.log((row-1) * cols + col - 1);
-    // console.log(availableList[(row-1) * cols + col - 1] === 1)
     if (canSelect && availableList[(row - 1) * cols + col - 1] === 1) {
-      // console.log("Select")
-      // Check if the seat is already selected
       const isSeatSelected = selectedSeats.some(
         (seat) => seat.row === row && seat.col === col
       );
@@ -94,10 +76,8 @@ const Section = ({
         (seat) => seat.row === row && seat.col === col
       );
       if (!isSeatSelected && !isSeatBlocked) {
-        // Add the selected seat to the list
         setSelectedSeats((prevSeats) => [...prevSeats, { row, col, cost, id }]);
       } else {
-        // Remove the selected seat from the list if it's already selected
         setSelectedSeats((prevSeats) =>
           prevSeats.filter((seat) => !(seat.row === row && seat.col === col))
         );
@@ -112,12 +92,8 @@ const Section = ({
       for (let index = 0; index < selectedSeats.length; index++) {
         idList.push(selectedSeats[index].id);
       }
-      console.log(idList);
       purchaseSeatsC(idList);
-      // console.log(title);
-      // console.log(selectedSeats);
       setBlockedSeats((prevSeats) => [...prevSeats, ...selectedSeats]);
-      // setBlocks(prevBlocks => [...prevBlocks, selectedSeats]);
       setSelectedSeats([]);
     }
   };
@@ -135,7 +111,7 @@ const Section = ({
                 row={rowIndex + 1}
                 col={colIndex + 1}
                 onClick={() =>
-                  handleSeatClick(rowIndex + 1, colIndex + 1, ticketPrice)
+                  handleSeatClick(rowIndex + 1, colIndex + 1, ticketPriceList[rowIndex * cols + colIndex])
                 }
                 selected={selectedSeats.some(
                   (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
@@ -199,20 +175,8 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
   const [selectedShow, setSelectedShow] = useState(null);
   const [selectedShowList, setSelectedShowList] = useState(null);
-  // const [leftRow, setLeftRow] = useState("");
-  // const [leftCol, setLeftCol] = useState("");
-  // const [rightRow, setRightRow] = useState("");
-  // const [rightCol, setRightCol] = useState("");
-  // const [centerRow, setCenterRow] = useState("");
-  // const [centerCol, setCenterCol] = useState("");
 
-  const [layoutDict, setLayoutDict] = useState({
-    //1: [10, 20],
-  });
-
-  // useEffect(() => {
-  //   console.log(layoutDict);
-  // }, [layoutDict]);
+  const [layoutDict, setLayoutDict] = useState({});
 
   const navigate = useNavigate();
 
@@ -324,13 +288,15 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   const handleShowClick = async (index) => {
     setSelectedShow(searchResults[index]);
     let result = searchResults[index];
-    await listSeats(result.event_id);
+    console.log(result);
+    await listSeats(result.event_id, result.venue_id);
   };
 
   const handleShowClickList = async (index) => {
     setSelectedShowList(listOfShows[index]);
     let result = listOfShows[index];
-    await listSeats(result.id);
+    console.log(result);
+    await listSeats(result.id, result.venue_id);
   };
 
   const handleUnselectShow = () => {
@@ -410,11 +376,13 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     });
   }
 
-  const [ticketPrice, setTicketPrice] = useState(null);
+  const [leftTicketPriceList, setLeftTicketPriceList] = useState([]);
+  const [midTicketPriceList, setMidTicketPriceList] = useState([]);
+  const [rightTicketPriceList, setRightTicketPriceList] = useState([]);
   const [availableList, setAvailableList] = useState([]);
   const [startId, setStartId] = useState(null);
 
-  async function listSeats(eventId) {
+  async function listSeats(eventId, venueId) {
     setAvailableList([]);
 
     try {
@@ -435,8 +403,6 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
       const data = await res.json();
 
-      //console.log(data.length);
-
       setStartId(data.seats[0].id);
 
       for (let index = 0; index < data.seats.length; index++) {
@@ -447,36 +413,77 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
         console.log(data.seats[index].available);
       }
 
-      let price = parseInt(data.blocks[0].price, 10);
-      setTicketPrice(price);
-      console.log(price);
+      // Group blocks by section_id
+      const groupedBlocks = data.blocks.reduce((acc, block) => {
+        const sectionId = block.section_id;
+        if (!acc[sectionId]) {acc[sectionId] = [];}
+        acc[sectionId].push(block);
+        return acc;
+      }, {});
 
-      // for (let index = 0; index < data.blocks.length; index++) {
-      //   if (data.blocks[index].event_id === eventId) {
-      //     // Found the matching id, get the price and break the loop
-      //     let price = parseInt(data.blocks[index].price, 10);
-      //     setTicketPrice(price);
-      //     console.log(eventId);
-      //     console.log(price);
-      //     return;
-      //   }
-      // }
-      // setTicketPrice(null);
-      // console.log("no ticket price found");
+      // Sort each section list by start_row
+      const sortedBlocks = Object.keys(groupedBlocks).reduce((acc, sectionId) => {
+        const sortedList = groupedBlocks[sectionId].sort((a, b) => a.start_row - b.start_row);
+        acc.push(sortedList);
+        return acc;
+      }, []);
+
+      const leftCostList =[];
+      const midCostList =[];
+      const rightCostList =[];
+
+      const leftCol = getLayout(venueId, 1);
+      const midCol = getLayout(venueId, 3);
+      const rightCol = getLayout(venueId, 5);
+
+      const leftBlocks = sortedBlocks[0];
+      const midBlocks = sortedBlocks[1];
+      const rightBlocks = sortedBlocks[2];
+
+      console.log(leftBlocks)
+      console.log(midBlocks)
+      console.log(rightBlocks)
+
+      leftBlocks.forEach((block) => {
+        const numColumns = leftCol;
+        for (let row =  block.start_row; row <= block.end_row; row++) {
+          for (let col = 1; col <= numColumns; col++) {
+            leftCostList.push(block.price);
+          }
+        }
+        console.log(leftCostList);
+      });
+
+      midBlocks.forEach((block) => {
+        const numColumns = midCol;
+        for (let row =  block.start_row; row <= block.end_row; row++) {
+          for (let col = 1; col <= numColumns; col++) {
+            midCostList.push(block.price);
+          }
+        }
+        console.log(midCostList);
+      });
+
+      rightBlocks.forEach((block) => {
+        const numColumns = rightCol;
+        for (let row =  block.start_row; row <= block.end_row; row++) {
+          for (let col = 1; col <= numColumns; col++) {
+            rightCostList.push(block.price);
+          }
+        }
+        console.log(rightCostList);
+      });
+
+      setLeftTicketPriceList(leftCostList);
+      setMidTicketPriceList(midCostList);
+      setRightTicketPriceList(rightCostList);
+
       return;
 
-      // let price = parseInt(data[0].price, 10);
-      // setTicketPrice(price);
-      // console.log(data);
-      // console.log(data[0]);
-      // console.log(data[0].price);
     } catch (error) {
       console.error("Error occurred during listing seats:", error);
     }
   }
-  // useEffect(() => {
-  //   console.log(startId);
-  // }, [startId]);
 
   return (
     <div>
@@ -509,14 +516,6 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       )}
 
       <div className="upper-right-text">
-        {/* {loggedInUser ? (
-            <div>
-              <p>Welcome back, {loggedInUser.role} {loggedInUser.username}! Now you may purchase tickets.</p>
-              <button onClick={onLogout}>Logout</button>
-            </div>
-          ) : (
-              <p>Please <Link to="/login">log in</Link> here.</p>
-          )} */}
         <p>
           Please <Link to="/login">log in</Link> here.
         </p>
@@ -572,7 +571,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   rows={getLayout(selectedShow.venue_id, 0)}
                   cols={getLayout(selectedShow.venue_id, 1)}
                   canSelect={true}
-                  ticketPrice={ticketPrice}
+                  ticketPriceList={leftTicketPriceList}
                   availableList={availableList.slice(
                     0,
                     getLayout(selectedShow.venue_id, 0) *
@@ -585,7 +584,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   rows={getLayout(selectedShow.venue_id, 2)}
                   cols={getLayout(selectedShow.venue_id, 3)}
                   canSelect={true}
-                  ticketPrice={ticketPrice}
+                  ticketPriceList={midTicketPriceList}
                   availableList={availableList.slice(
                     getLayout(selectedShow.venue_id, 0) *
                     getLayout(selectedShow.venue_id, 1),
@@ -605,7 +604,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   rows={getLayout(selectedShow.venue_id, 4)}
                   cols={getLayout(selectedShow.venue_id, 5)}
                   canSelect={true}
-                  ticketPrice={ticketPrice}
+                  ticketPriceList={rightTicketPriceList}
                   availableList={availableList.slice(
                     getLayout(selectedShow.venue_id, 0) *
                     getLayout(selectedShow.venue_id, 1) +
@@ -670,7 +669,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   rows={getLayout(selectedShowList.venue_id, 0)}
                   cols={getLayout(selectedShowList.venue_id, 1)}
                   canSelect={true}
-                  ticketPrice={ticketPrice}
+                  ticketPriceList={leftTicketPriceList}
                   availableList={availableList.slice(
                     0,
                     getLayout(selectedShowList.venue_id, 0) *
@@ -683,7 +682,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   rows={getLayout(selectedShowList.venue_id, 2)}
                   cols={getLayout(selectedShowList.venue_id, 3)}
                   canSelect={true}
-                  ticketPrice={ticketPrice}
+                  ticketPriceList={midTicketPriceList}
                   availableList={availableList.slice(
                     getLayout(selectedShowList.venue_id, 0) *
                     getLayout(selectedShowList.venue_id, 1),
@@ -703,7 +702,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   rows={getLayout(selectedShowList.venue_id, 4)}
                   cols={getLayout(selectedShowList.venue_id, 5)}
                   canSelect={true}
-                  ticketPrice={ticketPrice}
+                  ticketPriceList={rightTicketPriceList}
                   availableList={availableList.slice(
                     getLayout(selectedShowList.venue_id, 0) *
                     getLayout(selectedShowList.venue_id, 1) +
@@ -729,26 +728,6 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
           </div>
         )}
       </div>
-
-      {/* <div className="lower-right-text">
-          {loggedInUser && loggedInUser.role === "Manager" ? (
-            <div>
-              <p>Now you are in Customer view.</p>
-              <Link to="/manager">Go back to Manager View</Link>
-            </div>
-          ) : (
-              <p></p>
-          )}
-
-          {loggedInUser && loggedInUser.role === "Administrator" ? (
-              <div>
-                <p>Now you are in Customer view.</p>
-                <Link to="/admin">Go back to Admin View</Link>
-              </div>
-          ) : (
-              <p></p>
-          )}
-        </div> */}
     </div>
   );
 };
