@@ -229,6 +229,7 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
         let key = `${eventId}_${sectionID}_${startROW}_${endROW}`;
         updateBlockDict(key, [blockID, price]);
       });
+      console.log(blockDict);
 
       return;
     } catch (error) {
@@ -267,6 +268,14 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
           ),
         }
       );
+
+      const blockDictCopy = { ...blockDict };
+
+      // Use the delete operator to remove the specified key
+      delete blockDictCopy[key];
+  
+      // Update the state with the modified dictionary
+      setBlockDict(blockDictCopy);
 
       // const data = await res.json();
       // console.log(data)
