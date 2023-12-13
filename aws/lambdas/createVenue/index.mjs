@@ -22,32 +22,13 @@ try {
 }
 
 export const handler = async (event) => {
-  const cookie = event.cookies[0];
+  const user = event.requestContext.authorizer.lambda;
   const { name, sections } = JSON.parse(event.body);
 
   if (!name || !sections) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "Venue name or sections is missing" }),
-    };
-  }
-
-  if (!cookie) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ error: "Cookie missing" }),
-    };
-  }
-
-  const token = cookie.split("=")[1];
-
-  let user;
-  try {
-    user = jwt.verify(token, jwtSecret);
-  } catch (error) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ error: "Invalid token" }),
     };
   }
 
@@ -59,7 +40,7 @@ export const handler = async (event) => {
         [user.sub]
       );
 
-      if (rows.length === 1) {
+      if (rows.length === 1 || user.roleId === Role.ADMIN) {
         const [res] = await connection.execute(
           "INSERT INTO venue (name) VALUES (?)",
           [name]
@@ -94,10 +75,12 @@ export const handler = async (event) => {
           console.error("JWT error: ", error);
         }
 
+        console.log(res.insertId);
         return {
           headers: {
             "Set-Cookie": `token=${token}; HttpOnly; SameSite=None; Secure`,
           },
+          body: JSON.stringify({ venueId: res.insertId }),
           statusCode: 200,
         };
       } else {

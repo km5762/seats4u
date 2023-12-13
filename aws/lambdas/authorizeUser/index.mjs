@@ -34,10 +34,7 @@ export const handler = function (event, context, callback) {
       callback(null, generatePolicy("user", "Allow", event.routeArn, user));
       break;
     case Role.VENUE_MANAGER:
-      if (
-        event.routeArn.includes("listvenues") ||
-        event.routeArn.includes("generateshowsreport")
-      ) {
+      if (event.routeArn.includes("listvenues")) {
         callback(null, generatePolicy("user", "Deny", event.routeArn, user));
       } else {
         callback(null, generatePolicy("user", "Allow", event.routeArn, user));

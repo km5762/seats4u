@@ -32,8 +32,6 @@ export const handler = async (event) => {
       [showsReport] = await connection.execute(query);
     }
 
-    console.log(showsReport);
-
     return {
       statusCode: 200,
       body: JSON.stringify(showsReport),

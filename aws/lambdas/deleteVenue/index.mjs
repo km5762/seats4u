@@ -1,13 +1,9 @@
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
-import jwt from "jsonwebtoken";
-import fs from "fs";
 
 dotenv.config();
 
 const Role = Object.freeze({ ADMIN: 1, VENUE_MANAGER: 2 });
-
-const jwtSecret = fs.readFileSync("private.key");
 
 let connection;
 try {
@@ -22,32 +18,13 @@ try {
 }
 
 export const handler = async (event) => {
-  const cookie = event.cookies[0];
+  const user = event.requestContext.authorizer.lambda;
   const requestedVenueId = JSON.parse(event.body).venueId;
-
-  if (!cookie) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ error: "Cookie missing" }),
-    };
-  }
 
   if (!requestedVenueId) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "venueId missing" }),
-    };
-  }
-
-  const token = cookie.split("=")[1];
-
-  let user;
-  try {
-    user = jwt.verify(token, jwtSecret);
-  } catch (error) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ error: "Invalid token" }),
     };
   }
 
