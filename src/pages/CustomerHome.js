@@ -413,6 +413,18 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
         console.log(data.seats[index].available);
       }
 
+      if (data.blocks[0].section_id === null) {
+        let leftSeatNumber = getLayout(venueId, 0) * getLayout(venueId, 1);
+        let midSeatNumber = getLayout(venueId, 2) * getLayout(venueId, 3);
+        let rightSeatNumber = getLayout(venueId, 4) * getLayout(venueId, 5);
+
+        setLeftTicketPriceList(Array.from({ length: leftSeatNumber }, () => data.blocks[0].price));
+        setMidTicketPriceList(Array.from({ length: midSeatNumber }, () => data.blocks[0].price));
+        setRightTicketPriceList(Array.from({ length: rightSeatNumber }, () => data.blocks[0].price));
+
+        return;
+      }
+
       // Group blocks by section_id
       const groupedBlocks = data.blocks.reduce((acc, block) => {
         const sectionId = block.section_id;

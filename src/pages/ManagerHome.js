@@ -942,6 +942,45 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     listSeats(selectedShow.id);
   };
 
+  async function createBlock(){
+    // listSeats(selectedShow.id);
+    // if (blockId !== null){
+    //   //deleteCurrentBlock
+    // }
+  
+    try {
+        const res = await fetch(
+        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/createblocks",
+        {
+            credentials: "include",
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                Accept: "application/json"
+            },
+            body: JSON.stringify(
+              [
+                {
+                  "eventId": selectedShow.id,
+                  "sectionId": null,
+                  "price": ticketPrice,
+                  "startRow": null,
+                  "endRow": null
+                }
+              ]
+            ),
+        }
+        );
+
+        // const data = await res.json();
+        // console.log(data)
+        setTicketPrice(null);
+    } catch (error) {
+        console.error("Error occurred during creating blocks:", error);
+    }
+    // setCurrentTicketPrice(null);
+  }
+
   return (
     <div>
       <div className="center-container">
@@ -1137,6 +1176,9 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                             }}
                           >
                             <h3>Venue Layout</h3>
+                            <input type="number" value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} placeholder="Enter ticket price"/><p></p>
+                            <p>This ticket price will be assigned to all seats: ${ticketPrice}</p>
+                            <button onClick={createBlock}>Submit ticket price</button>
                             <div style={{ display: "flex" }}>
                               <Section
                                 title="Left"
@@ -1145,7 +1187,6 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                 show={selectedShow.id}
                                 sectionId={sectionID}
                                 canSelect={true}
-
                               />
                               <Section
                                 title="Center"
