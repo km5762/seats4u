@@ -24,8 +24,8 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
         selected && !blocked
           ? "lightblue" // Light blue when selected and not blocked
           : blocked && !selected
-            ? "blue" // Blue when blocked and not selected
-            : "white", // White when neither selected nor blocked
+          ? "blue" // Blue when blocked and not selected
+          : "white", // White when neither selected nor blocked
     }}
     onClick={() => onClick(row, col)}
   >
@@ -84,21 +84,32 @@ const Section = ({ title, rows, cols, canSelect }) => {
   return (
     <div style={{ padding: "4px" }}>
       <h4>{title}</h4>
-      <div style={{ display: "grid", gridTemplateColumns: `auto repeat(${cols}, 1fr)` }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: `auto repeat(${cols}, 1fr)`,
+        }}
+      >
         {Array.from({ length: rows }, (_, rowIndex) => (
           <>
-            <div style={{ gridRow: rowIndex + 1, alignSelf: "center" }}>{String.fromCharCode(65 + rowIndex)}</div>
+            <div style={{ gridRow: rowIndex + 1, alignSelf: "center" }}>
+              {String.fromCharCode(65 + rowIndex)}
+            </div>
             {Array.from({ length: cols }, (_, colIndex) => (
               <Seat
                 key={`${rowIndex}-${colIndex}`}
                 row={rowIndex + 1}
                 col={colIndex + 1}
-                onClick={() => handleSeatClick(rowIndex + 1, colIndex + 1, cols)}
+                onClick={() =>
+                  handleSeatClick(rowIndex + 1, colIndex + 1, cols)
+                }
                 selected={selectedSeats.some(
-                  (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
+                  (seat) =>
+                    seat.row === rowIndex + 1 && seat.col === colIndex + 1
                 )}
                 blocked={blockedSeats.some(
-                  (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
+                  (seat) =>
+                    seat.row === rowIndex + 1 && seat.col === colIndex + 1
                 )}
               />
             ))}
@@ -224,127 +235,32 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   const [generatedToggle, setGeneratedToggle] = useState(true);
   const [reports, setReports] = useState([]);
 
-  useNavigate();
+  const navigate = useNavigate();
 
   const hideListOfShows = () => {
     setHideList(true);
     setListOfShows([]);
   };
 
-  // useEffect(() => {
-  //   const handleLogin = async () => {
-  //     // Simulate login logic (you would typically perform an API call here)
-  //     try {
-  //       const res = await fetch(
-  //         "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/signinuserbytoken",
-  //         {
-  //           credentials: "include",
-  //           method: "GET",
-  //         }
-  //       );
+  useEffect(() => {
+    const checkLogin = (event) => {
+      console.log("Checking login");
+      if (event && event.key === "login") {
+        const login = localStorage.getItem("login");
+        if (JSON.parse(login) === false) {
+          onLogout();
+          navigate("/");
+        }
+      }
+    };
 
-  //       const data = await res.json();
+    window.addEventListener("storage", checkLogin);
 
-  //       if (data && data.user) {
-  //         if (data.user.role_id === 2) {
-  //           if (data.venue && data.venue.length > 0) {
-  //             if (data.venue.length === 1) {
-  //               const singleVenue = data.venue[0];
-  //               console.log("Only one venue found:", singleVenue);
-  //               // Venue manager with a single venue
-  //               navigate("/manager", { state: { userData: data } });
-  //               localStorage.setItem("login", JSON.stringify(true));
-  //               console.log(res);
-  //               console.log(data);
-  //             }
-  //           } else {
-  //             console.log("No venues found in the response");
-  //             navigate("/manager", { state: { userData: data } });
-  //             localStorage.setItem("login", JSON.stringify(true));
-  //             console.log(res);
-  //             console.log(data);
-  //           }
+    return () => {
+      window.removeEventListener("storage", checkLogin);
+    };
+  }, [navigate, onLogout]);
 
-  //           // Set the logged-in user
-  //           setLoggedInUser(data.user);
-  //         } else if (data.user.role_id === 1) {
-  //           // Redirect to '/admin'
-  //           navigate("/admin", { state: { userData: data } });
-  //           setLoggedInUser(data.user);
-  //           localStorage.setItem("login", JSON.stringify(true));
-  //         } else {
-  //           console.log("User doesn't have the required role for this action");
-  //         }
-  //       } else {
-  //         console.log("Invalid user data or role information");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error occurred during login:", error);
-  //     }
-  //     // For simplicity, just set the logged-in user to the entered username
-  //     // setLoggedInUser({ username, role });
-  //   };
-
-  //   const checkLogin = (event) => {
-  //     console.log("Checking login");
-  //     if (event && event.key === "login") {
-  //       const login = localStorage.getItem("login");
-  //       if (JSON.parse(login) === true) {
-  //         handleLogin();
-  //       } else {
-  //         onLogout();
-  //         navigate("/");
-  //       }
-  //     }
-  //   };
-
-  //   const login = localStorage.getItem("login");
-  //   if (JSON.parse(login)) {
-  //     handleLogin();
-  //   } else {
-  //     onLogout();
-  //   }
-
-  //   window.addEventListener("storage", checkLogin);
-
-  //   return () => {
-  //     window.removeEventListener("storage", checkLogin);
-  //   };
-  // }, [navigate, setLoggedInUser, onLogout]);
-
-  // async function handleSearch(query) {
-  //   setSearchQuery((prevQuery) => {
-  //     // Define an async function to perform the API call
-  //     const fetchData = async () => {
-  //       try {
-  //         console.log(`Search query: ${query}`);
-  //         const res = await fetch(
-  //           "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/searchevents",
-  //           {
-  //             credentials: "include",
-  //             method: "POST",
-  //             headers: { "Content-Type": "application/json" },
-  //             body: JSON.stringify({ searchQuery: query }),
-  //           }
-  //         );
-  //         const data = await res.json();
-  //         setListOfShows(data.events);
-  //         setHideList(false);
-  //       } catch (error) {
-  //         console.error("Error occurred while searching show:", error);
-  //       }
-
-  //       // Continue with any other logic after the API call
-  //       console.log("API call completed");
-  //     };
-
-  //     // Call the async function immediately
-  //     fetchData();
-
-  //     // Return the new state value to update the state
-  //     return query;
-  //   });
-  // }
   const addShow = (newShow) => {
     setListOfShows((prevShows) => [...prevShows, newShow]);
   };
@@ -525,8 +441,8 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     return `${year.toString().padStart(2, "0")}-${month
       .toString()
       .padStart(2, "0")}-${day.toString().padStart(2, "0")}T${hours
-        .toString()
-        .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+      .toString()
+      .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
   };
   const handleDateTimeChange = (datetimeString) => {
     const selectedDate = new Date(datetimeString); // Convert string to Date object
@@ -580,7 +496,6 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       setShowCreating(false);
       setSubmitLoading(false);
     }, 2000);
-
 
     addShow({
       name: showName,
@@ -673,7 +588,14 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   return (
     <div>
       <div className="center-container">
-        <img src="/pictures/logo.png" alt="Logo" width="250" height="100" onClick={onLogout} style={{ cursor: 'pointer' }}/>
+        <img
+          src="/pictures/logo.png"
+          alt="Logo"
+          width="250"
+          height="100"
+          onClick={onLogout}
+          style={{ cursor: "pointer" }}
+        />
       </div>
       <div>
         {loggedInUser && (
