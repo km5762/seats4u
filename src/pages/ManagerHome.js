@@ -1116,6 +1116,63 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     // setCurrentTicketPrice(null);
   }
 
+  const deleteBlockM = async () => {
+
+    let blockId = null;
+
+    try {
+      const res = await fetch(
+        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/listseats",
+        {
+          credentials: "include",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            eventId: selectedShow.id,
+          }),
+        }
+      );
+
+      const data = await res.json();
+      console.log(data);
+
+      blockId = data.blocks[0].id;
+      console.log(blockId)
+
+      try {
+        console.log("payload");
+        console.log([blockId]);
+        const res = await fetch(
+          "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/deleteblocks",
+          {
+            credentials: "include",
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              blockIds: [blockId],
+            }),
+          }
+        );
+      } catch (error) {
+        console.error("Error occurred during creating blocks:", error);
+      }
+
+      setTicketPrice(null);
+      setSubmittedPrice(false);
+
+    } catch (error) {
+      console.error("Error occurred during listing seats:", error);
+    }
+
+  }
+
+
   return (
     <div>
       <div className="center-container">
@@ -1353,7 +1410,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                   This ticket price has been assigned to all
                                   seats: ${ticketPrice}
                                 </p>
-                                <button>Delete current ticket price</button>
+                                <button onClick={deleteBlockM}>Delete current ticket price</button>
                               </div>
                             )}
                             <div style={{ display: "flex" }}>
