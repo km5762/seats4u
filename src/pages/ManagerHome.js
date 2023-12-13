@@ -916,7 +916,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       setSectionID(data.seats[0].section_id);
       console.log(data.seats[0].section_id);
 
-      if (data.blocks[0].section_id === null){
+      if (data.blocks.length > 0 && data.blocks[0].section_id === null){
         let price = parseInt(data.blocks[0].price, 10);
         console.log(price);
         setTicketPrice(price);
@@ -926,7 +926,6 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
         setTicketPrice(null);
         setSubmittedPrice(false);
       }
-
 
       return;
       // console.log(data);
@@ -984,6 +983,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
         // const data = await res.json();
         // console.log(data)
         // setTicketPrice(null);
+        setSubmittedPrice(true);
     } catch (error) {
         console.error("Error occurred during creating blocks:", error);
     }
