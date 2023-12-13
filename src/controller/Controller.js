@@ -215,6 +215,9 @@ export async function purchaseSeatsC(seatSelection) {
                 body: JSON.stringify({"seatIds": seatSelection}),
             }
         );
+        const data = await res.json();
+        console.log("Purchase Seats");
+        console.log(data);
     } catch (error) {
         console.error("Error occurred while activating show:", error);
     }

@@ -402,7 +402,8 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       );
 
       const data = await res.json();
-
+      console.log("list Seats");
+        console.log(data);
       setStartId(data.seats[0].id);
 
       for (let index = 0; index < data.seats.length; index++) {
