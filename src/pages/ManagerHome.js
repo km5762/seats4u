@@ -892,6 +892,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     });
   }
 
+  const [submittedPrice, setSubmittedPrice] = useState(false);
 
   async function listSeats(eventId) {
     try {
@@ -915,11 +916,19 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       setSectionID(data.seats[0].section_id);
       console.log(data.seats[0].section_id);
 
+      if (data.blocks[0].section_id === null){
+        let price = parseInt(data.blocks[0].price, 10);
+        console.log(price);
+        setTicketPrice(price);
+        setSubmittedPrice(true);
+      }
+      else {
+        setTicketPrice(null);
+        setSubmittedPrice(false);
+      }
+
 
       return;
-
-      // let price = parseInt(data[0].price, 10);
-      // setTicketPrice(price);
       // console.log(data);
       // console.log(data[0]);
       // console.log(data[0].price);
@@ -974,7 +983,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
         // const data = await res.json();
         // console.log(data)
-        setTicketPrice(null);
+        // setTicketPrice(null);
     } catch (error) {
         console.error("Error occurred during creating blocks:", error);
     }
@@ -1176,9 +1185,19 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                             }}
                           >
                             <h3>Venue Layout</h3>
-                            <input type="number" value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} placeholder="Enter ticket price"/><p></p>
-                            <p>This ticket price will be assigned to all seats: ${ticketPrice}</p>
-                            <button onClick={createBlock}>Submit ticket price</button>
+                            {submittedPrice === false ? (
+                              <div>
+                                <input type="number" value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} placeholder="Enter ticket price"/><p></p>
+                                <p>This ticket price will be assigned to all seats: ${ticketPrice}</p>
+                                <button onClick={createBlock}>Submit ticket price</button>
+                              </div>
+                            ):(
+                              <div>
+                                <p>This ticket price has been assigned to all seats: ${ticketPrice}</p>
+                                <button>Delete current ticket price</button>
+                              </div>
+                            )
+                            }
                             <div style={{ display: "flex" }}>
                               <Section
                                 title="Left"
@@ -1186,7 +1205,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                 cols={getLayout(manager.id, 1)}
                                 show={selectedShow.id}
                                 sectionId={sectionID}
-                                canSelect={true}
+                                canSelect={submittedPrice === false ? true : false}
                               />
                               <Section
                                 title="Center"
@@ -1194,7 +1213,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                 cols={getLayout(manager.id, 3)}
                                 show={selectedShow.id}
                                 sectionId={sectionID+1}
-                                canSelect={true}
+                                canSelect={submittedPrice === false ? true : false}
                               />
                               <Section
                                 title="Right"
@@ -1202,7 +1221,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                 cols={getLayout(manager.id, 5)}
                                 show={selectedShow.id}
                                 sectionId={sectionID+2}
-                                canSelect={true}
+                                canSelect={submittedPrice === false ? true : false}
                               />
                             </div>
                           </div>
