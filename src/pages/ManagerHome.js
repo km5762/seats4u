@@ -680,11 +680,118 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     setShowCreating(true);
   };
 
-  const activateShow = () => {
-    selectedShow.active = 1;
-    activateShowC(selectedShow);
-    console.log(selectedShow);
-    setSelectedShow(null);
+  const canActivate = async () => {
+    try {
+
+      let activation = false;
+
+      const res = await fetch(
+        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/listseats",
+        {
+          credentials: "include",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            eventId: selectedShow.id,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.blocks.length < 3) {
+        
+        activation = false;
+
+        return activation;
+      }
+
+      // Group blocks by section_id
+      const groupedBlocks = data.blocks.reduce((acc, block) => {
+        const sectionId = block.section_id;
+        if (!acc[sectionId]) {acc[sectionId] = [];}
+        acc[sectionId].push(block);
+        return acc;
+      }, {});
+
+      // Sort each section list by start_row
+      const sortedBlocks = Object.keys(groupedBlocks).reduce((acc, sectionId) => {
+        const sortedList = groupedBlocks[sectionId].sort((a, b) => a.start_row - b.start_row);
+        acc.push(sortedList);
+        return acc;
+      }, []);
+
+      const leftCol = getLayout(manager.id, 1);
+      const midCol = getLayout(manager.id, 3);
+      const rightCol = getLayout(manager.id, 5);
+
+      const leftBlocks = sortedBlocks[0];
+      const midBlocks = sortedBlocks[1];
+      const rightBlocks = sortedBlocks[2];
+
+      let numberOfBlockedSeats = 0;
+
+      leftBlocks.forEach((block) => {
+        const numColumns = leftCol;
+        for (let row =  block.start_row; row <= block.end_row; row++) {
+          for (let col = 1; col <= numColumns; col++) {
+            numberOfBlockedSeats++;
+          }
+        }
+      });
+
+      midBlocks.forEach((block) => {
+        const numColumns = midCol;
+        for (let row =  block.start_row; row <= block.end_row; row++) {
+          for (let col = 1; col <= numColumns; col++) {
+            numberOfBlockedSeats++;
+          }
+        }
+      });
+
+      rightBlocks.forEach((block) => {
+        const numColumns = rightCol;
+        for (let row =  block.start_row; row <= block.end_row; row++) {
+          for (let col = 1; col <= numColumns; col++) {
+            numberOfBlockedSeats++;
+          }
+        }
+      });
+
+      let numberOfSeats = getLayout(manager.id, 0) * getLayout(manager.id, 1) + 
+                          getLayout(manager.id, 2) * getLayout(manager.id, 3) +
+                          getLayout(manager.id, 4) * getLayout(manager.id, 5);
+
+      console.log("Number of seats", numberOfSeats)
+      console.log("Number of blocked seats", numberOfBlockedSeats)
+      
+      activation = numberOfSeats === numberOfBlockedSeats;
+
+      console.log(activation);
+
+      return activation;
+
+    } catch (error) {
+      console.error("Error occurred during listing seats:", error);
+    }
+  }
+
+  const activateShow = async () => {
+
+    let activation = await canActivate();
+
+    if (activation) {
+      selectedShow.active = 1;
+      activateShowC(selectedShow);
+      console.log(selectedShow);
+      setSelectedShow(null);
+    }
+    else{
+      console.log("You cannot activate show until all the seats belongs to a block.")
+    }
   };
 
   const Report = ({
