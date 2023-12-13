@@ -191,7 +191,12 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId }) => {
 
       const data = await res.json();
 
+      const availableSeats = data.seats.filter(seat => (seat.available === 1 && seat.section_id === sectionId));
+
+      console.log(availableSeats);
+
       data.blocks.map((block) => {
+
         let sectionID = block.section_id;
         let startROW = block.start_row;
         let endROW = block.end_row;
@@ -199,7 +204,19 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId }) => {
         let blockID = block.id;
 
         let key = `${eventId}_${sectionID}_${startROW}_${endROW}`;
-        updateBlockDict(key, [blockID, price]);
+
+        let seatsInThisBlock = 0;
+        availableSeats.map((seat) => {
+          if (seat.section_row <= endROW && seat.section_row >= startROW){
+            seatsInThisBlock++;
+            // console.log("Row: ", seat.section_row)
+            // console.log("Col: ", seat.section_col)
+            // console.log("Start row: ", startROW)
+            // console.log("Start col: ", endROW)
+          }
+        })
+        console.log(seatsInThisBlock)
+        updateBlockDict(key, [blockID, price, seatsInThisBlock]);
       });
 
       if (!initBlocks) {
@@ -376,19 +393,27 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId }) => {
           )}
           {listBlocks &&
             blocks.length > 0 &&
-            blocks.map((block, index) => (
-              <div>
-                <p>Block</p>
-                <span key={index}>
-                  {block.length > 0 &&
-                    block.map((seat, j) => (
-                      <p key={j}>{`${String.fromCharCode(
-                        64 + seat.row
-                      ).toUpperCase()}-${seat.col}`}</p>
-                    ))}
-                </span>
-              </div>
-            ))}
+            blocks.map((block, index) => {
+              const startRow = block[0].row - 1;
+              const endRow = block[block.length - 1].row - 1;
+
+              const blockKey = `${show}_${sectionId}_${startRow}_${endRow}`;
+              const info = blockDict[blockKey];
+              const blockPrice = info[1];
+              const seatsAvailable = info[2];
+              const seatsSold = block.length - info[2];
+
+              return (
+                <div key={index}>
+                  <p>Block</p>
+                  <p>Block Price: {blockPrice}</p>
+                  <p>Available Seats: {seatsAvailable}</p>
+                  <p>Sold Seats: {seatsSold}</p>
+                </div>
+              );
+            })}
+
+          
         </div>
       )}
     </div>
