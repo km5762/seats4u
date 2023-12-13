@@ -23,7 +23,7 @@ export const handler = async (event) => {
     const purchasedSeatIds = [];
     for (const seatId of seatIds) {
       const [res] = await connection.execute(
-        "UPDATE seat JOIN event ON seat.event_id = event.id SET seat.available = FALSE WHERE seat.id = (?) AND event.active = TRUE AND seat.available = TRUE",
+        "UPDATE seat JOIN event ON seat.event_id = event.id SET seat.available = FALSE WHERE seat.id = (?) AND event.active = TRUE AND seat.available = TRUE AND event.date > NOW()",
         [seatId]
       );
 
