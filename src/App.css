@@ -82,3 +82,11 @@
   color: red;
   margin-top: 5px;
 }
+
+.sold-out-message {
+  font-size: 24px; /* Adjust the font size as needed */
+  text-align: center;
+  background-color: red; /* Example background color */
+  color: white; /* Example text color */
+  padding: 20px; /* Adjust padding as needed */
+}

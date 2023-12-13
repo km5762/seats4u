@@ -301,10 +301,12 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
   const handleUnselectShow = () => {
     setSelectedShow(null);
+    setSoldout(false);
   };
 
   const handleUnselectShowList = () => {
     setSelectedShowList(null);
+    setSoldout(false);
   };
 
   async function handleSearch(query) {
@@ -571,7 +573,13 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
             />
           ))}
         {selectedShow && (
-          <div>
+          <div >
+            <div>
+              {soldOut && (
+                <h2 class="sold-out-message">Sold Out</h2>
+                
+              )}
+            </div>
             <Show
               name={selectedShow.event_name}
               date={new Date(selectedShow.event_date).toLocaleDateString()}
@@ -670,6 +678,12 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
           ))}
         {selectedShowList && (
           <div>
+            <div>
+              {soldOut && (
+                <h2 class="sold-out-message">Sold Out</h2>
+                
+              )}
+            </div>
             <Show
               name={selectedShowList.name}
               date={new Date(selectedShowList.date).toLocaleDateString()}
@@ -680,7 +694,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
               })}
               venue={selectedShowList.venue_id}
               eventId={selectedShowList.id}
-            />
+            /> 
             {/* <button onClick={() => listSeats(selectedShowList.id)}>List Seats</button> */}
             <button onClick={handleUnselectShowList}>unselectShow</button>
             <div style={{ position: "absolute", left: 600, top: -200 }}>
