@@ -381,6 +381,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   const [rightTicketPriceList, setRightTicketPriceList] = useState([]);
   const [availableList, setAvailableList] = useState([]);
   const [startId, setStartId] = useState(null);
+  const [soldOut, setSoldout] = useState(false);
 
   async function listSeats(eventId, venueId) {
     setAvailableList([]);
@@ -405,13 +406,21 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
       setStartId(data.seats[0].id);
 
+      let listOfAvailability = [];
+
       for (let index = 0; index < data.seats.length; index++) {
         setAvailableList((prevList) => [
           ...prevList,
           data.seats[index].available,
         ]);
+        listOfAvailability.push(data.seats[index].available);
         console.log(data.seats[index].available);
       }
+
+      console.log(listOfAvailability);
+      const isSoldOut = listOfAvailability.every(item => item === 0);
+      console.log(isSoldOut);
+      setSoldout(isSoldOut);
 
       if (data.blocks[0].section_id === null) {
         let leftSeatNumber = getLayout(venueId, 0) * getLayout(venueId, 1);
