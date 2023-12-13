@@ -18,14 +18,13 @@ const Seat = ({ row, col, onClick, selected, blocked, selectedAndBlocked }) => (
       padding: "4px",
       margin: "2px",
       cursor: "pointer",
-      backgroundColor:
-        selectedAndBlocked ?
-          "red"
-          : selected && !blocked
-            ? "yellow" // Light blue when selected and not blocked
-            : blocked && !selected
-              ? "orange" // Blue when blocked and not selected
-              : "white", // White when neither selected nor blocked
+      backgroundColor: selectedAndBlocked
+        ? "red"
+        : selected && !blocked
+        ? "yellow" // Light blue when selected and not blocked
+        : blocked && !selected
+        ? "orange" // Blue when blocked and not selected
+        : "white", // White when neither selected nor blocked
     }}
     onClick={() => onClick(row, col)}
   >
@@ -34,7 +33,7 @@ const Seat = ({ row, col, onClick, selected, blocked, selectedAndBlocked }) => (
 );
 
 // Section component containing a grid of seats
-const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
+const Section = ({ title, rows, cols, canSelect, show, sectionId }) => {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [blockedSeats, setBlockedSeats] = useState([]);
   const [blocks, setBlocks] = useState([]);
@@ -45,8 +44,7 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
   const [ticketPrice, setTicketPrice] = useState(null);
 
   async function createBlock() {
-
-    console.log("Create Block")
+    console.log("Create Block");
     console.log("Show ID");
     console.log(show);
     console.log("Section ID");
@@ -57,7 +55,7 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
     console.log(selectedSeats);
 
     let startRow = selectedSeats[0].row - 1;
-    let endRow = selectedSeats[selectedSeats.length-1].row - 1;
+    let endRow = selectedSeats[selectedSeats.length - 1].row - 1;
 
     console.log("Start Row");
     console.log(startRow);
@@ -104,34 +102,31 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
 
       const isSeatBlocked = blockedSeats.some(
         (seat) => seat.row === row && seat.col === col
-      )
+      );
 
       const isBlockSelected = selectedBlock.some(
         (seat) => seat.row === row && seat.col === col
-      )
+      );
 
       if (!isSeatSelected && !isSeatBlocked) {
         for (let col = 1; col < maxCols + 1; col++) {
           setSelectedSeats((prevSeats) => [...prevSeats, { row, col }]);
         }
         setSelectedBlock([]);
-      } 
-      else if (isSeatSelected && !isSeatBlocked) {
+      } else if (isSeatSelected && !isSeatBlocked) {
         for (let col = 1; col < maxCols + 1; col++) {
           setSelectedSeats((prevSeats) =>
             prevSeats.filter((seat) => !(seat.row === row && seat.col === col))
           );
         }
-      }
-      else if (isSeatBlocked && !isBlockSelected) {
-        for (let i = 0; i < blocks.length; i++){
+      } else if (isSeatBlocked && !isBlockSelected) {
+        for (let i = 0; i < blocks.length; i++) {
           if (blocks[i].some((seat) => seat.row === row && seat.col === col)) {
             setSelectedBlock(blocks[i]);
           }
         }
         setSelectedSeats([]);
-      }
-      else{
+      } else {
         setSelectedBlock([]);
       }
     }
@@ -156,7 +151,8 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
         prevSeats.filter(
           (seat) =>
             !selectedBlock.some(
-              (selectedSeat) => selectedSeat.row === seat.row && selectedSeat.col === seat.col
+              (selectedSeat) =>
+                selectedSeat.row === seat.row && selectedSeat.col === seat.col
             )
         )
       );
@@ -201,32 +197,36 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
         let endROW = block.end_row;
         let price = block.price;
         let blockID = block.id;
-  
+
         let key = `${eventId}_${sectionID}_${startROW}_${endROW}`;
         updateBlockDict(key, [blockID, price]);
       });
 
-      if (!initBlocks){
+      if (!initBlocks) {
         console.log("Listing block initially");
         data.blocks.map((block) => {
-          if (block.section_id === sectionId){
+          if (block.section_id === sectionId) {
             console.log(sectionId);
             console.log(block);
             let newBlocks = [];
-            for (let rowIndex = block.start_row; rowIndex <= block.end_row; rowIndex++){
-              for (let colIndex = 0; colIndex < cols; colIndex++){
+            for (
+              let rowIndex = block.start_row;
+              rowIndex <= block.end_row;
+              rowIndex++
+            ) {
+              for (let colIndex = 0; colIndex < cols; colIndex++) {
                 let row = rowIndex + 1;
                 let col = colIndex + 1;
                 console.log(row, col);
-                setBlockedSeats((prevSeats) => [...prevSeats, {row, col}]);
-                newBlocks.push({col, row});
+                setBlockedSeats((prevSeats) => [...prevSeats, { row, col }]);
+                newBlocks.push({ col, row });
               }
             }
             setBlocks((prevBlocks) => [...prevBlocks, newBlocks]);
           }
-        })
+        });
         setInitBlocks(true);
-      };
+      }
 
       return;
     } catch (error) {
@@ -236,7 +236,7 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
 
   async function deleteBlockC() {
     let startRow = selectedBlock[0].row - 1;
-    let endRow = selectedBlock[selectedBlock.length-1].row - 1;
+    let endRow = selectedBlock[selectedBlock.length - 1].row - 1;
     let key = `${show}_${sectionId}_${startRow}_${endRow}`;
     let info = blockDict[key];
     let blockId = info[0];
@@ -258,11 +258,9 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
-          body: JSON.stringify(
-            {
-              blockIds: ids,
-            },
-          ),
+          body: JSON.stringify({
+            blockIds: ids,
+          }),
         }
       );
 
@@ -282,10 +280,10 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
     }
   }
 
-  const listBlocksC = () =>{
+  const listBlocksC = () => {
     //listBlock(show);
     setListBlocks(true);
-  }
+  };
 
   // useEffect(() => {
   //   console.log("USE EFFECT")
@@ -297,34 +295,45 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
   return (
     <div style={{ padding: "4px" }}>
       <h4>{title}</h4>
-      {!initBlocks && (<button onClick={getInitBlocks}>Get Layout</button>)}
+      {!initBlocks && <button onClick={getInitBlocks}>Get Layout</button>}
       {initBlocks && (
-        <div style={{ display: "grid", gridTemplateColumns: `auto repeat(${cols}, 1fr)` }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: `auto repeat(${cols}, 1fr)`,
+          }}
+        >
           {Array.from({ length: rows }, (_, rowIndex) => (
             <>
-              <div style={{ gridRow: rowIndex + 1, alignSelf: "center" }}>{String.fromCharCode(65 + rowIndex)}</div>
+              <div style={{ gridRow: rowIndex + 1, alignSelf: "center" }}>
+                {String.fromCharCode(65 + rowIndex)}
+              </div>
               {Array.from({ length: cols }, (_, colIndex) => (
                 <Seat
                   key={`${rowIndex}-${colIndex}`}
                   row={rowIndex + 1}
                   col={colIndex + 1}
-                  onClick={() => handleSeatClick(rowIndex + 1, colIndex + 1, cols)}
+                  onClick={() =>
+                    handleSeatClick(rowIndex + 1, colIndex + 1, cols)
+                  }
                   selected={selectedSeats.some(
-                    (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
+                    (seat) =>
+                      seat.row === rowIndex + 1 && seat.col === colIndex + 1
                   )}
                   blocked={blockedSeats.some(
-                    (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
+                    (seat) =>
+                      seat.row === rowIndex + 1 && seat.col === colIndex + 1
                   )}
                   selectedAndBlocked={selectedBlock.some(
-                    (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
+                    (seat) =>
+                      seat.row === rowIndex + 1 && seat.col === colIndex + 1
                   )}
                 />
               ))}
             </>
           ))}
         </div>
-      )
-      }
+      )}
       {selectedSeats.length > 0 && selectedBlock.length === 0 && (
         <div>
           <h3>Selected Seats</h3>
@@ -336,20 +345,18 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
           <input
             type="number"
             value={ticketPrice}
-            onChange={(e) =>
-              setTicketPrice(e.target.value)
-            }
+            onChange={(e) => setTicketPrice(e.target.value)}
             placeholder="Enter ticket price"
           />
           <p></p>
           <p>
-            This ticket price will be assigned to all
-            seats in this block: ${ticketPrice}
+            This ticket price will be assigned to all seats in this block: $
+            {ticketPrice}
           </p>
           <button onClick={addBlock}>Add block</button>
         </div>
       )}
-      {selectedBlock.length > 0 && selectedSeats.length === 0 &&(
+      {selectedBlock.length > 0 && selectedSeats.length === 0 && (
         <div>
           <h3>Selected Block</h3>
           {selectedBlock.map((seat, index) => (
@@ -364,12 +371,12 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
         <div>
           {listBlocks ? (
             <button onClick={() => setListBlocks(false)}>Hide Blocks</button>
-          ):(
+          ) : (
             <button onClick={listBlocksC}>List Blocks</button>
-          )
-          }
+          )}
           {listBlocks &&
-            blocks.length > 0 && blocks.map((block, index) => (
+            blocks.length > 0 &&
+            blocks.map((block, index) => (
               <div>
                 <p>Block</p>
                 <span key={index}>
@@ -381,8 +388,7 @@ const Section = ({ title, rows, cols, canSelect, show, sectionId  }) => {
                     ))}
                 </span>
               </div>
-            ))
-          }
+            ))}
         </div>
       )}
     </div>
@@ -427,7 +433,26 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
   const location = useLocation();
   const receivedData = location.state.userData;
-  useNavigate();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkLogin = (event) => {
+      console.log("Checking login");
+      if (event && event.key === "login") {
+        const login = localStorage.getItem("login");
+        if (JSON.parse(login) === false) {
+          onLogout();
+          navigate("/");
+        }
+      }
+    };
+
+    window.addEventListener("storage", checkLogin);
+
+    return () => {
+      window.removeEventListener("storage", checkLogin);
+    };
+  }, [navigate, onLogout]);
 
   // const [loading, setLoading] = useState(false);
 
@@ -548,7 +573,6 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     }
 
     listShows();
-
   }, [receivedData]);
 
   const createVenue = () => {
@@ -784,8 +808,8 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     return `${year.toString().padStart(2, "0")}-${month
       .toString()
       .padStart(2, "0")}-${day.toString().padStart(2, "0")}T${hours
-        .toString()
-        .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+      .toString()
+      .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
   };
 
   const handleDateTimeChange = (datetimeString) => {
@@ -916,13 +940,12 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       setSectionID(data.seats[0].section_id);
       console.log(data.seats[0].section_id);
 
-      if (data.blocks.length > 0 && data.blocks[0].section_id === null){
+      if (data.blocks.length > 0 && data.blocks[0].section_id === null) {
         let price = parseInt(data.blocks[0].price, 10);
         console.log(price);
         setTicketPrice(price);
         setSubmittedPrice(true);
-      }
-      else {
+      } else {
         setTicketPrice(null);
         setSubmittedPrice(false);
       }
@@ -936,8 +959,6 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     }
   }
 
-
-
   const handleBackCreateShow = () => {
     setShowName("");
     setShowDate("");
@@ -950,42 +971,40 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     listSeats(selectedShow.id);
   };
 
-  async function createBlock(){
+  async function createBlock() {
     // listSeats(selectedShow.id);
     // if (blockId !== null){
     //   //deleteCurrentBlock
     // }
-  
+
     try {
-        const res = await fetch(
+      const res = await fetch(
         "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/createblocks",
         {
-            credentials: "include",
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                Accept: "application/json"
+          credentials: "include",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify([
+            {
+              eventId: selectedShow.id,
+              sectionId: null,
+              price: ticketPrice,
+              startRow: null,
+              endRow: null,
             },
-            body: JSON.stringify(
-              [
-                {
-                  "eventId": selectedShow.id,
-                  "sectionId": null,
-                  "price": ticketPrice,
-                  "startRow": null,
-                  "endRow": null
-                }
-              ]
-            ),
+          ]),
         }
-        );
+      );
 
-        // const data = await res.json();
-        // console.log(data)
-        // setTicketPrice(null);
-        setSubmittedPrice(true);
+      // const data = await res.json();
+      // console.log(data)
+      // setTicketPrice(null);
+      setSubmittedPrice(true);
     } catch (error) {
-        console.error("Error occurred during creating blocks:", error);
+      console.error("Error occurred during creating blocks:", error);
     }
     // setCurrentTicketPrice(null);
   }
@@ -993,7 +1012,14 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   return (
     <div>
       <div className="center-container">
-        <img src="/pictures/logo.png" alt="Logo" width="250" height="100" onClick={onLogout} style={{ cursor: 'pointer' }}/>
+        <img
+          src="/pictures/logo.png"
+          alt="Logo"
+          width="250"
+          height="100"
+          onClick={onLogout}
+          style={{ cursor: "pointer" }}
+        />
       </div>
 
       <div className="upper-right-text">
@@ -1187,17 +1213,32 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                             <h3>Venue Layout</h3>
                             {submittedPrice === false ? (
                               <div>
-                                <input type="number" value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} placeholder="Enter ticket price"/><p></p>
-                                <p>This ticket price will be assigned to all seats: ${ticketPrice}</p>
-                                <button onClick={createBlock}>Submit ticket price</button>
+                                <input
+                                  type="number"
+                                  value={ticketPrice}
+                                  onChange={(e) =>
+                                    setTicketPrice(e.target.value)
+                                  }
+                                  placeholder="Enter ticket price"
+                                />
+                                <p></p>
+                                <p>
+                                  This ticket price will be assigned to all
+                                  seats: ${ticketPrice}
+                                </p>
+                                <button onClick={createBlock}>
+                                  Submit ticket price
+                                </button>
                               </div>
-                            ):(
+                            ) : (
                               <div>
-                                <p>This ticket price has been assigned to all seats: ${ticketPrice}</p>
+                                <p>
+                                  This ticket price has been assigned to all
+                                  seats: ${ticketPrice}
+                                </p>
                                 <button>Delete current ticket price</button>
                               </div>
-                            )
-                            }
+                            )}
                             <div style={{ display: "flex" }}>
                               <Section
                                 title="Left"
@@ -1205,23 +1246,29 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                 cols={getLayout(manager.id, 1)}
                                 show={selectedShow.id}
                                 sectionId={sectionID}
-                                canSelect={submittedPrice === false ? true : false}
+                                canSelect={
+                                  submittedPrice === false ? true : false
+                                }
                               />
                               <Section
                                 title="Center"
                                 rows={getLayout(manager.id, 2)}
                                 cols={getLayout(manager.id, 3)}
                                 show={selectedShow.id}
-                                sectionId={sectionID+1}
-                                canSelect={submittedPrice === false ? true : false}
+                                sectionId={sectionID + 1}
+                                canSelect={
+                                  submittedPrice === false ? true : false
+                                }
                               />
                               <Section
                                 title="Right"
                                 rows={getLayout(manager.id, 4)}
                                 cols={getLayout(manager.id, 5)}
                                 show={selectedShow.id}
-                                sectionId={sectionID+2}
-                                canSelect={submittedPrice === false ? true : false}
+                                sectionId={sectionID + 2}
+                                canSelect={
+                                  submittedPrice === false ? true : false
+                                }
                               />
                             </div>
                           </div>
