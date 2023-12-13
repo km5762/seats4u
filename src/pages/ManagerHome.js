@@ -1017,7 +1017,10 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
           alt="Logo"
           width="250"
           height="100"
-          onClick={onLogout}
+          onClick={() => {
+            onLogout();
+            navigate("/");
+          }}
           style={{ cursor: "pointer" }}
         />
       </div>
@@ -1029,7 +1032,14 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
               Welcome back, {loggedInUser.role} {loggedInUser.username}! Now you
               may manage.
             </p>
-            <button onClick={onLogout}>Logout</button>
+            <button
+              onClick={() => {
+                onLogout();
+                navigate("/");
+              }}
+            >
+              Logout
+            </button>
             {/* <Link to="/">Customer View</Link> */}
           </div>
         ) : (
