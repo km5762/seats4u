@@ -188,6 +188,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   const [selectedShowList, setSelectedShowList] = useState(null);
 
   const [layoutDict, setLayoutDict] = useState({});
+  const [layoutState, setLayout] = useState([]);
 
   const navigate = useNavigate();
 
@@ -291,8 +292,14 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   // Function to retrieve numbers from the dictionary
   const getLayout = (venueId, num) => {
     let layout = layoutDict[venueId];
-    // console.log(layoutDict[venueId])
-    let result = layout[num];
+    let result = -1;
+    if (!layout) {
+      layout = layoutState; // for some reason this works???
+    }
+    // else {
+    //   setLayout(layout);
+    // }
+    result = layout[num];
     return result;
   };
 
@@ -448,7 +455,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       // Group blocks by section_id
       const groupedBlocks = data.blocks.reduce((acc, block) => {
         const sectionId = block.section_id;
-        if (!acc[sectionId]) {acc[sectionId] = [];}
+        if (!acc[sectionId]) { acc[sectionId] = []; }
         acc[sectionId].push(block);
         return acc;
       }, {});
@@ -460,9 +467,9 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
         return acc;
       }, []);
 
-      const leftCostList =[];
-      const midCostList =[];
-      const rightCostList =[];
+      const leftCostList = [];
+      const midCostList = [];
+      const rightCostList = [];
 
       const leftCol = getLayout(venueId, 1);
       const midCol = getLayout(venueId, 3);
@@ -478,7 +485,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
       leftBlocks.forEach((block) => {
         const numColumns = leftCol;
-        for (let row =  block.start_row; row <= block.end_row; row++) {
+        for (let row = block.start_row; row <= block.end_row; row++) {
           for (let col = 1; col <= numColumns; col++) {
             leftCostList.push(block.price);
           }
@@ -488,7 +495,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
       midBlocks.forEach((block) => {
         const numColumns = midCol;
-        for (let row =  block.start_row; row <= block.end_row; row++) {
+        for (let row = block.start_row; row <= block.end_row; row++) {
           for (let col = 1; col <= numColumns; col++) {
             midCostList.push(block.price);
           }
@@ -498,7 +505,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
       rightBlocks.forEach((block) => {
         const numColumns = rightCol;
-        for (let row =  block.start_row; row <= block.end_row; row++) {
+        for (let row = block.start_row; row <= block.end_row; row++) {
           for (let col = 1; col <= numColumns; col++) {
             rightCostList.push(block.price);
           }
@@ -509,7 +516,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       setLeftTicketPriceList(leftCostList);
       setMidTicketPriceList(midCostList);
       setRightTicketPriceList(rightCostList);
-
+      console.log(availableList)
       return;
 
     } catch (error) {
@@ -593,7 +600,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
               venue={selectedShow.venue_name}
               eventId={selectedShow.event_id}
             />
-            {/* <button onClick={() => listSeats(selectedShow.event_id)}>List Seats</button> */}
+            <button onClick={() => listSeats(selectedShow.event_id)}>List Seats</button>
             <button onClick={handleUnselectShow}>unselectShow</button>
             <div style={{ position: "absolute", left: 600, top: -200 }}>
               <h3>Venue Layout</h3>
@@ -691,7 +698,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
               venue={selectedShowList.venue_id}
               eventId={selectedShowList.id}
             />
-            {/* <button onClick={() => listSeats(selectedShowList.id)}>List Seats</button> */}
+            <button onClick={() => listSeats(selectedShowList.id)}>List Seats</button>
             <button onClick={handleUnselectShowList}>unselectShow</button>
             <div style={{ position: "absolute", left: 600, top: -200 }}>
               <h3>Venue Layout</h3>
