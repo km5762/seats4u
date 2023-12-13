@@ -39,9 +39,11 @@ export const handler = async (event) => {
       `%${searchQuery.toLowerCase()}%`,
     ]);
 
+    const [sections] = await connection.execute("SELECT * FROM section");
+
     return {
       statusCode: 200,
-      body: JSON.stringify({ events: events }),
+      body: JSON.stringify({ events: events, sections: sections }),
     };
   } catch (error) {
     console.error("Database error: ", error);

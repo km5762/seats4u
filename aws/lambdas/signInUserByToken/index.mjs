@@ -23,7 +23,7 @@ export const handler = async (event) => {
   if (!user) {
     return {
       statusCode: 401,
-      body: JSON.stringify({ error: "Token missing" }),
+      body: JSON.stringify({ error: "Token missing or invalid" }),
     };
   }
 

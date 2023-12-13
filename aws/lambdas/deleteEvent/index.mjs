@@ -30,7 +30,7 @@ export const handler = async (event) => {
 
   if (user.roleId === Role.VENUE_MANAGER) {
     const [rows] = await connection.execute(
-      "SELECT venue_id FROM event WHERE id = ?",
+      "SELECT venue_id, active FROM event WHERE id = ?",
       [eventId]
     );
 
@@ -46,6 +46,13 @@ export const handler = async (event) => {
         statusCode: 403,
         body: JSON.stringify({
           error: "User does not own event venue",
+        }),
+      };
+    } else if (rows[0]["active"]) {
+      return {
+        statusCode: 403,
+        body: JSON.stringify({
+          error: "Event is active",
         }),
       };
     }

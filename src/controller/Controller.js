@@ -216,8 +216,9 @@ export async function purchaseSeatsC(seatSelection) {
             }
         );
         const data = await res.json();
-        console.log("Purchase Seats");
-        console.log(data);
+        let purchased = data.purchasedSeatIds.length === seatSelection.length;
+        console.log(purchased);
+        return purchased;
     } catch (error) {
         console.error("Error occurred while activating show:", error);
     }

@@ -27,7 +27,7 @@ export const handler = async (event) => {
     switch (user.roleId) {
       case Role.VENUE_MANAGER:
         [seats] = await connection.execute(
-          "SELECT seat.id, seat.section_id, seat.available, seat.section_row, seat.section_col FROM seat JOIN event ON seat.event_id = event.id WHERE event.active OR event.venue_id = ? AND event.id = ?",
+          "SELECT seat.id, seat.section_id, seat.available, seat.section_row, seat.section_col FROM seat JOIN event ON seat.event_id = event.id WHERE (event.active OR event.venue_id = ?) AND event.id = ?",
           [user.venueId, eventId]
         );
         [blocks] = await connection.execute(

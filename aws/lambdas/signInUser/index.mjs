@@ -66,7 +66,6 @@ export const handler = async (event) => {
           token = jwt.sign(
             {
               sub: user["id"],
-              exp: Math.floor(Date.now() / 1000) + 60 * 60,
               username: user["username"],
               roleId: user["role_id"],
               venueId: user["venue_id"],

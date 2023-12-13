@@ -18,7 +18,7 @@ try {
 export const handler = async (event) => {
   try {
     const [venues] = await connection.execute("SELECT * FROM venue");
-
+    console.log(event);
     return {
       statusCode: 200,
       body: JSON.stringify(venues),

@@ -593,7 +593,10 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
           alt="Logo"
           width="250"
           height="100"
-          onClick={onLogout}
+          onClick={() => {
+            onLogout();
+            navigate("/");
+          }}
           style={{ cursor: "pointer" }}
         />
       </div>
@@ -613,7 +616,14 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                 Welcome back, {loggedInUser.role} {loggedInUser.username}! Now
                 you may administrate.
               </p>
-              <button onClick={onLogout}>Logout</button>
+              <button
+                onClick={() => {
+                  onLogout();
+                  navigate("/");
+                }}
+              >
+                Logout
+              </button>
               {/* <Link to="/">Customer View</Link>
               <Link to="/manager">Manager View</Link> */}
             </div>
