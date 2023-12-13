@@ -66,6 +66,7 @@ const Section = ({
   const [blocks, setBlocks] = useState([]);
 
   const handleSeatClick = (row, col, cost) => {
+    setPurchaseDenied(false);
     cost = parseInt(cost, 10);
     let id = startId + (row - 1) * cols + col - 1;
     if (canSelect && availableList[(row - 1) * cols + col - 1] === 1) {
@@ -85,16 +86,25 @@ const Section = ({
     }
   };
 
-  const purchaseSeats = () => {
+  const [purchaseDenied, setPurchaseDenied] = useState(false);
+
+  const purchaseSeats = async () => {
     if (selectedSeats.length > 0) {
       console.log(selectedSeats);
       const idList = [];
       for (let index = 0; index < selectedSeats.length; index++) {
         idList.push(selectedSeats[index].id);
       }
-      purchaseSeatsC(idList);
-      setBlockedSeats((prevSeats) => [...prevSeats, ...selectedSeats]);
-      setSelectedSeats([]);
+      let purchased = await purchaseSeatsC(idList);
+      if (purchased) {
+        setBlockedSeats((prevSeats) => [...prevSeats, ...selectedSeats]);
+        setSelectedSeats([]);
+      }
+      else {
+        setPurchaseDenied(true);
+        setSelectedSeats([]);
+        console.warn("Seat purchase denied");
+      }
     }
   };
 
@@ -145,6 +155,7 @@ const Section = ({
           <button onClick={purchaseSeats}>Purchase Seats</button>
         </div>
       )}
+      {purchaseDenied && (<p>Purchase denied</p>)}
       {blocks.length > 0 &&
         blocks.map((block, index) => (
           <div>
