@@ -215,6 +215,11 @@ export async function purchaseSeatsC(seatSelection) {
                 body: JSON.stringify({"seatIds": seatSelection}),
             }
         );
+
+        const data = await res.json();
+        let purchased = data.purchasedSeatIds.length === seatSelection.length;
+        console.log(purchased);
+        return purchased;
     } catch (error) {
         console.error("Error occurred while activating show:", error);
     }
