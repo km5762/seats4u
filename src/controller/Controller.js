@@ -1,4 +1,12 @@
-import { Seat, Row, Section, Venue} from '../model/Model.js'
+import { Seat, Row, Section, Venue, SeededRandom} from '../model/Model.js'
+
+export function randomFloatC(min, max, seed) {
+    const seededRandom = new SeededRandom(seed);
+    // jump to more exciting colors
+    const tmp1 = min + seededRandom.nextFloat() * (max - min);
+    const tmp2 = min + seededRandom.nextFloat() * (max - min);
+    return min + seededRandom.nextFloat() * (max - min);
+}
 
 export async function createVenueC(manager, name, leftR, leftC, rightR, rightC, centerR, centerC){
     

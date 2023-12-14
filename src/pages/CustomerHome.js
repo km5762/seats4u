@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SearchBar from "../component/SearchBar";
-import { purchaseSeatsC } from "../controller/Controller";
+import { purchaseSeatsC, randomFloatC } from "../controller/Controller";
 // import BlockCanvas from "../boundary/Boundary";
 
 // Show component representing a rectangular block
@@ -35,7 +35,7 @@ const Show = ({ name, date, time, venue, onClick, eventId }) => (
   </div>
 );
 
-const Seat = ({ row, col, onClick, selected, blocked, available }) => (
+const Seat = ({ row, col, cost, onClick, selected, blocked, available }) => (
   <div
     style={{
       border: "1px solid black",
@@ -43,7 +43,7 @@ const Seat = ({ row, col, onClick, selected, blocked, available }) => (
       margin: "2px",
       cursor: "pointer",
       backgroundColor:
-        selected ? "lightblue" : available && !blocked ? "white" : "gray",
+        selected ? "lightblue" : available && !blocked ? `rgb(${randomFloatC(0, 241, cost) + 15}, ${randomFloatC(0, 221, cost * 20) + 35}, ${randomFloatC(0, 201, cost * 40) + 55})` : "gray",
     }}
     onClick={() => onClick(row, col)}
   >
@@ -120,6 +120,7 @@ const Section = ({
                 key={`${rowIndex}-${colIndex}`}
                 row={rowIndex + 1}
                 col={colIndex + 1}
+                cost={ticketPriceList[rowIndex * cols + colIndex]}
                 onClick={() =>
                   handleSeatClick(rowIndex + 1, colIndex + 1, ticketPriceList[rowIndex * cols + colIndex])
                 }
@@ -609,7 +610,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
               venue={selectedShow.venue_name}
               eventId={selectedShow.event_id}
             />
-            <button onClick={() => listSeats(selectedShow.event_id)}>List Seats</button>
+            {/* <button onClick={() => listSeats(selectedShow.event_id)}>List Seats</button> */}
             <button onClick={handleUnselectShow}>unselectShow</button>
             <div style={{ position: "absolute", left: 600, top: -200 }}>
               <h3>Venue Layout</h3>
@@ -713,7 +714,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
               venue={selectedShowList.venue_id}
               eventId={selectedShowList.id}
             />
-            <button onClick={() => listSeats(selectedShowList.id)}>List Seats</button>
+            {/* <button onClick={() => listSeats(selectedShowList.id)}>List Seats</button> */}
             <button onClick={handleUnselectShowList}>unselectShow</button>
             <div style={{ position: "absolute", left: 600, top: -200 }}>
               <h3>Venue Layout</h3>
