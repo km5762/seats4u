@@ -138,21 +138,12 @@ const Section = ({
         ))}
       </div>
       {selectedSeats.length > 0 && (
-        <div>
+        <div style={{ padding: "4px" }}>
           <h3>Selected Seats</h3>
           {selectedSeats.map((seat, index) => (
-            <p key={index}>{`Row: ${String.fromCharCode(
-              64 + seat.row
-            ).toUpperCase()}, Column: ${seat.col}`}</p>
+            <p key={index}>{`Row: ${String.fromCharCode(64 + seat.row).toUpperCase()}, Column: ${seat.col}`}</p>
           ))}
-          <p>
-            Total Cost = $
-            {selectedSeats.reduce(
-              (costSoFar, currentSeat) => costSoFar + currentSeat.cost,
-              0
-            )}
-            .00
-          </p>
+          <p>{`Total Cost = $${selectedSeats.reduce((costSoFar, currentSeat) => costSoFar + currentSeat.cost, 0)}.00`}</p>
           <button onClick={purchaseSeats}>Purchase Seats</button>
         </div>
       )}
@@ -403,6 +394,13 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   const [availableList, setAvailableList] = useState([]);
   const [startId, setStartId] = useState(null);
   const [soldOut, setSoldout] = useState(false);
+  const [legend, setLegend] = useState([]);
+  // const legend = [
+  //   { color: 'red', price: '$20' },
+  //   { color: 'blue', price: '$30' },
+  //   { color: 'green', price: '$40' },
+  //   // Add more as needed
+  // ];
 
   async function listSeats(eventId, venueId) {
     setAvailableList([]);
@@ -425,7 +423,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
       const data = await res.json();
       console.log("list Seats");
-        console.log(data);
+      console.log(data);
       setStartId(data.seats[0].id);
 
       let listOfAvailability = [];
@@ -483,11 +481,14 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       const midBlocks = sortedBlocks[1];
       const rightBlocks = sortedBlocks[2];
 
+      const legendBlocks = []
+
       console.log(leftBlocks)
       console.log(midBlocks)
       console.log(rightBlocks)
 
       leftBlocks.forEach((block) => {
+        legendBlocks.push({ color: `rgb(${randomFloatC(0, 241, block.price) + 15}, ${randomFloatC(0, 221, block.price * 20) + 35}, ${randomFloatC(0, 201, block.price * 40) + 55})`, price: `$${block.price}` });
         const numColumns = leftCol;
         for (let row = block.start_row; row <= block.end_row; row++) {
           for (let col = 1; col <= numColumns; col++) {
@@ -498,6 +499,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       });
 
       midBlocks.forEach((block) => {
+        legendBlocks.push({ color: `rgb(${randomFloatC(0, 241, block.price) + 15}, ${randomFloatC(0, 221, block.price * 20) + 35}, ${randomFloatC(0, 201, block.price * 40) + 55})`, price: `$${block.price}` });
         const numColumns = midCol;
         for (let row = block.start_row; row <= block.end_row; row++) {
           for (let col = 1; col <= numColumns; col++) {
@@ -508,6 +510,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       });
 
       rightBlocks.forEach((block) => {
+        legendBlocks.push({ color: `rgb(${randomFloatC(0, 241, block.price) + 15}, ${randomFloatC(0, 221, block.price * 20) + 35}, ${randomFloatC(0, 201, block.price * 40) + 55})`, price: `$${block.price}` });
         const numColumns = rightCol;
         for (let row = block.start_row; row <= block.end_row; row++) {
           for (let col = 1; col <= numColumns; col++) {
@@ -521,6 +524,21 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       setMidTicketPriceList(midCostList);
       setRightTicketPriceList(rightCostList);
       console.log(availableList)
+
+      const uniqueLegendBlocks = legendBlocks.reduce((unique, item) => {
+        return unique.findIndex(uniqueItem => uniqueItem.color === item.color && uniqueItem.price === item.price) < 0
+          ? [...unique, item]
+          : unique;
+      }, []);
+
+      const sortedLegendBlocks = uniqueLegendBlocks.sort((a, b) => {
+        const priceA = Number(a.price.replace('$', ''));
+        const priceB = Number(b.price.replace('$', ''));
+        return priceA - priceB;
+      });
+
+      setLegend(sortedLegendBlocks);
+
       return;
 
     } catch (error) {
@@ -596,7 +614,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
             <div>
               {soldOut && (
                 <h2 class="sold-out-message">Sold Out</h2>
-                
+
               )}
             </div>
             <Show
@@ -612,7 +630,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
             />
             {/* <button onClick={() => listSeats(selectedShow.event_id)}>List Seats</button> */}
             <button onClick={handleUnselectShow}>unselectShow</button>
-            <div style={{ position: "absolute", left: 600, top: -200 }}>
+            <div style={{ position: "absolute", left: 250, top: -20 }}>
               <h3>Venue Layout</h3>
               <div style={{ display: "flex" }}>
                 <Section
@@ -700,7 +718,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
             <div>
               {soldOut && (
                 <h2 class="sold-out-message">Sold Out</h2>
-                
+
               )}
             </div>
             <Show
@@ -716,7 +734,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
             />
             {/* <button onClick={() => listSeats(selectedShowList.id)}>List Seats</button> */}
             <button onClick={handleUnselectShowList}>unselectShow</button>
-            <div style={{ position: "absolute", left: 600, top: -200 }}>
+            <div style={{ position: "absolute", left: 250, top: -20 }}>
               <h3>Venue Layout</h3>
               <div style={{ display: "flex" }}>
                 <Section
@@ -778,6 +796,17 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                     getLayout(selectedShowList.venue_id, 3)
                   }
                 />
+              </div>
+              <div style={{ position: "absolute", left: 400, top: -4 }}>
+                <h3>Pricing</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', marginTop: 20 }}>
+                  {legend.map((item, index) => (
+                    <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+                      <div style={{ width: 15, height: 15, backgroundColor: item.color }}></div>
+                      <p style={{ marginLeft: 10, marginTop: 15 }}>{item.price}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
