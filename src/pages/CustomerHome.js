@@ -395,12 +395,6 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   const [startId, setStartId] = useState(null);
   const [soldOut, setSoldout] = useState(false);
   const [legend, setLegend] = useState([]);
-  // const legend = [
-  //   { color: 'red', price: '$20' },
-  //   { color: 'blue', price: '$30' },
-  //   { color: 'green', price: '$40' },
-  //   // Add more as needed
-  // ];
 
   async function listSeats(eventId, venueId) {
     setAvailableList([]);
@@ -692,6 +686,17 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                     getLayout(selectedShow.venue_id, 3)
                   }
                 />
+              </div>
+              <div style={{ position: "absolute", left: 400, top: -4 }}>
+                <h3>Pricing</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', marginTop: 20 }}>
+                  {legend.map((item, index) => (
+                    <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+                      <div style={{ width: 15, height: 15, backgroundColor: item.color }}></div>
+                      <p style={{ marginLeft: 10, marginTop: 15 }}>{item.price}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

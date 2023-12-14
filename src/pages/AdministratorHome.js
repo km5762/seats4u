@@ -10,6 +10,7 @@ import {
   createShowAdminC,
   // deleteShowC,
   activateShowAdminC,
+  randomFloatC
 } from "../controller/Controller";
 
 // Seat component representing a clickable seat
