@@ -14,7 +14,7 @@ import {
 } from "../controller/Controller";
 
 // Seat component representing a clickable seat
-const Seat = ({ row, col, onClick, selected, blocked }) => (
+const Seat = ({ row, col, cost, onClick, selected, blocked }) => (
   <div
     style={{
       border: "1px solid black",
@@ -25,8 +25,8 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
         selected && !blocked
           ? "lightblue" // Light blue when selected and not blocked
           : blocked && !selected
-          ? "blue" // Blue when blocked and not selected
-          : "white", // White when neither selected nor blocked
+            ? "blue" // Blue when blocked and not selected
+            : `rgb(${randomFloatC(0, 241, cost) + 15}, ${randomFloatC(0, 221, cost * 20) + 35}, ${randomFloatC(0, 201, cost * 40) + 55})`, // White when neither selected nor blocked
     }}
     onClick={() => onClick(row, col)}
   >
@@ -35,7 +35,7 @@ const Seat = ({ row, col, onClick, selected, blocked }) => (
 );
 
 // Section component containing a grid of seats
-const Section = ({ title, rows, cols, canSelect }) => {
+const Section = ({ title, rows, cols, canSelect, ticketPriceList}) => {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [blockedSeats, setBlockedSeats] = useState([]);
   const [blocks, setBlocks] = useState([]);
@@ -101,6 +101,7 @@ const Section = ({ title, rows, cols, canSelect }) => {
                 key={`${rowIndex}-${colIndex}`}
                 row={rowIndex + 1}
                 col={colIndex + 1}
+                cost={ticketPriceList[rowIndex * cols + colIndex]}
                 onClick={() =>
                   handleSeatClick(rowIndex + 1, colIndex + 1, cols)
                 }
@@ -342,7 +343,138 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   const handleShowClick = (index) => {
     setSelectedShow(listOfShows[index]);
     setGeneratedToggle(true);
+    listSeats(listOfShows[index].id, listOfShows[index].venue_id);
   };
+
+  const [leftTicketPriceList, setLeftTicketPriceList] = useState([]);
+  const [midTicketPriceList, setMidTicketPriceList] = useState([]);
+  const [rightTicketPriceList, setRightTicketPriceList] = useState([]);
+  const [legend, setLegend] = useState([]);
+
+  async function listSeats(eventId, venueId) {
+    try {
+      const res = await fetch(
+        "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/listseats",
+        {
+          credentials: "include",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            eventId: eventId,
+          }),
+        }
+      );
+
+      const data = await res.json();
+      console.log(data);
+
+      if (data.blocks[0].section_id === null) {
+        let leftSeatNumber = getLayout(venueId, 0) * getLayout(venueId, 1);
+        let midSeatNumber = getLayout(venueId, 2) * getLayout(venueId, 3);
+        let rightSeatNumber = getLayout(venueId, 4) * getLayout(venueId, 5);
+
+        setLeftTicketPriceList(Array.from({ length: leftSeatNumber }, () => data.blocks[0].price));
+        setMidTicketPriceList(Array.from({ length: midSeatNumber }, () => data.blocks[0].price));
+        setRightTicketPriceList(Array.from({ length: rightSeatNumber }, () => data.blocks[0].price));
+
+        return;
+      }
+
+      // Group blocks by section_id
+      const groupedBlocks = data.blocks.reduce((acc, block) => {
+        const sectionId = block.section_id;
+        if (!acc[sectionId]) { acc[sectionId] = []; }
+        acc[sectionId].push(block);
+        return acc;
+      }, {});
+
+      // Sort each section list by start_row
+      const sortedBlocks = Object.keys(groupedBlocks).reduce((acc, sectionId) => {
+        const sortedList = groupedBlocks[sectionId].sort((a, b) => a.start_row - b.start_row);
+        acc.push(sortedList);
+        return acc;
+      }, []);
+
+      const leftCostList = [];
+      const midCostList = [];
+      const rightCostList = [];
+
+      const leftCol = getLayout(venueId, 1);
+      const midCol = getLayout(venueId, 3);
+      const rightCol = getLayout(venueId, 5);
+
+      const leftBlocks = sortedBlocks[0];
+      const midBlocks = sortedBlocks[1];
+      const rightBlocks = sortedBlocks[2];
+
+      const legendBlocks = []
+
+      console.log(leftBlocks)
+      console.log(midBlocks)
+      console.log(rightBlocks)
+
+      leftBlocks.forEach((block) => {
+        legendBlocks.push({ color: `rgb(${randomFloatC(0, 241, block.price) + 15}, ${randomFloatC(0, 221, block.price * 20) + 35}, ${randomFloatC(0, 201, block.price * 40) + 55})`, price: `$${block.price}` });
+        const numColumns = leftCol;
+        for (let row = block.start_row; row <= block.end_row; row++) {
+          for (let col = 1; col <= numColumns; col++) {
+            leftCostList.push(block.price);
+          }
+        }
+        console.log(leftCostList);
+      });
+
+      midBlocks.forEach((block) => {
+        legendBlocks.push({ color: `rgb(${randomFloatC(0, 241, block.price) + 15}, ${randomFloatC(0, 221, block.price * 20) + 35}, ${randomFloatC(0, 201, block.price * 40) + 55})`, price: `$${block.price}` });
+        const numColumns = midCol;
+        for (let row = block.start_row; row <= block.end_row; row++) {
+          for (let col = 1; col <= numColumns; col++) {
+            midCostList.push(block.price);
+          }
+        }
+        console.log(midCostList);
+      });
+
+      rightBlocks.forEach((block) => {
+        legendBlocks.push({ color: `rgb(${randomFloatC(0, 241, block.price) + 15}, ${randomFloatC(0, 221, block.price * 20) + 35}, ${randomFloatC(0, 201, block.price * 40) + 55})`, price: `$${block.price}` });
+        const numColumns = rightCol;
+        for (let row = block.start_row; row <= block.end_row; row++) {
+          for (let col = 1; col <= numColumns; col++) {
+            rightCostList.push(block.price);
+          }
+        }
+        console.log(rightCostList);
+      });
+
+      setLeftTicketPriceList(leftCostList);
+      setMidTicketPriceList(midCostList);
+      setRightTicketPriceList(rightCostList);
+
+      const uniqueLegendBlocks = legendBlocks.reduce((unique, item) => {
+        return unique.findIndex(uniqueItem => uniqueItem.color === item.color && uniqueItem.price === item.price) < 0
+          ? [...unique, item]
+          : unique;
+      }, []);
+
+      const sortedLegendBlocks = uniqueLegendBlocks.sort((a, b) => {
+        const priceA = Number(a.price.replace('$', ''));
+        const priceB = Number(b.price.replace('$', ''));
+        return priceA - priceB;
+      });
+
+      setLegend(sortedLegendBlocks);
+
+      return;
+      // console.log(data);
+      // console.log(data[0]);
+      // console.log(data[0].price);
+    } catch (error) {
+      console.error("Error occurred during listing seats:", error);
+    }
+  }
 
   const handleUnselectShow = () => {
     setSelectedShow(null);
@@ -392,7 +524,7 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
   const getLayout = (venueId, num) => {
     let layout = layoutDict[venueId];
-    console.log(layoutDict[venueId]);
+    // console.log(layoutDict[venueId]);
     let result = layout[num];
     return result;
   };
@@ -442,8 +574,8 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     return `${year.toString().padStart(2, "0")}-${month
       .toString()
       .padStart(2, "0")}-${day.toString().padStart(2, "0")}T${hours
-      .toString()
-      .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+        .toString()
+        .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
   };
   const handleDateTimeChange = (datetimeString) => {
     const selectedDate = new Date(datetimeString); // Convert string to Date object
@@ -784,19 +916,33 @@ const AdminHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                       rows={getLayout(selectedVenue.id, 0)}
                                       cols={getLayout(selectedVenue.id, 1)}
                                       canSelect={false}
+                                      ticketPriceList={leftTicketPriceList}
                                     />
                                     <Section
                                       title="Center"
                                       rows={getLayout(selectedVenue.id, 2)}
                                       cols={getLayout(selectedVenue.id, 3)}
                                       canSelect={false}
+                                      ticketPriceList={midTicketPriceList}
                                     />
                                     <Section
                                       title="Right"
                                       rows={getLayout(selectedVenue.id, 4)}
                                       cols={getLayout(selectedVenue.id, 5)}
                                       canSelect={false}
+                                      ticketPriceList={rightTicketPriceList}
                                     />
+                                  </div>
+                                  <div style={{ position: "absolute", left: 400, top: -4 }}>
+                                    <h3>Pricing</h3>
+                                    <div style={{ display: 'flex', flexDirection: 'column', marginTop: 20 }}>
+                                      {legend.map((item, index) => (
+                                        <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+                                          <div style={{ width: 15, height: 15, backgroundColor: item.color }}></div>
+                                          <p style={{ marginLeft: 10, marginTop: 15 }}>{item.price}</p>
+                                        </div>
+                                      ))}
+                                    </div>
                                   </div>
                                 </div>
                               </div>
