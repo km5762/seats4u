@@ -43,6 +43,7 @@ const Section = ({ title, rows, cols, canSelect, ticketPriceList, show, sectionI
   const [listBlocks, setListBlocks] = useState(false);
 
   const [ticketPrice, setTicketPrice] = useState(null);
+  const [ticketPriceListState, setTicketPriceListState] = useState([]);
 
   async function createBlock() {
     console.log("Create Block");
@@ -89,8 +90,8 @@ const Section = ({ title, rows, cols, canSelect, ticketPriceList, show, sectionI
           ]),
         }
       );
-      
-      await listBlock(show);
+
+      await listBlock(show, true);
 
       setTicketPrice(null);
       setSelectedSeats([]);
@@ -184,7 +185,7 @@ const Section = ({ title, rows, cols, canSelect, ticketPriceList, show, sectionI
     });
   };
 
-  async function listBlock(eventId) {
+  async function listBlock(eventId, flag) {
     try {
       const res = await fetch(
         "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/listseats",
@@ -256,6 +257,23 @@ const Section = ({ title, rows, cols, canSelect, ticketPriceList, show, sectionI
         });
         setInitBlocks(true);
       }
+      if (flag) {
+        const ticketPriceLists = [];
+        data.blocks.forEach((block) => {
+          const numColumns = cols;
+          for (let row = block.start_row; row <= block.end_row; row++) {
+            for (let col = 1; col <= numColumns; col++) {
+              ticketPriceLists.push(block.price);
+            }
+          }
+          console.log(ticketPriceLists);
+        });
+
+        setTicketPriceListState(ticketPriceLists);
+      }
+      else {
+        setTicketPriceListState(ticketPriceList);
+      }
 
       return;
     } catch (error) {
@@ -305,12 +323,12 @@ const Section = ({ title, rows, cols, canSelect, ticketPriceList, show, sectionI
 
   async function getInitBlocks() {
     if (!initBlocks) {
-      await listBlock(show);
+      await listBlock(show, false);
     }
   }
 
   const listBlocksC = () => {
-    //listBlock(show);
+    listBlock(show, false);
     setListBlocks(true);
   };
 
@@ -342,7 +360,7 @@ const Section = ({ title, rows, cols, canSelect, ticketPriceList, show, sectionI
                   key={`${rowIndex}-${colIndex}`}
                   row={rowIndex + 1}
                   col={colIndex + 1}
-                  cost={ticketPriceList[rowIndex * cols + colIndex]}
+                  cost={ticketPriceListState[rowIndex * cols + colIndex]}
                   onClick={() =>
                     handleSeatClick(rowIndex + 1, colIndex + 1, cols)
                   }
@@ -420,6 +438,8 @@ const Section = ({ title, rows, cols, canSelect, ticketPriceList, show, sectionI
                 <div key={index}>
                   <p>Block</p>
                   <p>Block Price: {blockPrice}</p>
+                  <div style={{ width: 15, height: 15, backgroundColor: `rgb(${randomFloatC(0, 241, blockPrice) + 15}, ${randomFloatC(0, 221, blockPrice * 20) + 35}, ${randomFloatC(0, 201, blockPrice * 40) + 55})` }}>
+                  </div>
                   <p>Available Seats: {seatsAvailable}</p>
                   <p>Sold Seats: {seatsSold}</p>
                 </div>
@@ -1063,7 +1083,6 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
   const [leftTicketPriceList, setLeftTicketPriceList] = useState([]);
   const [midTicketPriceList, setMidTicketPriceList] = useState([]);
   const [rightTicketPriceList, setRightTicketPriceList] = useState([]);
-  const [legend, setLegend] = useState([]);
 
   async function listSeats(eventId, venueId) {
     try {
@@ -1136,14 +1155,11 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       const midBlocks = sortedBlocks[1];
       const rightBlocks = sortedBlocks[2];
 
-      const legendBlocks = []
-
       console.log(leftBlocks)
       console.log(midBlocks)
       console.log(rightBlocks)
 
       leftBlocks.forEach((block) => {
-        legendBlocks.push({ color: `rgb(${randomFloatC(0, 241, block.price) + 15}, ${randomFloatC(0, 221, block.price * 20) + 35}, ${randomFloatC(0, 201, block.price * 40) + 55})`, price: `$${block.price}` });
         const numColumns = leftCol;
         for (let row = block.start_row; row <= block.end_row; row++) {
           for (let col = 1; col <= numColumns; col++) {
@@ -1154,7 +1170,6 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       });
 
       midBlocks.forEach((block) => {
-        legendBlocks.push({ color: `rgb(${randomFloatC(0, 241, block.price) + 15}, ${randomFloatC(0, 221, block.price * 20) + 35}, ${randomFloatC(0, 201, block.price * 40) + 55})`, price: `$${block.price}` });
         const numColumns = midCol;
         for (let row = block.start_row; row <= block.end_row; row++) {
           for (let col = 1; col <= numColumns; col++) {
@@ -1165,7 +1180,6 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       });
 
       rightBlocks.forEach((block) => {
-        legendBlocks.push({ color: `rgb(${randomFloatC(0, 241, block.price) + 15}, ${randomFloatC(0, 221, block.price * 20) + 35}, ${randomFloatC(0, 201, block.price * 40) + 55})`, price: `$${block.price}` });
         const numColumns = rightCol;
         for (let row = block.start_row; row <= block.end_row; row++) {
           for (let col = 1; col <= numColumns; col++) {
@@ -1178,20 +1192,6 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       setLeftTicketPriceList(leftCostList);
       setMidTicketPriceList(midCostList);
       setRightTicketPriceList(rightCostList);
-
-      const uniqueLegendBlocks = legendBlocks.reduce((unique, item) => {
-        return unique.findIndex(uniqueItem => uniqueItem.color === item.color && uniqueItem.price === item.price) < 0
-          ? [...unique, item]
-          : unique;
-      }, []);
-
-      const sortedLegendBlocks = uniqueLegendBlocks.sort((a, b) => {
-        const priceA = Number(a.price.replace('$', ''));
-        const priceB = Number(b.price.replace('$', ''));
-        return priceA - priceB;
-      });
-
-      setLegend(sortedLegendBlocks);
 
       return;
       // console.log(data);
@@ -1439,17 +1439,6 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                     ticketPriceList={rightTicketPriceList}
                   />
                 </div>
-                <div style={{ position: "absolute", left: 400, top: -4 }}>
-                  <h3>Pricing</h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', marginTop: 20 }}>
-                    {legend.map((item, index) => (
-                      <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
-                        <div style={{ width: 15, height: 15, backgroundColor: item.color }}></div>
-                        <p style={{ marginLeft: 10, marginTop: 15 }}>{item.price}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
             </div>
           ) : (
@@ -1563,17 +1552,6 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                 <button onClick={deleteBlockM}>Delete current ticket price</button>
                               </div>
                             )}
-                            <div style={{ position: "absolute", left: -120, top: 177 }}>
-                              <h3>Pricing</h3>
-                              <div style={{ display: 'flex', flexDirection: 'column', marginTop: 20 }}>
-                                {legend.map((item, index) => (
-                                  <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
-                                    <div style={{ width: 15, height: 15, backgroundColor: item.color }}></div>
-                                    <p style={{ marginLeft: 10, marginTop: 15 }}>{item.price}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
                             <div style={{ display: "flex" }}>
                               <Section
                                 title="Left"
@@ -1609,7 +1587,6 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                 ticketPriceList={rightTicketPriceList}
                               />
                             </div>
-                            
                           </div>
                         </div>
                       )}
