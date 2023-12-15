@@ -144,7 +144,9 @@ const Section = ({ title, rows, cols, canSelect, ticketPriceList, show, sectionI
   const addBlock = async () => {
     if (selectedSeats.length > 0) {
       setBlockedSeats((prevSeats) => [...prevSeats, ...selectedSeats]);
-      setBlocks((prevBlocks) => [...prevBlocks, selectedSeats]);
+      let sortedSeats = [...selectedSeats].sort((a, b) => a.row - b.row);
+      setBlocks((prevBlocks) => [...prevBlocks, sortedSeats]);
+      // setBlocks((prevBlocks) => [...prevBlocks, blockedSeats]);
       await createBlock();
       //await listBlock();
     }
