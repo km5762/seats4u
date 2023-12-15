@@ -42,8 +42,13 @@ const Seat = ({ row, col, cost, onClick, selected, blocked, available }) => (
       padding: "4px",
       margin: "2px",
       cursor: "pointer",
-      backgroundColor:
-        selected ? "lightblue" : available && !blocked ? `rgb(${randomFloatC(0, 241, cost) + 15}, ${randomFloatC(0, 221, cost * 20) + 35}, ${randomFloatC(0, 201, cost * 40) + 55})` : "gray",
+      backgroundColor: selected
+        ? "lightblue"
+        : available && !blocked
+        ? `rgb(${randomFloatC(0, 241, cost) + 15}, ${
+            randomFloatC(0, 221, cost * 20) + 35
+          }, ${randomFloatC(0, 201, cost * 40) + 55})`
+        : "gray",
     }}
     onClick={() => onClick(row, col)}
   >
@@ -99,8 +104,7 @@ const Section = ({
       if (purchased) {
         setBlockedSeats((prevSeats) => [...prevSeats, ...selectedSeats]);
         setSelectedSeats([]);
-      }
-      else {
+      } else {
         setPurchaseDenied(true);
         setSelectedSeats([]);
         console.warn("Seat purchase denied");
@@ -111,10 +115,17 @@ const Section = ({
   return (
     <div style={{ padding: "4px" }}>
       <h4>{title}</h4>
-      <div style={{ display: "grid", gridTemplateColumns: `auto repeat(${cols}, 1fr)` }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: `auto repeat(${cols}, 1fr)`,
+        }}
+      >
         {Array.from({ length: rows }, (_, rowIndex) => (
           <>
-            <div style={{ gridRow: rowIndex + 1, alignSelf: "center" }}>{String.fromCharCode(65 + rowIndex)}</div>
+            <div style={{ gridRow: rowIndex + 1, alignSelf: "center" }}>
+              {String.fromCharCode(65 + rowIndex)}
+            </div>
             {Array.from({ length: cols }, (_, colIndex) => (
               <Seat
                 key={`${rowIndex}-${colIndex}`}
@@ -122,13 +133,19 @@ const Section = ({
                 col={colIndex + 1}
                 cost={ticketPriceList[rowIndex * cols + colIndex]}
                 onClick={() =>
-                  handleSeatClick(rowIndex + 1, colIndex + 1, ticketPriceList[rowIndex * cols + colIndex])
+                  handleSeatClick(
+                    rowIndex + 1,
+                    colIndex + 1,
+                    ticketPriceList[rowIndex * cols + colIndex]
+                  )
                 }
                 selected={selectedSeats.some(
-                  (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
+                  (seat) =>
+                    seat.row === rowIndex + 1 && seat.col === colIndex + 1
                 )}
                 blocked={blockedSeats.some(
-                  (seat) => seat.row === rowIndex + 1 && seat.col === colIndex + 1
+                  (seat) =>
+                    seat.row === rowIndex + 1 && seat.col === colIndex + 1
                 )}
                 available={availableList[rowIndex * cols + colIndex] === 1}
                 id={startId}
@@ -141,13 +158,18 @@ const Section = ({
         <div style={{ padding: "4px" }}>
           <h3>Selected Seats</h3>
           {selectedSeats.map((seat, index) => (
-            <p key={index}>{`Row: ${String.fromCharCode(64 + seat.row).toUpperCase()}, Column: ${seat.col}`}</p>
+            <p key={index}>{`Row: ${String.fromCharCode(
+              64 + seat.row
+            ).toUpperCase()}, Column: ${seat.col}`}</p>
           ))}
-          <p>{`Total Cost = $${selectedSeats.reduce((costSoFar, currentSeat) => costSoFar + currentSeat.cost, 0)}.00`}</p>
+          <p>{`Total Cost = $${selectedSeats.reduce(
+            (costSoFar, currentSeat) => costSoFar + currentSeat.cost,
+            0
+          )}.00`}</p>
           <button onClick={purchaseSeats}>Purchase Seats</button>
         </div>
       )}
-      {purchaseDenied && (<p>Purchase denied</p>)}
+      {purchaseDenied && <p>Purchase denied</p>}
       {blocks.length > 0 &&
         blocks.map((block, index) => (
           <div>
@@ -167,6 +189,7 @@ const Section = ({
 };
 
 const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState(false);
   const [list, setList] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -188,6 +211,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     const handleLogin = async () => {
       // Simulate login logic (you would typically perform an API call here)
       try {
+        setLoading(true);
         const res = await fetch(
           "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/signinuserbytoken",
           {
@@ -228,10 +252,13 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
           } else {
             console.log("User doesn't have the required role for this action");
           }
+          setLoading(false);
         } else {
+          setLoading(false);
           console.log("Invalid user data or role information");
         }
       } catch (error) {
+        setLoading(false);
         console.error("Error occurred during login:", error);
       }
       // For simplicity, just set the logged-in user to the entered username
@@ -432,7 +459,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       }
 
       console.log(listOfAvailability);
-      const isSoldOut = listOfAvailability.every(item => item === 0);
+      const isSoldOut = listOfAvailability.every((item) => item === 0);
       console.log(isSoldOut);
       setSoldout(isSoldOut);
 
@@ -441,9 +468,15 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
         let midSeatNumber = getLayout(venueId, 2) * getLayout(venueId, 3);
         let rightSeatNumber = getLayout(venueId, 4) * getLayout(venueId, 5);
 
-        setLeftTicketPriceList(Array.from({ length: leftSeatNumber }, () => data.blocks[0].price));
-        setMidTicketPriceList(Array.from({ length: midSeatNumber }, () => data.blocks[0].price));
-        setRightTicketPriceList(Array.from({ length: rightSeatNumber }, () => data.blocks[0].price));
+        setLeftTicketPriceList(
+          Array.from({ length: leftSeatNumber }, () => data.blocks[0].price)
+        );
+        setMidTicketPriceList(
+          Array.from({ length: midSeatNumber }, () => data.blocks[0].price)
+        );
+        setRightTicketPriceList(
+          Array.from({ length: rightSeatNumber }, () => data.blocks[0].price)
+        );
 
         return;
       }
@@ -451,17 +484,24 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       // Group blocks by section_id
       const groupedBlocks = data.blocks.reduce((acc, block) => {
         const sectionId = block.section_id;
-        if (!acc[sectionId]) { acc[sectionId] = []; }
+        if (!acc[sectionId]) {
+          acc[sectionId] = [];
+        }
         acc[sectionId].push(block);
         return acc;
       }, {});
 
       // Sort each section list by start_row
-      const sortedBlocks = Object.keys(groupedBlocks).reduce((acc, sectionId) => {
-        const sortedList = groupedBlocks[sectionId].sort((a, b) => a.start_row - b.start_row);
-        acc.push(sortedList);
-        return acc;
-      }, []);
+      const sortedBlocks = Object.keys(groupedBlocks).reduce(
+        (acc, sectionId) => {
+          const sortedList = groupedBlocks[sectionId].sort(
+            (a, b) => a.start_row - b.start_row
+          );
+          acc.push(sortedList);
+          return acc;
+        },
+        []
+      );
 
       const leftCostList = [];
       const midCostList = [];
@@ -475,14 +515,19 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       const midBlocks = sortedBlocks[1];
       const rightBlocks = sortedBlocks[2];
 
-      const legendBlocks = []
+      const legendBlocks = [];
 
-      console.log(leftBlocks)
-      console.log(midBlocks)
-      console.log(rightBlocks)
+      console.log(leftBlocks);
+      console.log(midBlocks);
+      console.log(rightBlocks);
 
       leftBlocks.forEach((block) => {
-        legendBlocks.push({ color: `rgb(${randomFloatC(0, 241, block.price) + 15}, ${randomFloatC(0, 221, block.price * 20) + 35}, ${randomFloatC(0, 201, block.price * 40) + 55})`, price: `$${block.price}` });
+        legendBlocks.push({
+          color: `rgb(${randomFloatC(0, 241, block.price) + 15}, ${
+            randomFloatC(0, 221, block.price * 20) + 35
+          }, ${randomFloatC(0, 201, block.price * 40) + 55})`,
+          price: `$${block.price}`,
+        });
         const numColumns = leftCol;
         for (let row = block.start_row; row <= block.end_row; row++) {
           for (let col = 1; col <= numColumns; col++) {
@@ -493,7 +538,12 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       });
 
       midBlocks.forEach((block) => {
-        legendBlocks.push({ color: `rgb(${randomFloatC(0, 241, block.price) + 15}, ${randomFloatC(0, 221, block.price * 20) + 35}, ${randomFloatC(0, 201, block.price * 40) + 55})`, price: `$${block.price}` });
+        legendBlocks.push({
+          color: `rgb(${randomFloatC(0, 241, block.price) + 15}, ${
+            randomFloatC(0, 221, block.price * 20) + 35
+          }, ${randomFloatC(0, 201, block.price * 40) + 55})`,
+          price: `$${block.price}`,
+        });
         const numColumns = midCol;
         for (let row = block.start_row; row <= block.end_row; row++) {
           for (let col = 1; col <= numColumns; col++) {
@@ -504,7 +554,12 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       });
 
       rightBlocks.forEach((block) => {
-        legendBlocks.push({ color: `rgb(${randomFloatC(0, 241, block.price) + 15}, ${randomFloatC(0, 221, block.price * 20) + 35}, ${randomFloatC(0, 201, block.price * 40) + 55})`, price: `$${block.price}` });
+        legendBlocks.push({
+          color: `rgb(${randomFloatC(0, 241, block.price) + 15}, ${
+            randomFloatC(0, 221, block.price * 20) + 35
+          }, ${randomFloatC(0, 201, block.price * 40) + 55})`,
+          price: `$${block.price}`,
+        });
         const numColumns = rightCol;
         for (let row = block.start_row; row <= block.end_row; row++) {
           for (let col = 1; col <= numColumns; col++) {
@@ -517,24 +572,26 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
       setLeftTicketPriceList(leftCostList);
       setMidTicketPriceList(midCostList);
       setRightTicketPriceList(rightCostList);
-      console.log(availableList)
+      console.log(availableList);
 
       const uniqueLegendBlocks = legendBlocks.reduce((unique, item) => {
-        return unique.findIndex(uniqueItem => uniqueItem.color === item.color && uniqueItem.price === item.price) < 0
+        return unique.findIndex(
+          (uniqueItem) =>
+            uniqueItem.color === item.color && uniqueItem.price === item.price
+        ) < 0
           ? [...unique, item]
           : unique;
       }, []);
 
       const sortedLegendBlocks = uniqueLegendBlocks.sort((a, b) => {
-        const priceA = Number(a.price.replace('$', ''));
-        const priceB = Number(b.price.replace('$', ''));
+        const priceA = Number(a.price.replace("$", ""));
+        const priceB = Number(b.price.replace("$", ""));
         return priceA - priceB;
       });
 
       setLegend(sortedLegendBlocks);
 
       return;
-
     } catch (error) {
       console.error("Error occurred during listing seats:", error);
     }
@@ -542,6 +599,15 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
 
   return (
     <div>
+      {loading && (
+        <div
+          id="loading"
+          class="loading"
+          style={{ visibility: loading ? "visible" : "hidden" }}
+        >
+          Loading&#8230;
+        </div>
+      )}
       <div className="center-container">
         <img src="/pictures/logo.png" alt="Logo" width="250" height="100" />
       </div>
@@ -600,17 +666,14 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
               })}
               venue={event.venue_name}
               eventId={event.event_id}
-              onClick={async () => { await handleShowClick(index) }}
+              onClick={async () => {
+                await handleShowClick(index);
+              }}
             />
           ))}
         {selectedShow && (
-          <div >
-            <div>
-              {soldOut && (
-                <h2 class="sold-out-message">Sold Out</h2>
-
-              )}
-            </div>
+          <div>
+            <div>{soldOut && <h2 class="sold-out-message">Sold Out</h2>}</div>
             <Show
               name={selectedShow.event_name}
               date={new Date(selectedShow.event_date).toLocaleDateString()}
@@ -636,7 +699,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   availableList={availableList.slice(
                     0,
                     getLayout(selectedShow.venue_id, 0) *
-                    getLayout(selectedShow.venue_id, 1)
+                      getLayout(selectedShow.venue_id, 1)
                   )}
                   startId={startId}
                 />
@@ -648,16 +711,16 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   ticketPriceList={midTicketPriceList}
                   availableList={availableList.slice(
                     getLayout(selectedShow.venue_id, 0) *
-                    getLayout(selectedShow.venue_id, 1),
+                      getLayout(selectedShow.venue_id, 1),
                     getLayout(selectedShow.venue_id, 0) *
-                    getLayout(selectedShow.venue_id, 1) +
-                    getLayout(selectedShow.venue_id, 2) *
-                    getLayout(selectedShow.venue_id, 3)
+                      getLayout(selectedShow.venue_id, 1) +
+                      getLayout(selectedShow.venue_id, 2) *
+                        getLayout(selectedShow.venue_id, 3)
                   )}
                   startId={
                     startId +
                     getLayout(selectedShow.venue_id, 0) *
-                    getLayout(selectedShow.venue_id, 1)
+                      getLayout(selectedShow.venue_id, 1)
                   }
                 />
                 <Section
@@ -668,32 +731,49 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   ticketPriceList={rightTicketPriceList}
                   availableList={availableList.slice(
                     getLayout(selectedShow.venue_id, 0) *
-                    getLayout(selectedShow.venue_id, 1) +
-                    getLayout(selectedShow.venue_id, 2) *
-                    getLayout(selectedShow.venue_id, 3),
+                      getLayout(selectedShow.venue_id, 1) +
+                      getLayout(selectedShow.venue_id, 2) *
+                        getLayout(selectedShow.venue_id, 3),
                     getLayout(selectedShow.venue_id, 0) *
-                    getLayout(selectedShow.venue_id, 1) +
-                    getLayout(selectedShow.venue_id, 2) *
-                    getLayout(selectedShow.venue_id, 3) +
-                    getLayout(selectedShow.venue_id, 4) *
-                    getLayout(selectedShow.venue_id, 5)
+                      getLayout(selectedShow.venue_id, 1) +
+                      getLayout(selectedShow.venue_id, 2) *
+                        getLayout(selectedShow.venue_id, 3) +
+                      getLayout(selectedShow.venue_id, 4) *
+                        getLayout(selectedShow.venue_id, 5)
                   )}
                   startId={
                     startId +
                     getLayout(selectedShow.venue_id, 0) *
-                    getLayout(selectedShow.venue_id, 1) +
+                      getLayout(selectedShow.venue_id, 1) +
                     getLayout(selectedShow.venue_id, 2) *
-                    getLayout(selectedShow.venue_id, 3)
+                      getLayout(selectedShow.venue_id, 3)
                   }
                 />
               </div>
               <div style={{ position: "absolute", left: 400, top: -4 }}>
                 <h3>Pricing</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', marginTop: 20 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    marginTop: 20,
+                  }}
+                >
                   {legend.map((item, index) => (
-                    <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
-                      <div style={{ width: 15, height: 15, backgroundColor: item.color }}></div>
-                      <p style={{ marginLeft: 10, marginTop: 15 }}>{item.price}</p>
+                    <div
+                      key={index}
+                      style={{ display: "flex", alignItems: "center" }}
+                    >
+                      <div
+                        style={{
+                          width: 15,
+                          height: 15,
+                          backgroundColor: item.color,
+                        }}
+                      ></div>
+                      <p style={{ marginLeft: 10, marginTop: 15 }}>
+                        {item.price}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -715,17 +795,14 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
               })}
               venue={event.venue_id}
               eventId={event.id}
-              onClick={async () => { await handleShowClickList(index) }}
+              onClick={async () => {
+                await handleShowClickList(index);
+              }}
             />
           ))}
         {selectedShowList && (
           <div>
-            <div>
-              {soldOut && (
-                <h2 class="sold-out-message">Sold Out</h2>
-
-              )}
-            </div>
+            <div>{soldOut && <h2 class="sold-out-message">Sold Out</h2>}</div>
             <Show
               name={selectedShowList.name}
               date={new Date(selectedShowList.date).toLocaleDateString()}
@@ -751,7 +828,7 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   availableList={availableList.slice(
                     0,
                     getLayout(selectedShowList.venue_id, 0) *
-                    getLayout(selectedShowList.venue_id, 1)
+                      getLayout(selectedShowList.venue_id, 1)
                   )}
                   startId={startId}
                 />
@@ -763,16 +840,16 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   ticketPriceList={midTicketPriceList}
                   availableList={availableList.slice(
                     getLayout(selectedShowList.venue_id, 0) *
-                    getLayout(selectedShowList.venue_id, 1),
+                      getLayout(selectedShowList.venue_id, 1),
                     getLayout(selectedShowList.venue_id, 0) *
-                    getLayout(selectedShowList.venue_id, 1) +
-                    getLayout(selectedShowList.venue_id, 2) *
-                    getLayout(selectedShowList.venue_id, 3)
+                      getLayout(selectedShowList.venue_id, 1) +
+                      getLayout(selectedShowList.venue_id, 2) *
+                        getLayout(selectedShowList.venue_id, 3)
                   )}
                   startId={
                     startId +
                     getLayout(selectedShowList.venue_id, 0) *
-                    getLayout(selectedShowList.venue_id, 1)
+                      getLayout(selectedShowList.venue_id, 1)
                   }
                 />
                 <Section
@@ -783,32 +860,49 @@ const CustomerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                   ticketPriceList={rightTicketPriceList}
                   availableList={availableList.slice(
                     getLayout(selectedShowList.venue_id, 0) *
-                    getLayout(selectedShowList.venue_id, 1) +
-                    getLayout(selectedShowList.venue_id, 2) *
-                    getLayout(selectedShowList.venue_id, 3),
+                      getLayout(selectedShowList.venue_id, 1) +
+                      getLayout(selectedShowList.venue_id, 2) *
+                        getLayout(selectedShowList.venue_id, 3),
                     getLayout(selectedShowList.venue_id, 0) *
-                    getLayout(selectedShowList.venue_id, 1) +
-                    getLayout(selectedShowList.venue_id, 2) *
-                    getLayout(selectedShowList.venue_id, 3) +
-                    getLayout(selectedShowList.venue_id, 4) *
-                    getLayout(selectedShowList.venue_id, 5)
+                      getLayout(selectedShowList.venue_id, 1) +
+                      getLayout(selectedShowList.venue_id, 2) *
+                        getLayout(selectedShowList.venue_id, 3) +
+                      getLayout(selectedShowList.venue_id, 4) *
+                        getLayout(selectedShowList.venue_id, 5)
                   )}
                   startId={
                     startId +
                     getLayout(selectedShowList.venue_id, 0) *
-                    getLayout(selectedShowList.venue_id, 1) +
+                      getLayout(selectedShowList.venue_id, 1) +
                     getLayout(selectedShowList.venue_id, 2) *
-                    getLayout(selectedShowList.venue_id, 3)
+                      getLayout(selectedShowList.venue_id, 3)
                   }
                 />
               </div>
               <div style={{ position: "absolute", left: 400, top: -4 }}>
                 <h3>Pricing</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', marginTop: 20 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    marginTop: 20,
+                  }}
+                >
                   {legend.map((item, index) => (
-                    <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
-                      <div style={{ width: 15, height: 15, backgroundColor: item.color }}></div>
-                      <p style={{ marginLeft: 10, marginTop: 15 }}>{item.price}</p>
+                    <div
+                      key={index}
+                      style={{ display: "flex", alignItems: "center" }}
+                    >
+                      <div
+                        style={{
+                          width: 15,
+                          height: 15,
+                          backgroundColor: item.color,
+                        }}
+                      ></div>
+                      <p style={{ marginLeft: 10, marginTop: 15 }}>
+                        {item.price}
+                      </p>
                     </div>
                   ))}
                 </div>
