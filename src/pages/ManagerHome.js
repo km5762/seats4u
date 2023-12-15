@@ -55,8 +55,13 @@ const Section = ({ title, rows, cols, canSelect, ticketPriceList, show, sectionI
     console.log("Selected Seats");
     console.log(selectedSeats);
 
-    let startRow = selectedSeats[0].row - 1;
-    let endRow = selectedSeats[selectedSeats.length - 1].row - 1;
+    let sortedSeats = [...selectedSeats].sort((a, b) => a.row - b.row);
+
+    console.log("Sorted Seats");
+    console.log(sortedSeats);
+
+    let startRow = sortedSeats[0].row - 1;
+    let endRow = sortedSeats[sortedSeats.length - 1].row - 1;
 
     console.log("Start Row");
     console.log(startRow);
@@ -96,6 +101,9 @@ const Section = ({ title, rows, cols, canSelect, ticketPriceList, show, sectionI
 
   const handleSeatClick = (row, col, maxCols) => {
     if (canSelect) {
+
+      setListBlocks(false);
+
       // Check if the seat is already selected
       const isSeatSelected = selectedSeats.some(
         (seat) => seat.row === row && seat.col === col
@@ -133,11 +141,12 @@ const Section = ({ title, rows, cols, canSelect, ticketPriceList, show, sectionI
     }
   };
 
-  const addBlock = () => {
+  const addBlock = async () => {
     if (selectedSeats.length > 0) {
       setBlockedSeats((prevSeats) => [...prevSeats, ...selectedSeats]);
       setBlocks((prevBlocks) => [...prevBlocks, selectedSeats]);
-      createBlock();
+      await createBlock();
+      //await listBlock();
     }
   };
 
@@ -414,8 +423,6 @@ const Section = ({ title, rows, cols, canSelect, ticketPriceList, show, sectionI
                 </div>
               );
             })}
-
-
         </div>
       )}
     </div>
