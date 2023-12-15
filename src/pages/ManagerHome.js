@@ -328,7 +328,7 @@ const Section = ({ title, rows, cols, canSelect, ticketPriceList, show, sectionI
   }
 
   const listBlocksC = () => {
-    listBlock(show, false);
+    //listBlock(show, false);
     setListBlocks(true);
   };
 
