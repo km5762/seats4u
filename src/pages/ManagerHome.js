@@ -89,7 +89,7 @@ const Section = ({ title, rows, cols, canSelect, ticketPriceList, show, sectionI
           ]),
         }
       );
-
+      
       await listBlock(show);
 
       setTicketPrice(null);
@@ -1561,6 +1561,17 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                 <button onClick={deleteBlockM}>Delete current ticket price</button>
                               </div>
                             )}
+                            <div style={{ position: "absolute", left: -120, top: 177 }}>
+                              <h3>Pricing</h3>
+                              <div style={{ display: 'flex', flexDirection: 'column', marginTop: 20 }}>
+                                {legend.map((item, index) => (
+                                  <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+                                    <div style={{ width: 15, height: 15, backgroundColor: item.color }}></div>
+                                    <p style={{ marginLeft: 10, marginTop: 15 }}>{item.price}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
                             <div style={{ display: "flex" }}>
                               <Section
                                 title="Left"
@@ -1596,17 +1607,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
                                 ticketPriceList={rightTicketPriceList}
                               />
                             </div>
-                            <div style={{ position: "absolute", left: 400, top: -4 }}>
-                              <h3>Pricing</h3>
-                              <div style={{ display: 'flex', flexDirection: 'column', marginTop: 20 }}>
-                                {legend.map((item, index) => (
-                                  <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
-                                    <div style={{ width: 15, height: 15, backgroundColor: item.color }}></div>
-                                    <p style={{ marginLeft: 10, marginTop: 15 }}>{item.price}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
+                            
                           </div>
                         </div>
                       )}
