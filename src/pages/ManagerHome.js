@@ -736,10 +736,19 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     setShowCreating(true);
   };
 
+  const [submittedPrice, setSubmittedPrice] = useState(false);
+
   const canActivate = async () => {
     try {
 
       let activation = false;
+
+      if (submittedPrice) {
+        
+        activation = true;
+        console.log("Submitted price")
+        return activation;
+      }
 
       const res = await fetch(
         "https://4r6n1ud949.execute-api.us-east-2.amazonaws.com/listseats",
@@ -1079,7 +1088,7 @@ const ManagerHome = ({ loggedInUser, setLoggedInUser, onLogout }) => {
     });
   }
 
-  const [submittedPrice, setSubmittedPrice] = useState(false);
+ 
   const [leftTicketPriceList, setLeftTicketPriceList] = useState([]);
   const [midTicketPriceList, setMidTicketPriceList] = useState([]);
   const [rightTicketPriceList, setRightTicketPriceList] = useState([]);
