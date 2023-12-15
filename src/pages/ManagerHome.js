@@ -24,7 +24,7 @@ const Seat = ({ row, col, cost, onClick, selected, blocked, selectedAndBlocked }
         : selected && !blocked
           ? "yellow" // Light blue when selected and not blocked
           : blocked && !selected
-            ? `rgb(${randomFloatC(0, 241, cost) + 15}, ${randomFloatC(0, 221, cost * 20) + 35}, ${randomFloatC(0, 201, cost * 40) + 55})` // Colored when blocked and not selected
+            ? "orange" // Colored when blocked and not selected
             : "white", // White when neither selected nor blocked
     }}
     onClick={() => onClick(row, col)}
@@ -437,9 +437,9 @@ const Section = ({ title, rows, cols, canSelect, ticketPriceList, show, sectionI
               return (
                 <div key={index}>
                   <p>Block</p>
+                  <p>Start Row: {startRow}</p>
+                  <p>End Row: {endRow}</p>
                   <p>Block Price: {blockPrice}</p>
-                  <div style={{ width: 15, height: 15, backgroundColor: `rgb(${randomFloatC(0, 241, blockPrice) + 15}, ${randomFloatC(0, 221, blockPrice * 20) + 35}, ${randomFloatC(0, 201, blockPrice * 40) + 55})` }}>
-                  </div>
                   <p>Available Seats: {seatsAvailable}</p>
                   <p>Sold Seats: {seatsSold}</p>
                 </div>
